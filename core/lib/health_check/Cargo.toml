@@ -1,0 +1,12 @@
+[package]
+name = "micro_health_check"
+version = "0.1.0"
+edition = "2021"
+authors = []
+homepage = ""
+repository = "https://github.com/zkamoeba/micro-2"
+license = "Apache-2.0"
+keywords = ["blockchain", "micro"]
+categories = ["cryptography"]
+
+[dependencies]

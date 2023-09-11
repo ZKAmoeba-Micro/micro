@@ -1,0 +1,24 @@
+[package]
+name = "micro_object_store"
+version = "1.0.0"
+edition = "2021"
+authors = []
+homepage = ""
+repository = "https://github.com/ZKAmoeba-Micro/micro"
+license = "Apache-2.0"
+keywords = ["blockchain", "micro"]
+categories = ["cryptography"]
+
+[dependencies]
+micro_config = { path = "../../lib/config", version = "1.0" }
+micro_types = { path = "../types", version = "1.0" }
+
+bincode = "1"
+http = "0.2.9"
+metrics = "0.20"
+tokio = { version = "1.21.2", features = ["full"] }
+vlog = { path = "../vlog", version = "1.0" }
+reqwest = { version = "0.11.18", features = ["blocking"] }
+
+[dev-dependencies]
+tempdir = "0.3.7"

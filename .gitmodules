@@ -1,0 +1,12 @@
+[submodule "sdk/binaryen"]
+	path = sdk/binaryen
+	url = https://github.com/WebAssembly/binaryen.git
+[submodule "etc/openzeppelin-contracts"]
+	path = etc/openzeppelin-contracts
+	url = https://github.com/ZKAmoeba-Micro/micro-openzeppelin.git
+[submodule "contracts"]
+	path = contracts
+	url = https://github.com/ZKAmoeba-Micro/micro-contracts.git
+[submodule "etc/system-contracts"]
+	path = etc/system-contracts
+	url = https://github.com/ZKAmoeba-Micro/micro-system-contracts.git

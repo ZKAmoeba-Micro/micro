@@ -1,0 +1,16 @@
+# Sensitive values which MUST be different for production
+# Values provided here are valid for the development infrastructure only.
+
+database_url="postgres://postgres@localhost/micro_local"
+test_database_url="postgres://postgres@localhost/micro_local_test"
+
+[eth_sender.sender]
+# Set in env file for development, production, staging and testnet.
+operator_private_key="0x848181ca4df71f9fe087f3ce10a503bb8d700775dfe8e948a07d40889a3e4200"
+# Address to be used for micro account managing the interaction with a contract on Ethereum.
+# Derived from the `OPERATOR_PRIVATE_KEY`.
+operator_commit_eth_addr="0x26937d59db4463254c930D5f31353F14AA89a0F7"
+
+[misc]
+# Private key for the fee seller account
+fee_account_private_key="0x848181ca4df71f9fe087f3ce10a503bb8d700775dfe8e948a07d40889a3e4200"

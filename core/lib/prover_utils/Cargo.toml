@@ -1,0 +1,22 @@
+[package]
+name = "micro_prover_utils"
+version = "1.0.0"
+edition = "2018"
+authors = []
+homepage = ""
+repository = "https://github.com/ZKAmoeba-Micro/micro"
+license = "Apache-2.0"
+keywords = ["blockchain", "micro"]
+categories = ["cryptography"]
+
+[dependencies]
+vlog = { path = "../../lib/vlog", version = "1.0" }
+micro_config = { path = "../../lib/config", version = "1.0" }
+micro_utils = { path = "../../lib/utils", version = "1.0" }
+
+metrics = "0.20"
+reqwest = { version = "0.11", features = ["blocking"] }
+regex = "1.7.2"
+tokio = "1.27.0"
+futures = { version = "0.3", features = ["compat"] }
+ctrlc = { version = "3.1", features = ["termination"] }

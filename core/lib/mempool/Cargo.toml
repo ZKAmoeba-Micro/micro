@@ -1,0 +1,15 @@
+[package]
+name = "micro_mempool"
+version = "1.0.0"
+edition = "2018"
+authors = []
+homepage = ""
+repository = "https://github.com/ZKAmoeba-Micro/micro"
+license = "Apache-2.0"
+keywords = ["blockchain", "micro"]
+categories = ["cryptography"]
+
+[dependencies]
+micro_types = { path = "../types", version = "1.0" }
+vlog = { path = "../../lib/vlog", version = "1.0" }
+metrics = "0.20"

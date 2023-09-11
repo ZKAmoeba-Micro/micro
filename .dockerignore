@@ -1,0 +1,43 @@
+*
+!docker/prover/prover-entry.sh
+!docker/zk/entrypoint.sh
+!docker/local-node/entrypoint.sh
+!docker/contract-verifier/install-all-solc.sh
+!docker/external-node/entrypoint.sh
+!etc/test_config
+!etc/env/dev.env.example
+!etc/env/docker.env
+!etc/env/base
+!etc/env/ext-node.env
+!etc/env/.init.env
+!etc/tokens
+!etc/ERC20
+!artifacts
+!keys
+keys/setup
+!bin/
+!db/
+!backups/
+!core/
+!yarn.lock
+!package.json
+!Cargo.lock
+!Cargo.toml
+!contracts/
+# It's required to remove .git from contracts,
+# otherwise yarn tries to use .git parent directory that
+# doesn't exist.
+contracts/.git
+!infrastructure/local-setup-preparation
+!infrastructure/zk
+!sdk/micro-rs
+!sdk/micro-web3
+!etc/system-contracts/bootloader/build/artifacts
+!etc/system-contracts/artifacts-zk
+!etc/system-contracts/contracts/artifacts/ 
+!etc/system-contracts/contracts/precompiles/artifacts/ 
+
+
+!cargo
+!bellman-cuda
+!core/bin/verification_key_generator_and_server/data/

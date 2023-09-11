@@ -1,0 +1,36 @@
+# Environment configuration for the Rust code
+# We don't provide the group name like `[rust]` here, because we don't want
+# these variables to be prefixed during the compiling. 
+
+# `RUST_LOG` environmnet variable for `env_logger`
+# Here we use TOML multiline strings: newlines will be trimmed.
+RUST_LOG="""\
+micro_core=debug,\
+micro_server=debug,\
+micro_prover=debug,\
+micro_contract_verifier=debug,\
+micro_dal=info,\
+micro_eth_client=info,\
+micro_storage=info,\
+micro_db_manager=info,\
+micro_merkle_tree=info,\
+micro_state=debug,\
+micro_utils=debug,\
+micro_queued_job_processor=info,\
+micro_types=info,\
+micro_mempool=debug,\
+loadnext=debug,\
+vm=info,\
+block_sizes_test=info,\
+micro_verification_key_generator_and_server=info,\
+micro_object_store=info,\
+setup_key_generator_and_server=info,\
+micro_circuit_synthesizer=info,\
+en_playground=info,\
+micro_external_node=info,\
+cross_nodes_checker=debug,\
+"""
+
+# `RUST_BACKTRACE` variable
+RUST_BACKTRACE="full"
+RUST_LIB_BACKTRACE="1"

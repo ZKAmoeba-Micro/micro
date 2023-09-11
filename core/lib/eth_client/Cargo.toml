@@ -1,0 +1,29 @@
+[package]
+name = "micro_eth_client"
+version = "1.0.0"
+edition = "2018"
+authors = []
+homepage = ""
+repository = "https://github.com/ZKAmoeba-Micro/micro"
+license = "Apache-2.0"
+keywords = ["blockchain", "micro"]
+categories = ["cryptography"]
+
+[dependencies]
+micro_types = { path = "../types", version = "1.0" }
+micro_eth_signer = { path = "../eth_signer", version = "1.0" }
+micro_config = { path = "../config", version = "1.0" }
+micro_contracts = { path = "../contracts", version = "1.0" }
+vlog = { path = "../../lib/vlog", version = "1.0" }
+jsonrpc-core = "18"
+
+serde = "1.0.90"
+parity-crypto = { version = "0.9", features = ["publickey"] }
+hex = "0.4"
+
+anyhow = "1.0"
+metrics = "0.20"
+thiserror = "1"
+tokio = { version = "1", features = ["full"] }
+async-trait = "0.1"
+sha3 = "0.10.6"

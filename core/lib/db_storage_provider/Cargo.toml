@@ -1,0 +1,14 @@
+[package]
+name = "micro_db_storage_provider"
+version = "1.0.0"
+edition = "2018"
+authors = []
+homepage = ""
+repository = "https://github.com/zkamoeba/micro"
+license = "Apache-2.0"
+keywords = ["blockchain", "micro"]
+categories = ["cryptography"]
+
+[dependencies]
+micro_types = { path = "../types", version = "1.0" }
+micro_dal = { path = "../dal", version = "1.0" }
