@@ -786,7 +786,7 @@ dependencies = [
 [[package]]
 name = "bellman_ce"
 version = "0.3.2"
-source = "git+https://github.com/ZKAmoeba-Micro/bellman?branch=dev#160d872cb6eca46cfe6428d0be985c161cb235e5"
+source = "git+https://github.com/ZKAmoeba-Micro/bellman?branch=dev#22fbe54fb8e43abd1f10c1e273a1ad6e7060289a"
 dependencies = [
  "arrayvec 0.7.3",
  "bit-vec",
@@ -915,7 +915,7 @@ dependencies = [
 [[package]]
 name = "blake2s_const"
 version = "0.6.0"
-source = "git+https://github.com/ZKAmoeba-Micro/bellman?branch=dev#160d872cb6eca46cfe6428d0be985c161cb235e5"
+source = "git+https://github.com/ZKAmoeba-Micro/bellman?branch=dev#22fbe54fb8e43abd1f10c1e273a1ad6e7060289a"
 dependencies = [
  "arrayref",
  "arrayvec 0.5.2",
@@ -1218,7 +1218,7 @@ dependencies = [
 [[package]]
 name = "circuit_testing"
 version = "0.1.0"
-source = "git+https://github.com/ZKAmoeba-Micro/micro-circuit_testing.git?branch=main#0d602a4a2b80ada814507f77a0944ccabe21e5c5"
+source = "git+https://github.com/ZKAmoeba-Micro/micro-circuit_testing.git?branch=main#1671bb4eb09da4ccc5559baa77e0eacf476b56a4"
 dependencies = [
  "bellman_ce",
 ]
@@ -1353,7 +1353,7 @@ dependencies = [
 [[package]]
 name = "codegen"
 version = "0.1.0"
-source = "git+https://github.com/ZKAmoeba-Micro/solidity_plonk_verifier.git?branch=dev#921a3e7a5177ac62ea0673526cb394a876dfc0ff"
+source = "git+https://github.com/ZKAmoeba-Micro/solidity_plonk_verifier.git?branch=dev#4263a27f91412315d7f378f3c13cbfa3c60fd963"
 dependencies = [
  "ethereum-types",
  "franklin-crypto",
@@ -1790,7 +1790,7 @@ dependencies = [
 [[package]]
 name = "cs_derive"
 version = "0.1.0"
-source = "git+https://github.com/ZKAmoeba-Micro/micro-sync_vm.git?branch=main#a5fe22aa46dbf78f2c930cfe9e3cce4b91bca59d"
+source = "git+https://github.com/ZKAmoeba-Micro/micro-sync_vm.git?branch=main#d37c203503e0ea82ecc7c7987a26b93da48be71c"
 dependencies = [
  "proc-macro-error",
  "proc-macro2 1.0.60",
@@ -2345,7 +2345,7 @@ dependencies = [
 [[package]]
 name = "franklin-crypto"
 version = "0.0.5"
-source = "git+https://github.com/ZKAmoeba-Micro/franklin-crypto?branch=dev#b940fe17289d70b422be3c7bf58e666339280bf5"
+source = "git+https://github.com/ZKAmoeba-Micro/franklin-crypto?branch=dev#743d80f22088d11e4f3191ce124086b0ae8c7c12"
 dependencies = [
  "arr_macro",
  "bellman_ce",
@@ -3196,7 +3196,7 @@ dependencies = [
 [[package]]
 name = "jsonrpc-client-transports"
 version = "18.0.0"
-source = "git+https://github.com/ZKAmoeba-Micro/jsonrpc.git?branch=main#b638db832c0b31531ba775e2f11889a110f6c2c4"
+source = "git+https://github.com/ZKAmoeba-Micro/jsonrpc.git?branch=main#87f2003bd12311ac8d457f05f2a972c62f2f7d48"
 dependencies = [
  "derive_more",
  "futures 0.3.28",
@@ -3225,7 +3225,7 @@ dependencies = [
 [[package]]
 name = "jsonrpc-core"
 version = "18.0.0"
-source = "git+https://github.com/ZKAmoeba-Micro/jsonrpc.git?branch=main#b638db832c0b31531ba775e2f11889a110f6c2c4"
+source = "git+https://github.com/ZKAmoeba-Micro/jsonrpc.git?branch=main#87f2003bd12311ac8d457f05f2a972c62f2f7d48"
 dependencies = [
  "futures 0.3.28",
  "futures-executor",
@@ -3239,7 +3239,7 @@ dependencies = [
 [[package]]
 name = "jsonrpc-core-client"
 version = "18.0.0"
-source = "git+https://github.com/ZKAmoeba-Micro/jsonrpc.git?branch=main#b638db832c0b31531ba775e2f11889a110f6c2c4"
+source = "git+https://github.com/ZKAmoeba-Micro/jsonrpc.git?branch=main#87f2003bd12311ac8d457f05f2a972c62f2f7d48"
 dependencies = [
  "futures 0.3.28",
  "jsonrpc-client-transports",
@@ -3248,7 +3248,7 @@ dependencies = [
 [[package]]
 name = "jsonrpc-derive"
 version = "18.0.0"
-source = "git+https://github.com/ZKAmoeba-Micro/jsonrpc.git?branch=main#b638db832c0b31531ba775e2f11889a110f6c2c4"
+source = "git+https://github.com/ZKAmoeba-Micro/jsonrpc.git?branch=main#87f2003bd12311ac8d457f05f2a972c62f2f7d48"
 dependencies = [
  "proc-macro-crate 0.1.5",
  "proc-macro2 1.0.60",
@@ -3259,7 +3259,7 @@ dependencies = [
 [[package]]
 name = "jsonrpc-http-server"
 version = "18.0.0"
-source = "git+https://github.com/ZKAmoeba-Micro/jsonrpc.git?branch=main#b638db832c0b31531ba775e2f11889a110f6c2c4"
+source = "git+https://github.com/ZKAmoeba-Micro/jsonrpc.git?branch=main#87f2003bd12311ac8d457f05f2a972c62f2f7d48"
 dependencies = [
  "futures 0.3.28",
  "hyper",
@@ -3274,7 +3274,7 @@ dependencies = [
 [[package]]
 name = "jsonrpc-pubsub"
 version = "18.0.0"
-source = "git+https://github.com/ZKAmoeba-Micro/jsonrpc.git?branch=main#b638db832c0b31531ba775e2f11889a110f6c2c4"
+source = "git+https://github.com/ZKAmoeba-Micro/jsonrpc.git?branch=main#87f2003bd12311ac8d457f05f2a972c62f2f7d48"
 dependencies = [
  "futures 0.3.28",
  "jsonrpc-core 18.0.0 (git+https://github.com/ZKAmoeba-Micro/jsonrpc.git?branch=main)",
@@ -3288,7 +3288,7 @@ dependencies = [
 [[package]]
 name = "jsonrpc-server-utils"
 version = "18.0.0"
-source = "git+https://github.com/ZKAmoeba-Micro/jsonrpc.git?branch=main#b638db832c0b31531ba775e2f11889a110f6c2c4"
+source = "git+https://github.com/ZKAmoeba-Micro/jsonrpc.git?branch=main#87f2003bd12311ac8d457f05f2a972c62f2f7d48"
 dependencies = [
  "bytes 1.4.0",
  "futures 0.3.28",
@@ -3305,7 +3305,7 @@ dependencies = [
 [[package]]
 name = "jsonrpc-ws-server"
 version = "18.0.0"
-source = "git+https://github.com/ZKAmoeba-Micro/jsonrpc.git?branch=main#b638db832c0b31531ba775e2f11889a110f6c2c4"
+source = "git+https://github.com/ZKAmoeba-Micro/jsonrpc.git?branch=main#87f2003bd12311ac8d457f05f2a972c62f2f7d48"
 dependencies = [
  "futures 0.3.28",
  "jsonrpc-core 18.0.0 (git+https://github.com/ZKAmoeba-Micro/jsonrpc.git?branch=main)",
@@ -5939,7 +5939,7 @@ dependencies = [
 [[package]]
 name = "rescue_poseidon"
 version = "0.4.1"
-source = "git+https://github.com/ZKAmoeba-Micro/rescue-poseidon#4217601e1c4ae07b4a7cc4a9dc5506822fcf5bed"
+source = "git+https://github.com/ZKAmoeba-Micro/rescue-poseidon#cd6c33e909400baa7ee111369fb009e4e40fb26b"
 dependencies = [
  "addchain",
  "arrayvec 0.7.3",
@@ -7065,7 +7065,7 @@ dependencies = [
 [[package]]
 name = "sync_vm"
 version = "1.3.2"
-source = "git+https://github.com/ZKAmoeba-Micro/micro-sync_vm.git?branch=main#a5fe22aa46dbf78f2c930cfe9e3cce4b91bca59d"
+source = "git+https://github.com/ZKAmoeba-Micro/micro-sync_vm.git?branch=main#d37c203503e0ea82ecc7c7987a26b93da48be71c"
 dependencies = [
  "arrayvec 0.7.3",
  "cs_derive",
@@ -8275,7 +8275,7 @@ checksum = "2a0956f1ba7c7909bfb66c2e9e4124ab6f6482560f6628b5aaeba39207c9aad9"
 [[package]]
 name = "zk_evm"
 version = "1.3.2"
-source = "git+https://github.com/ZKAmoeba-Micro/micro-zk_evm.git?branch=main#f9f94d764fbf5ba9fc2037edadaf03bbc40e3045"
+source = "git+https://github.com/ZKAmoeba-Micro/micro-zk_evm.git?branch=main#17d55005bfa7a03f315cb267c9d713848b0f9c00"
 dependencies = [
  "lazy_static",
  "num 0.4.0",
@@ -8288,7 +8288,7 @@ dependencies = [
 [[package]]
 name = "zkevm-assembly"
 version = "1.3.2"
-source = "git+https://github.com/ZKAmoeba-Micro/micro-zkEVM-assembly.git?branch=main#2875418133102d9e879b7bc77f01c780289f320c"
+source = "git+https://github.com/ZKAmoeba-Micro/micro-zkEVM-assembly.git?branch=main#0a3c500c9eeb800221d2e501fd3c9079baf16828"
 dependencies = [
  "env_logger",
  "hex",
@@ -8308,7 +8308,7 @@ dependencies = [
 [[package]]
 name = "zkevm_opcode_defs"
 version = "1.3.2"
-source = "git+https://github.com/ZKAmoeba-Micro/micro-zkevm_opcode_defs.git?branch=main#f3dc1e1a256e9557d57dce59c699dd0f76db923c"
+source = "git+https://github.com/ZKAmoeba-Micro/micro-zkevm_opcode_defs.git?branch=main#235e8f1210f4639f2f6777a46b292550d9c07baa"
 dependencies = [
  "bitflags 2.3.2",
  "blake2 0.10.6",
@@ -8322,7 +8322,7 @@ dependencies = [
 [[package]]
 name = "zkevm_test_harness"
 version = "1.3.2"
-source = "git+https://github.com/ZKAmoeba-Micro/micro-zkevm_test_harness.git?branch=main#355d25510d15767636d169b626e280db42e28e2b"
+source = "git+https://github.com/ZKAmoeba-Micro/micro-zkevm_test_harness.git?branch=main#0cf05b9ee5c656f464769afeb3dcd33f00daff33"
 dependencies = [
  "bincode",
  "circuit_testing",
