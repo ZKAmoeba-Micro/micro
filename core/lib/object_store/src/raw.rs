@@ -1,5 +1,6 @@
 use std::{error, fmt, sync::Arc};
 
+use crate::ali_oss::AliyunOssStorage;
 use crate::{file::FileBackedObjectStore, http::HttpBackedObjectStore, mock::MockStore};
 use micro_config::configs::object_store::ObjectStoreMode;
 use micro_config::ObjectStoreConfig;
@@ -173,6 +174,14 @@ impl ObjectStoreFactory {
                 Box::new(HttpBackedObjectStore::new(
                     config.file_backed_base_path.clone(),
                     config.bucket_base_url.clone(),
+                ))
+            }
+            ObjectStoreMode::AliOssBacked => {
+                vlog::info!("Initialized AliOssBacked Object store");
+                Box::new(AliyunOssStorage::new(
+                    config.oss_credential_file_path.clone(),
+                    config.bucket_base_url.clone(),
+                    config.max_retries,
                 ))
             }
         }

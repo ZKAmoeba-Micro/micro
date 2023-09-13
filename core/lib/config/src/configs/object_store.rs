@@ -5,6 +5,7 @@ use serde::Deserialize;
 pub enum ObjectStoreMode {
     FileBacked,
     HttpBacked,
+    AliOssBacked,
 }
 
 /// Configuration for the object store
@@ -13,7 +14,7 @@ pub struct ObjectStoreConfig {
     pub bucket_base_url: String,
     pub mode: ObjectStoreMode,
     pub file_backed_base_path: String,
-    pub gcs_credential_file_path: String,
+    pub oss_credential_file_path: String,
     pub max_retries: u16,
 }
 
@@ -33,7 +34,7 @@ mod tests {
             bucket_base_url: "/base/url".to_string(),
             mode: ObjectStoreMode::FileBacked,
             file_backed_base_path: "artifacts".to_string(),
-            gcs_credential_file_path: "/path/to/credentials.json".to_string(),
+            oss_credential_file_path: "/path/to/credentials.json".to_string(),
             max_retries: 5,
         }
     }

@@ -158,8 +158,6 @@ impl MempoolConfig {
 
 #[cfg(test)]
 mod tests {
-    use std::string;
-
     use super::*;
     use crate::configs::test_utils::{addr, set_env};
 
