@@ -11,7 +11,7 @@ pub static ETHEREUM_ADDRESS: Address = Address::zero();
 pub const GUARANTEED_PUBDATA_PER_L1_BATCH: u64 = 4000;
 
 /// The maximum number of pubdata per L1 batch.
-pub const MAX_PUBDATA_PER_L1_BATCH: u64 = 70000;
+pub const MAX_PUBDATA_PER_L1_BATCH: u64 = 60000;
 
 pub const MAX_L2_TX_GAS_LIMIT: u64 = 80000000;
 
