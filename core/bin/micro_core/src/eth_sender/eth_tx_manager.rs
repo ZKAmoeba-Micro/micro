@@ -202,8 +202,39 @@ where
         );
 
         let counts = storage.blocks_dal().get_block_counts_for_eth_tx_id(tx.id);
+
+        let l2_gas_price = self.state.clone().tx_sender.gas_price();
+        let one_fee = l2_gas_price * DEPLOY_L2_CONTRACT_TX_GAS_LIMIT;
+        let l2_fee = U256::from(counts) * U256::from(one_fee);
+        let value = if l2_fee > U256::from(0u64) {
+            l2_fee
+        } else {
+            U256::from(10000000000000000u64)
+        };
+
+        vlog::info!(
+            "sending new tx {}, base_fee_per_gas {}, priority_fee_per_gas: {}, value: {}",
+            tx.id,
+            base_fee_per_gas,
+            priority_fee_per_gas,
+            value,
+        );
+
+        let gas = self
+            .ethereum_gateway
+            .estimate_gas(
+                self.ethereum_gateway.sender_account(),
+                tx.contract_address,
+                value,
+                tx.raw_tx.clone(),
+                "eth_tx_manager",
+            )
+            .await?;
+
+        vlog::info!("sending new tx {}, gas {}", tx.id, gas);
+
         let signed_tx = self
-            .sign_tx(tx, base_fee_per_gas, priority_fee_per_gas, counts)
+            .sign_tx(tx, base_fee_per_gas, priority_fee_per_gas, gas, value)
             .await;
 
         if let Some(tx_history_id) = storage.eth_sender_dal().insert_tx_history(
@@ -360,36 +391,19 @@ where
         tx: &EthTx,
         base_fee_per_gas: u64,
         priority_fee_per_gas: u64,
-        counts: u32,
+        gas: U256,
+        value: U256,
     ) -> SignedCallResult {
-        let l2_gas_price = self.state.clone().tx_sender.gas_price();
-        let one_fee = l2_gas_price * DEPLOY_L2_CONTRACT_TX_GAS_LIMIT;
-        let l2_fee = U256::from(counts) * U256::from(one_fee);
-        let res_fee = if l2_fee > U256::from(0u64) {
-            l2_fee
-        } else {
-            U256::from(10000000000000000u64)
-        };
-        vlog::info!(
-            "sign_tx2 when sending new signed tx for tx {}, res_fee {},l2_fee:{},one_fee:{},l2_gas_price:{},counts:{}",
-            tx.id,
-            res_fee,
-            l2_fee,
-            one_fee,
-            l2_gas_price,
-            counts
-        );
-
         self.ethereum_gateway
             .sign_prepared_tx_for_addr(
                 tx.raw_tx.clone(),
                 tx.contract_address,
                 Options::with(|opt| {
-                    opt.gas = Some(self.config.max_aggregated_tx_gas.into());
+                    opt.gas = Some(gas.into());
                     opt.max_fee_per_gas = Some(U256::from(base_fee_per_gas + priority_fee_per_gas));
                     opt.max_priority_fee_per_gas = Some(U256::from(priority_fee_per_gas));
                     opt.nonce = Some(tx.nonce.into());
-                    opt.value = Some(res_fee);
+                    opt.value = Some(value);
                 }),
                 "eth_tx_manager",
             )
@@ -593,7 +607,10 @@ where
                 .get_new_eth_txs(number_of_available_slots_for_eth_txs);
 
             for tx in new_eth_tx {
-                let _ = self.send_eth_tx(storage, &tx, 0, current_block).await;
+                let res = self.send_eth_tx(storage, &tx, 0, current_block).await;
+                if let Err(e) = res {
+                    vlog::warn!("send new eth tx failed {}", e);
+                }
             }
         }
     }
@@ -628,9 +645,12 @@ where
             // We don't want to return early in case resend does not succeed -
             // the error is logged anyway, but early returns will prevent
             // sending new operations.
-            let _ = self
+            let res = self
                 .send_eth_tx(storage, &tx, time_in_mempool, current_block)
                 .await;
+            if let Err(e) = res {
+                vlog::warn!("send eth tx failed {}", e);
+            }
         }
 
         Ok(current_block)

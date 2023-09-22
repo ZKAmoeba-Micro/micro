@@ -127,6 +127,15 @@ pub trait EthInterface {
 
     /// Returns the logs for the specified filter.
     async fn logs(&self, filter: Filter, component: &'static str) -> Result<Vec<Log>, Error>;
+
+    async fn estimate_gas(
+        &self,
+        from: Address,
+        to: Address,
+        value: U256,
+        data: Vec<u8>,
+        component: &'static str,
+    ) -> Result<U256, Error>;
 }
 
 /// An extension of `EthInterface` trait, which is used to perform queries that are bound to

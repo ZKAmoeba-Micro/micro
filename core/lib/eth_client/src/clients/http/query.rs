@@ -12,7 +12,7 @@ use micro_types::web3::{
     ethabi,
     transports::Http,
     types::{
-        Address, BlockId, BlockNumber, Bytes, Filter, Log, Transaction, TransactionId,
+        Address, BlockId, BlockNumber, Bytes, CallRequest, Filter, Log, Transaction, TransactionId,
         TransactionReceipt, H256, U256, U64,
     },
     Web3,
@@ -286,5 +286,28 @@ impl EthInterface for QueryClient {
         let logs = self.web3.eth().logs(filter).await?;
         metrics::histogram!("eth_client.direct.logs", start.elapsed());
         Ok(logs)
+    }
+
+    async fn estimate_gas(
+        &self,
+        from: Address,
+        to: Address,
+        value: U256,
+        data: Vec<u8>,
+        component: &'static str,
+    ) -> Result<U256, Error> {
+        metrics::counter!("server.ethereum_gateway.call", 1, "component" => component, "method" => "estimate_gas");
+
+        let req = CallRequest::builder()
+            .from(from)
+            .to(to)
+            .value(value)
+            .data(Bytes(data))
+            .build();
+
+        let start = Instant::now();
+        let gas = self.web3.eth().estimate_gas(req, None).await?;
+        metrics::histogram!("eth_client.direct.estimate_gas", start.elapsed());
+        Ok(gas)
     }
 }

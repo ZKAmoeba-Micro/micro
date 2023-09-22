@@ -208,6 +208,19 @@ impl<S: EthereumSigner> EthInterface for SigningClient<S> {
     async fn logs(&self, filter: Filter, component: &'static str) -> Result<Vec<Log>, Error> {
         self.query_client.logs(filter, component).await
     }
+
+    async fn estimate_gas(
+        &self,
+        from: Address,
+        to: Address,
+        value: U256,
+        data: Vec<u8>,
+        component: &'static str,
+    ) -> Result<U256, Error> {
+        self.query_client
+            .estimate_gas(from, to, value, data, component)
+            .await
+    }
 }
 
 #[async_trait]

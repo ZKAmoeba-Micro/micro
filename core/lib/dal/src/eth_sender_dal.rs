@@ -449,20 +449,18 @@ impl EthSenderDal<'_, '_> {
             .unwrap();
         })
     }
+
     pub fn get_latest_proof_time(&mut self) -> i64 {
         async_std::task::block_on(async {
             let result= sqlx::query!(
                 r#"SELECT updated_at as "updated_at?"  from eth_txs WHERE confirmed_eth_tx_history_id IS NOT NULL and tx_type = 'PublishProofBlocksOnchain'  ORDER BY id DESC limit 1"#
             )
-            .fetch_one(self.storage.conn())
-            .await;
-            match result {
-                Ok(value) => value.updated_at.unwrap().timestamp(),
-                Err(error) => {
-                    println!("Error: {}", error);
-                    0
-                }
-            }
+            .fetch_optional(self.storage.conn())
+            .await
+            .unwrap()
+            .map(|record| record.updated_at.unwrap().timestamp())
+            .unwrap_or(0);
+            result
         })
     }
 }

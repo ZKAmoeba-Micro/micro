@@ -55,7 +55,7 @@ max_base_fee_samples = 2_000
 # 2. base_fee_median * A * B ^ time_in_mempool
 # Currently the second is used.
 # To confirm, see core/bin/micro_core/src/eth_sender/gas_adjuster/mod.rs
-pricing_formula_parameter_a = 1.5
+pricing_formula_parameter_a = 5
 pricing_formula_parameter_b = 1.0005
 internal_l1_pricing_multiplier = 0.8
 # Node polling period in seconds.
