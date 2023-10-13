@@ -4,25 +4,27 @@ import dotenv from 'dotenv';
 import * as utils from './utils';
 import * as config from './config';
 
+export const getAvailableEnvsFromFiles = () => {
+    const envs = new Set();
+
+    fs.readdirSync(`etc/env`).forEach((file) => {
+        if (!file.startsWith('.') && (file.endsWith('.env') || file.endsWith('.toml'))) {
+            envs.add(file.replace(/\..*$/, ''));
+        }
+    });
+    return envs;
+};
 export function get(print: boolean = false) {
     const current = `etc/env/.current`;
     const inCurrent = fs.existsSync(current) && fs.readFileSync(current).toString().trim();
+
     const currentEnv = (process.env.MICRO_ENV =
         process.env.MICRO_ENV || inCurrent || (process.env.IN_DOCKER ? 'docker' : 'dev'));
 
+    const envs = getAvailableEnvsFromFiles();
+
     if (print) {
-        const envs = new Set(['dev', currentEnv]);
-        if (inCurrent) {
-            envs.add(inCurrent);
-        }
-
-        fs.readdirSync(`etc/env`).forEach((file) => {
-            if (!file.startsWith('.') && (file.endsWith('.env') || file.endsWith('.toml'))) {
-                envs.add(file.replace(/\..*$/, ''));
-            }
-        });
-
-        envs.forEach((env) => {
+        [...envs].sort().forEach((env) => {
             if (env === currentEnv) {
                 console.log(`* ${env}`);
             } else {
@@ -55,7 +57,7 @@ export function set(env: string, print: boolean = false) {
     const envFile = (process.env.ENV_FILE = `etc/env/${env}.env`);
     if (!fs.existsSync(envFile)) {
         // No .env file found - we should compile it!
-        config.compileConfig();
+        config.compileConfig(env);
     }
     reload();
     get(print);
@@ -67,6 +69,16 @@ function loadInit() {
         const initEnv = dotenv.parse(fs.readFileSync('etc/env/.init.env'));
         for (const envVar in initEnv) {
             process.env[envVar] = initEnv[envVar];
+        }
+    }
+}
+
+// Unset env variables loaded from `.init.env` file
+export function unloadInit() {
+    if (fs.existsSync('etc/env/.init.env')) {
+        const initEnv = dotenv.parse(fs.readFileSync('etc/env/.init.env'));
+        for (const envVar in initEnv) {
+            delete process.env[envVar];
         }
     }
 }
@@ -115,6 +127,20 @@ export function modify(variable: string, assignedVariable: string) {
     }
 
     reload();
+}
+
+// merges .init.env with current env file so all configs are in the same place
+export function mergeInitToEnv() {
+    const env = dotenv.parse(fs.readFileSync(process.env.ENV_FILE!));
+    const initEnv = dotenv.parse(fs.readFileSync('etc/env/.init.env'));
+    for (const initVar in initEnv) {
+        env[initVar] = initEnv[initVar];
+    }
+    let output = '';
+    for (const envVar in env) {
+        output += `${envVar}=${env[envVar]}\n`;
+    }
+    fs.writeFileSync(process.env.ENV_FILE!, output);
 }
 
 export const command = new Command('env')

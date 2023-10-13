@@ -1,0 +1,33 @@
+[package]
+name = "vm_virtual_blocks"
+version = "0.1.0"
+edition = "2018"
+authors = []
+homepage = "https://www.zkamoeba.com/"
+repository = "https://github.com/ZKAmoeba-Micro/micro-era"
+license = "MIT OR Apache-2.0"
+keywords = ["blockchain", "micro"]
+categories = ["cryptography"]
+
+[dependencies]
+vise = { git = "https://github.com/ZKAmoeba-Micro/vise.git", version = "0.1.0", rev = "9d097ab747b037b6e62504df1db5b975425b6bdd" }
+zk_evm = { git = "https://github.com/ZKAmoeba-Micro/micro-zk_evm.git", branch = "v1.3.3" }
+micro_config = { path = "../../lib/config" }
+micro_types = { path = "../../lib/types" }
+micro_utils = { path = "../../lib/utils" }
+micro_state = { path = "../../lib/state" }
+micro_contracts = { path = "../../lib/contracts" }
+
+anyhow = "1.0"
+hex = "0.4"
+itertools = "0.10"
+once_cell = "1.7"
+thiserror = "1.0"
+tracing = "0.1"
+
+[dev-dependencies]
+tokio = { version = "1", features = ["time"] }
+micro_test_account = { path = "../../lib/test_account" }
+ethabi = "18.0.0"
+micro_eth_signer = { path = "../../lib/eth_signer" }
+

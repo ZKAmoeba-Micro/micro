@@ -21,13 +21,13 @@ We provide support for five different types of transactions.
 
 Here's a simplified table of the transaction types:
 
-| Type id | Transaction type                                           | Features                                                                                           | Use cases                                                                            | % of transactions (mainnet/testnet) |
-| ------- | ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ | ----------------------------------- |
-| 0x0     | 'Legacy'                                                   | Only includes `gas price`                                                                          | These are traditional Ethereum transactions.                                         | 60% / 82%                           |
-| 0x1     | EIP-2930                                                   | Contains a list of storage keys/addresses the transaction will access                              | At present, this type of transaction is not enabled.                                 |
-| 0x2     | EIP-1559                                                   | Includes `max_priority_fee_per_gas`, `max_gas_price`                                               | These are Ethereum transactions that provide more control over the gas fee.          | 35% / 12%                           |
-| 0x71    | EIP-712 (specific to micro)                                | Similar to EIP-1559, but also adds `max_gas_per_pubdata`, custom signatures, and Paymaster support | This is used by those who are using micro specific Software Development Kits (SDKs). | 1% / 2%                             |
-| 0xFF    | L1 transactions also known as priority transactions `L1Tx` | Originating from L1, these have more custom fields like 'refund' addresses etc                     | Mainly used to transfer funds/data between L1 & L2 layer.                            | 4% / 3%                             |
+| Type id | Transaction type                                           | Features                                                                                           | Use cases                                                                             | % of transactions (mainnet/testnet) |
+| ------- | ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- | ----------------------------------- |
+| 0x0     | 'Legacy'                                                   | Only includes `gas price`                                                                          | These are traditional Ethereum transactions.                                          | 60% / 82%                           |
+| 0x1     | EIP-2930                                                   | Contains a list of storage keys/addresses the transaction will access                              | At present, this type of transaction is not enabled.                                  |
+| 0x2     | EIP-1559                                                   | Includes `max_priority_fee_per_gas`, `max_gas_price`                                               | These are Ethereum transactions that provide more control over the gas fee.           | 35% / 12%                           |
+| 0x71    | EIP-712 (specific to micro)                               | Similar to EIP-1559, but also adds `max_gas_per_pubdata`, custom signatures, and Paymaster support | This is used by those who are using micro specific Software Development Kits (SDKs). | 1% / 2%                             |
+| 0xFF    | L1 transactions also known as priority transactions `L1Tx` | Originating from L1, these have more custom fields like 'refund' addresses etc                     | Mainly used to transfer funds/data between L1 & L2 layer.                             | 4% / 3%                             |
 
 Here's the code that does the parsing: [TransactionRequest::from_bytes][transaction_request_from_bytes]
 
@@ -77,21 +77,21 @@ The transaction can have three different results in state keeper:
   happen - as we cannot charge the fee in such scenario, and it opens the possiblity for the DDoS attack.
 
 [transaction_request_from_bytes]:
-  https://github.com/zkamoeba/micro-2-dev/blob/e0820f994982f179c0466cd724a0a327327a501a/core/lib/types/src/transaction_request.rs#L539
+  https://github.com/ZKAmoeba-Micro/micro-2-dev/blob/e0820f994982f179c0466cd724a0a327327a501a/core/lib/types/src/transaction_request.rs#L539
   'transaction request from bytes'
 [get_priority_op_events]:
-  https://github.com/zkamoeba/micro-2-dev/blob/e0820f994982f179c0466cd724a0a327327a501a/core/bin/micro_core/src/eth_watch/client.rs#L112
+  https://github.com/ZKAmoeba-Micro/micro-2-dev/blob/e0820f994982f179c0466cd724a0a327327a501a/core/bin/micro_core/src/eth_watch/client.rs#L112
   'get priority op events'
 [l1_tx]:
-  https://github.com/zkamoeba/micro-2-dev/blob/e0820f994982f179c0466cd724a0a327327a501a/core/lib/types/src/l1/mod.rs#L196
+  https://github.com/ZKAmoeba-Micro/micro-2-dev/blob/e0820f994982f179c0466cd724a0a327327a501a/core/lib/types/src/l1/mod.rs#L196
   'l1 tx'
 [l2_tx]:
-  https://github.com/zkamoeba/micro-2-dev/blob/e0820f994982f179c0466cd724a0a327327a501a/core/lib/types/src/l2/mod.rs#L110
+  https://github.com/ZKAmoeba-Micro/micro-2-dev/blob/e0820f994982f179c0466cd724a0a327327a501a/core/lib/types/src/l2/mod.rs#L110
   'l2 tx'
 [submit_tx]:
-  https://github.com/zkamoeba/micro-2-dev/blob/e0820f994982f179c0466cd724a0a327327a501a/core/bin/micro_core/src/api_server/tx_sender/mod.rs#L146
+  https://github.com/ZKAmoeba-Micro/micro-2-dev/blob/e0820f994982f179c0466cd724a0a327327a501a/core/bin/micro_core/src/api_server/tx_sender/mod.rs#L146
   'submit tx'
 [process_l1_batch]:
-  https://github.com/zkamoeba/micro-2-dev/blob/e0820f994982f179c0466cd724a0a327327a501a/core/bin/micro_core/src/state_keeper/keeper.rs#L257
+  https://github.com/ZKAmoeba-Micro/micro-2-dev/blob/e0820f994982f179c0466cd724a0a327327a501a/core/bin/micro_core/src/state_keeper/keeper.rs#L257
   'process l1 batch'
 [life_of_call]: how_call_works.md 'life of call'

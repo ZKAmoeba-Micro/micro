@@ -2,12 +2,12 @@ version: '3.2'
 services:
 
   geth:
-    image: "matterlabs/geth:latest"
+    image: "zkamoeba/geth:latest"
     environment:
       - PLUGIN_CONFIG
 
   zk:
-    image: "matterlabs/zk-environment:latest2.0"
+    image: "zkamoeba/zk-environment:latest2.0"
     depends_on:
       - geth
     command: cargo run --bin micro_core

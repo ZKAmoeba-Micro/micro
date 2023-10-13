@@ -1,6 +1,7 @@
 # NFTF -- New Fancy Test Framework
 
-This folder contains a framework for writing integration tests for Micro, as well as set of integration test suites.
+This folder contains a framework for writing integration tests for zkAmoeba, as well as set of integration test
+suites.
 
 This framework is built atop of [jest](https://jestjs.io/). It is _highly recommended_ to familiarize yourself with its
 documentation to be able to write tests.

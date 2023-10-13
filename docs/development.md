@@ -1,24 +1,24 @@
 # Development guide
 
-This document covers development-related actions in zkAmoeba.
+This document covers development-related actions in micro.
 
 ## Initializing the project
 
 To setup the main toolkit, `zk`, simply run:
 
-```bash
+```
 zk
 ```
 
 You may also configure autocompletion for your shell via:
 
-```bash
+```
 zk completion install
 ```
 
 Once all the dependencies were installed, project can be initialized:
 
-```bash
+```
 zk init
 ```
 
@@ -39,9 +39,9 @@ Usually, it is a good idea to do `zk init` once after each merge to the `main` b
 
 Additionally, there is a subcommand `zk clean` to remove previously generated data. Examples:
 
-```bash
+```
 zk clean --all # Remove generated configs, database and backups.
-zl clean --config # Remove configs only.
+zk clean --config # Remove configs only.
 zk clean --database # Remove database.
 zk clean --backups # Remove backups.
 zk clean --database --backups # Remove database *and* backups, but not configs.
@@ -57,7 +57,7 @@ zk clean --database --backups # Remove database *and* backups, but not configs.
 If you don’t need all of the `zk init` functionality, but just need to start/stop containers, use the following
 commands:
 
-```bash
+```
 zk up   # Set up `geth` container
 zk down # Shut down `geth` container
 ```
@@ -70,7 +70,7 @@ redone.
 
 For this case, there is an additional command:
 
-```bash
+```
 zk reinit
 ```
 
@@ -101,33 +101,33 @@ To switch dummy prover to real prover, one must change `dummy_verifier` to `fals
 
 - Running the `rust` unit-tests:
 
-  ```bash
+  ```
   zk test rust
   ```
 
 - Running a specific `rust` unit-test:
 
-  ```bash
+  ```
   zk test rust --package <package_name> --lib <mod>::tests::<test_fn_name> -- --exact
   # e.g. zk test rust --package micro_core --lib eth_sender::tests::resend_each_block -- --exact
   ```
 
 - Running the integration test:
 
-  ```bash
+  ```
   zk server           # Has to be run in the 1st terminal
   zk test i server    # Has to be run in the 2nd terminal
   ```
 
 - Running the benchmarks:
 
-  ```bash
+  ```
   zk f cargo bench
   ```
 
 - Running the loadtest:
 
-  ```bash
+  ```
   zk server # Has to be run in the 1st terminal
   zk prover # Has to be run in the 2nd terminal if you want to use real prover, otherwise it's not required.
   zk run loadtest # Has to be run in the 3rd terminal
@@ -137,12 +137,12 @@ To switch dummy prover to real prover, one must change `dummy_verifier` to `fals
 
 ### Re-build contracts
 
-```bash
+```
 zk contract build
 ```
 
 ### Publish source code on etherscan
 
-```bash
+```
 zk contract publish
 ```

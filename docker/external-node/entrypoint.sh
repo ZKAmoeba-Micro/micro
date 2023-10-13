@@ -1,8 +1,8 @@
 #!/bin/bash
-set -a
-# start server
-source /etc/env/ext-node.env
-source /etc/env/.init.env
-source /etc/env/user.env
 
-micro_external_node $*
+set -e
+
+# Prepare the database if it's not ready. No-op if the DB is prepared.
+sqlx database setup
+# Run the external node.
+exec micro_external_node

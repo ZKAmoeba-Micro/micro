@@ -1,7 +1,7 @@
-use micro_basic_types::H256;
 use parity_crypto::publickey::Error as ParityCryptoError;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
+use micro_basic_types::H256;
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, Error)]
 pub enum TxCheckError {

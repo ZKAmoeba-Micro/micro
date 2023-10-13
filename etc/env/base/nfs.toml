@@ -1,2 +1,2 @@
 [nfs]
-setup_key_mount_path="/data"
+setup_key_mount_path="/home/setup_keys/"

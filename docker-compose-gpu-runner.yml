@@ -1,12 +1,12 @@
 version: '3.2'
 services:
   geth:
-    image: "matterlabs/geth:latest"
+    image: "zkamoeba/geth:latest"
     environment:
       - PLUGIN_CONFIG
 
   zk:
-    image: "matterlabs/zk-environment:latest2.0"
+    image: "zkamoeba/zk-environment:latest2.0"
     depends_on:
       - geth
       - postgres
@@ -21,8 +21,8 @@ services:
     environment:
       - CACHE_DIR=/usr/src/cache
       - SCCACHE_CACHE_SIZE=50g
-      - SCCACHE_GCS_BUCKET=matterlabs-infra-sccache-storage
-      - SCCACHE_GCS_OAUTH_URL=http://169.254.169.254/computeMetadata/v1/instance/service-accounts/gha-ci-runners@zkamoeba-infra.iam.gserviceaccount.com/token
+      - SCCACHE_GCS_BUCKET=zkamoeba-infra-sccache-storage
+      - SCCACHE_GCS_SERVICE_ACCOUNT=gha-ci-runners@zkamoeba-infra.iam.gserviceaccount.com
       - SCCACHE_ERROR_LOG=/tmp/sccache_log.txt
       - SCCACHE_GCS_RW_MODE=READ_WRITE
       - CI=1
@@ -33,9 +33,9 @@ services:
       resources:
         reservations:
           devices:
-            - capabilities: [ gpu ]
+            - capabilities: [gpu]
   postgres:
-    image: "postgres:12"
+    image: "postgres:14"
     ports:
       - "5432:5432"
     environment:

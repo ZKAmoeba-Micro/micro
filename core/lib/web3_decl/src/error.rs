@@ -1,7 +1,7 @@
 //! Definition of errors that can occur in the micro Web3 API.
 
-use micro_types::api::SerializationTransactionError;
 use thiserror::Error;
+use micro_types::api::SerializationTransactionError;
 
 #[derive(Debug, Error)]
 pub enum Web3Error {
@@ -33,4 +33,8 @@ pub enum Web3Error {
     NotImplemented,
     #[error("Query returned more than {0} results. Try with this block range [{1:#x}, {2:#x}].")]
     LogsLimitExceeded(usize, u32, u32),
+    #[error("invalid filter: if blockHash is supplied fromBlock and toBlock must not be")]
+    InvalidFilterBlockHash,
+    #[error("Query returned more than {0} results. Try smaller range of blocks")]
+    TooManyLogs(usize),
 }

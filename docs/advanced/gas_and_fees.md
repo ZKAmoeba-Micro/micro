@@ -124,11 +124,11 @@ There are a few reasons why refunds might be 'larger' on micro (i.e., why we mig
   impacts the amount of gas used by pubdata.
 
 [main_node_fetcher]:
-  https://github.com/zkamoeba/micro-2-dev/blob/d590b3f0965a23eb0011779aab829d86d4fdc1d1/core/bin/micro_core/src/l1_gas_price/main_node_fetcher.rs#L33
+  https://github.com/ZKAmoeba-Micro/micro-2-dev/blob/d590b3f0965a23eb0011779aab829d86d4fdc1d1/core/bin/micro_core/src/l1_gas_price/main_node_fetcher.rs#L33
   'main node fetcher'
 [gas_adjuster]:
-  https://github.com/zkamoeba/micro-2-dev/blob/d590b3f0965a23eb0011779aab829d86d4fdc1d1/core/bin/micro_core/src/l1_gas_price/gas_adjuster/mod.rs#L25
+  https://github.com/ZKAmoeba-Micro/micro-2-dev/blob/d590b3f0965a23eb0011779aab829d86d4fdc1d1/core/bin/micro_core/src/l1_gas_price/gas_adjuster/mod.rs#L25
   'gas_adjuster'
 [get_txs_fee_in_wei]:
-  https://github.com/zkamoeba/micro-2-dev/blob/d590b3f0965a23eb0011779aab829d86d4fdc1d1/core/bin/micro_core/src/api_server/tx_sender/mod.rs#L450
+  https://github.com/ZKAmoeba-Micro/micro-2-dev/blob/d590b3f0965a23eb0011779aab829d86d4fdc1d1/core/bin/micro_core/src/api_server/tx_sender/mod.rs#L450
   'get_txs_fee_in_wei'

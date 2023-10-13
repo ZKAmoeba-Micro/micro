@@ -1,8 +1,8 @@
 use itertools::Itertools;
-use micro_basic_types::ethabi::{encode, Token};
-use micro_basic_types::H256;
 use std::collections::HashMap;
 use std::convert::TryInto;
+use micro_basic_types::ethabi::{encode, Token};
+use micro_basic_types::H256;
 
 use crate::bytes_to_chunks;
 
@@ -124,8 +124,8 @@ impl CompressedBytecodeInfo {
 
         bytecode_hash
             .into_iter()
-            .chain(empty_cell.into_iter())
-            .chain(bytes_encoded.into_iter())
+            .chain(empty_cell)
+            .chain(bytes_encoded)
             .collect()
     }
 }

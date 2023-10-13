@@ -327,10 +327,10 @@ impl JsonRpcSigner {
 mod messages {
     use crate::raw_ethereum_tx::TransactionParameters;
     use hex::encode;
+    use serde::{Deserialize, Serialize};
     use micro_types::{
         eip712_signature::utils::get_eip712_json, Address, EIP712TypedStructure, Eip712Domain,
     };
-    use serde::{Deserialize, Serialize};
 
     #[derive(Debug, Serialize, Deserialize)]
     pub struct JsonRpcRequest {
@@ -462,7 +462,8 @@ mod tests {
                 let data: String = serde_json::from_value(req.params[1].clone()).unwrap();
                 let data_bytes = hex::decode(&data[2..]).unwrap();
                 let signature =
-                    PackedEthSignature::sign(state.key_pairs[0].secret(), &data_bytes).unwrap();
+                    PackedEthSignature::sign(&state.key_pairs[0].secret().0.into(), &data_bytes)
+                        .unwrap();
                 create_success(json!(signature))
             }
             "eth_signTransaction" => {

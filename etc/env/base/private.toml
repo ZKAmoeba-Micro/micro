@@ -6,11 +6,11 @@ test_database_url="postgres://postgres@localhost/micro_local_test"
 
 [eth_sender.sender]
 # Set in env file for development, production, staging and testnet.
-operator_private_key="0x848181ca4df71f9fe087f3ce10a503bb8d700775dfe8e948a07d40889a3e4200"
+operator_private_key="0x27593fea79697e947890ecbecce7901b0008345e5d7259710d0dd5e500d040be"
 # Address to be used for micro account managing the interaction with a contract on Ethereum.
 # Derived from the `OPERATOR_PRIVATE_KEY`.
-operator_commit_eth_addr="0x26937d59db4463254c930D5f31353F14AA89a0F7"
+operator_commit_eth_addr="0xde03a0B5963f75f1C8485B355fF6D30f3093BDE7"
 
 [misc]
 # Private key for the fee seller account
-fee_account_private_key="0x848181ca4df71f9fe087f3ce10a503bb8d700775dfe8e948a07d40889a3e4200"
+fee_account_private_key="0x27593fea79697e947890ecbecce7901b0008345e5d7259710d0dd5e500d040be"

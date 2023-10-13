@@ -1,12 +1,12 @@
 use crate::{mempool_store::MempoolStore, types::L2TxFilter};
+use std::collections::{HashMap, HashSet};
+use std::iter::FromIterator;
 use micro_types::fee::Fee;
 use micro_types::helpers::unix_timestamp_ms;
 use micro_types::l1::{OpProcessingType, PriorityQueueType};
 use micro_types::l2::L2Tx;
 use micro_types::{Address, ExecuteTransactionCommon, L1TxCommonData, PriorityOpId, H256, U256};
 use micro_types::{Execute, Nonce, Transaction};
-use std::collections::{HashMap, HashSet};
-use std::iter::FromIterator;
 
 #[test]
 fn basic_flow() {
@@ -206,7 +206,7 @@ fn two_ready_txs() {
             view(mempool.next_transaction(&L2TxFilter::default())),
             view(mempool.next_transaction(&L2TxFilter::default()))
         ]),
-        HashSet::<(_, _)>::from_iter(vec![(account0, 0), (account1, 0)].into_iter()),
+        HashSet::<(_, _)>::from_iter(vec![(account0, 0), (account1, 0)]),
     );
 }
 
@@ -223,14 +223,14 @@ fn mempool_size() {
         gen_l2_tx(account1, Nonce(1)),
     ];
     mempool.insert(transactions, HashMap::new());
-    assert_eq!(mempool.size(), 5);
+    assert_eq!(mempool.stats().l2_transaction_count, 5);
     // replacement
     mempool.insert(vec![gen_l2_tx(account0, Nonce(2))], HashMap::new());
-    assert_eq!(mempool.size(), 5);
+    assert_eq!(mempool.stats().l2_transaction_count, 5);
     // load next
     mempool.next_transaction(&L2TxFilter::default());
     mempool.next_transaction(&L2TxFilter::default());
-    assert_eq!(mempool.size(), 3);
+    assert_eq!(mempool.stats().l2_transaction_count, 3);
 }
 
 /// Checks whether filtering transactions based on their fee works as expected.
@@ -407,6 +407,7 @@ fn gen_l1_tx(priority_id: PriorityOpId) -> Transaction {
         common_data: ExecuteTransactionCommon::L1(op_data),
         execute,
         received_timestamp_ms: 0,
+        raw_bytes: None,
     }
 }
 

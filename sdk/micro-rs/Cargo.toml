@@ -3,13 +3,14 @@ name = "micro"
 version = "0.4.0"
 authors = []
 edition = "2018"
+license = "MIT OR Apache-2.0"
 
 [dependencies]
-micro_types = { path = "../../core/lib/types", version = "1.0" }
-micro_utils = { path = "../../core/lib/utils", version = "1.0" }
-micro_eth_client = { path = "../../core/lib/eth_client", version = "1.0" }
-micro_eth_signer = { path = "../../core/lib/eth_signer", version = "1.0" }
-micro_web3_decl = { path = "../../core/lib/web3_decl", version = "1.0", default-features = false, features = [
+micro_types = { path = "../../core/lib/types" }
+micro_utils = { path = "../../core/lib/utils" }
+micro_eth_client = { path = "../../core/lib/eth_client" }
+micro_eth_signer = { path = "../../core/lib/eth_signer" }
+micro_web3_decl = { path = "../../core/lib/web3_decl", default-features = false, features = [
     "client",
 ] }
 
@@ -20,7 +21,7 @@ num = { version = "0.3.1", features = ["serde"] }
 thiserror = "1.0"
 
 [dev-dependencies]
-micro_config = { path = "../../core/lib/config", version = "1.0" }
+micro_config = { path = "../../core/lib/config" }
 tokio = { version = "1", features = ["full"] }
 anyhow = "1.0"
 hex = "0.4"

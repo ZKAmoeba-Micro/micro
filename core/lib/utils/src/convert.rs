@@ -1,5 +1,4 @@
 use bigdecimal::BigDecimal;
-use micro_basic_types::{Address, H256, U128, U256};
 use num::{
     bigint::ToBigInt,
     rational::Ratio,
@@ -7,6 +6,7 @@ use num::{
     BigUint,
 };
 use std::convert::TryInto;
+use micro_basic_types::{Address, H256, U128, U256};
 
 pub fn u256_to_big_decimal(value: U256) -> BigDecimal {
     let ratio = Ratio::new_raw(u256_to_biguint(value), BigUint::from(1u8));
@@ -109,16 +109,8 @@ pub fn le_chunks_to_words(chunks: Vec<[u8; 32]>) -> Vec<U256> {
         .collect()
 }
 
-pub fn be_chunks_to_words(chunks: Vec<[u8; 32]>) -> Vec<U256> {
-    chunks
-        .into_iter()
-        .map(|el| U256::from_big_endian(&el))
-        .collect()
-}
-
-pub fn bytes_to_le_words(vec: Vec<u8>) -> Vec<U256> {
-    ensure_chunkable(&vec);
-    vec.chunks(32).map(U256::from_little_endian).collect()
+pub fn be_chunks_to_h256_words(chunks: Vec<[u8; 32]>) -> Vec<H256> {
+    chunks.into_iter().map(|el| H256::from_slice(&el)).collect()
 }
 
 pub fn bytes_to_be_words(vec: Vec<u8>) -> Vec<U256> {

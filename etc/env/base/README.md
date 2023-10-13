@@ -1,4 +1,4 @@
-# Base configuration for zkAmoeba stack
+# Base configuration for micro stack
 
 This folder contains the template for generating the configuration for micro applications. Configs in this folder are
 assigned default values suitable for development.

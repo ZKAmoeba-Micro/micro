@@ -1,0 +1,21 @@
+[package]
+name = "micro_test_account"
+version = "0.1.0"
+edition = "2018"
+authors = []
+homepage = "https://www.zkamoeba.com/"
+repository = "https://github.com/ZKAmoeba-Micro/micro-era"
+license = "MIT OR Apache-2.0"
+keywords = ["blockchain", "micro"]
+categories = ["cryptography"]
+readme = "README.md"
+
+[dependencies]
+micro_types = { path = "../types" }
+micro_config = { path = "../config" }
+micro_utils = { path = "../utils" }
+micro_eth_signer = { path = "../eth_signer" }
+micro_contracts = { path = "../contracts" }
+
+hex = "0.4"
+ethabi = "18.0.0"

@@ -1,6 +1,6 @@
-use micro_basic_types::H256;
 use serde_json::Value;
 use std::collections::{BTreeMap, VecDeque};
+use micro_basic_types::H256;
 
 use crate::tx::primitives::eip712_signature::typed_structure::{
     EncodedStructureMember, StructMember,

@@ -19,7 +19,7 @@ micro_utils=debug,\
 micro_queued_job_processor=info,\
 micro_types=info,\
 micro_mempool=debug,\
-loadnext=debug,\
+loadnext=info,\
 vm=info,\
 block_sizes_test=info,\
 micro_verification_key_generator_and_server=info,\
@@ -29,6 +29,12 @@ micro_circuit_synthesizer=info,\
 en_playground=info,\
 micro_external_node=info,\
 cross_nodes_checker=debug,\
+micro_witness_generator=info,\
+micro_prover_fri=info,\
+micro_witness_vector_generator=info,\
+micro_health_check=debug,\
+micro_proof_fri_compressor=info,\
+vise_exporter=debug,\
 """
 
 # `RUST_BACKTRACE` variable

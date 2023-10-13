@@ -1,13 +1,16 @@
 import { BigNumber, BytesLike } from 'ethers';
 import { ethers } from 'ethers';
-import { Provider, utils } from 'micro-web3';
+import { Provider, utils, Contract } from 'micro-web3';
 
 const L1_CONTRACTS_FOLDER = `${process.env.MICRO_HOME}/contracts/ethereum/artifacts/cache/solpp-generated-contracts`;
 const DIAMOND_UPGRADE_INIT_ABI = new ethers.utils.Interface(
     require(`${L1_CONTRACTS_FOLDER}/micro/upgrade-initializers/DiamondUpgradeInit1.sol/DiamondUpgradeInit1.json`).abi
 );
-const DIAMOND_CUT_FACET_ABI = new ethers.utils.Interface(
-    require(`${L1_CONTRACTS_FOLDER}/micro/facets/DiamondCut.sol/DiamondCutFacet.json`).abi
+const GOVERNANCE_ABI = new ethers.utils.Interface(
+    require(`${L1_CONTRACTS_FOLDER}/governance/Governance.sol/Governance.json`).abi
+);
+const ADMIN_FACET_ABI = new ethers.utils.Interface(
+    require(`${L1_CONTRACTS_FOLDER}/micro/facets/Admin.sol/AdminFacet.json`).abi
 );
 
 export interface ForceDeployment {
@@ -15,12 +18,12 @@ export interface ForceDeployment {
     bytecodeHash: BytesLike;
     // The address on which to deploy the bytecodehash to
     newAddress: string;
+    // Whether to call the constructor
+    callConstructor: boolean;
     // The value with which to initialize a contract
     value: BigNumber;
     // The constructor calldata
     input: BytesLike;
-    // Whether to call the constructor
-    callConstructor: boolean;
 }
 
 // A minimized copy of the `diamondCut` function used in L1 contracts
@@ -61,13 +64,7 @@ export async function deployOnAnyLocalAddress(
     const microContract = await l2Provider.getMainContractAddress();
 
     const micro = new ethers.Contract(microContract, utils.MICRO_MAIN_ABI, govWallet);
-
-    // In case there is some pending upgrade there, we cancel it
-    const upgradeProposalState = await micro.getUpgradeProposalState();
-    if (upgradeProposalState != 0) {
-        const currentProposalHash = await micro.getProposedUpgradeHash();
-        await micro.connect(govWallet).cancelUpgradeProposal(currentProposalHash);
-    }
+    const governanceContractAddr = await micro.getGovernor();
 
     // Encode data for the upgrade call
     const encodedParams = utils.CONTRACT_DEPLOYER.encodeFunctionData('forceDeployOnAddresses', [deployments]);
@@ -80,24 +77,35 @@ export async function deployOnAnyLocalAddress(
     ]);
 
     const upgradeParam = diamondCut([], diamondUpgradeInitAddress, upgradeInitData);
-    const currentProposalId = (await micro.getCurrentProposalId()).add(1);
-    // Get transaction data of the `proposeTransparentUpgrade`
-    const proposeTransparentUpgrade = DIAMOND_CUT_FACET_ABI.encodeFunctionData('proposeTransparentUpgrade', [
-        upgradeParam,
-        currentProposalId
+
+    // Prepare calldata for upgrading diamond proxy
+    const diamondProxyUpgradeCalldata = ADMIN_FACET_ABI.encodeFunctionData('executeUpgrade', [upgradeParam]);
+
+    const call = {
+        target: microContract,
+        value: 0,
+        data: diamondProxyUpgradeCalldata
+    };
+    const governanceOperation = {
+        calls: [call],
+        predecessor: ethers.constants.HashZero,
+        salt: ethers.constants.HashZero
+    };
+
+    // Get transaction data of the `scheduleTransparent`
+    const scheduleTransparentOperation = GOVERNANCE_ABI.encodeFunctionData('scheduleTransparent', [
+        governanceOperation,
+        0 // delay
     ]);
 
-    // Get transaction data of the `executeUpgrade`
-    const executeUpgrade = DIAMOND_CUT_FACET_ABI.encodeFunctionData('executeUpgrade', [
-        upgradeParam,
-        ethers.constants.HashZero
-    ]);
+    // Get transaction data of the `execute`
+    const executeOperation = GOVERNANCE_ABI.encodeFunctionData('execute', [governanceOperation]);
 
     // Proposing the upgrade
     await (
         await govWallet.sendTransaction({
-            to: microContract,
-            data: proposeTransparentUpgrade,
+            to: governanceContractAddr,
+            data: scheduleTransparentOperation,
             gasLimit: BigNumber.from(10000000)
         })
     ).wait();
@@ -105,8 +113,8 @@ export async function deployOnAnyLocalAddress(
     // Finalize the upgrade
     const receipt = await (
         await govWallet.sendTransaction({
-            to: microContract,
-            data: executeUpgrade,
+            to: governanceContractAddr,
+            data: executeOperation,
             gasLimit: BigNumber.from(10000000)
         })
     ).wait();

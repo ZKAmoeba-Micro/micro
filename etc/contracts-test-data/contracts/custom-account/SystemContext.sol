@@ -5,7 +5,7 @@ pragma solidity ^0.8.0;
 import "./Constants.sol";
 
 /**
- * @author Matter Labs
+ *
  * @notice Contract that stores some of the context variables, that may be either 
  * block-scoped, tx-scoped or system-wide.
  */
@@ -15,7 +15,7 @@ contract SystemContext {
         _;
     }
     
-    uint256 public chainId = 380;
+    uint256 public chainId = 270;
     address public origin;
     uint256 public gasPrice;
     // Some dummy value, maybe will be possible to change it in the future.

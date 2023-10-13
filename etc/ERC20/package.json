@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "devDependencies": {
-    "@zkamoeba/hardhat-micro-solc": "^0.3.21",
+    "@zkamoeba/hardhat-micro-solc": "^0.3.15",
     "hardhat": "=2.12.4"
   }
 }

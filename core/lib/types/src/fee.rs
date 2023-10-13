@@ -1,10 +1,9 @@
-use micro_utils::ceil_div;
 use serde::{Deserialize, Serialize};
+use micro_utils::ceil_div;
 
 use crate::U256;
 
-#[derive(Debug, Serialize, Deserialize, Clone, Default)]
-#[serde(rename_all = "camelCase", tag = "result")]
+#[derive(Debug, Default, Clone, Copy)]
 pub struct TransactionExecutionMetrics {
     pub initial_storage_writes: usize,
     pub repeated_storage_writes: usize,
@@ -24,7 +23,7 @@ pub struct TransactionExecutionMetrics {
     pub computational_gas_used: u32,
 }
 
-#[derive(Default, Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Debug, Default, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct Fee {
     /// The limit of gas that are to be spent on the actual transaction.
     pub gas_limit: U256,
@@ -46,13 +45,7 @@ impl Fee {
         assert!(self.max_priority_fee_per_gas <= self.max_fee_per_gas);
 
         // For now, we charge only for base fee.
-        if self.max_fee_per_gas == self.max_priority_fee_per_gas {
-            block_base_fee_per_gas
-        } else {
-            // for EIP1559
-            assert!(block_base_fee_per_gas + self.max_priority_fee_per_gas <= self.max_fee_per_gas);
-            block_base_fee_per_gas + self.max_priority_fee_per_gas
-        }
+        block_base_fee_per_gas
     }
 }
 
@@ -69,7 +62,7 @@ pub fn encoding_len(
     const BASE_LEN: usize = 1 + 19 + 5;
 
     // All of the fields are encoded as `bytes`, so their encoding takes ceil(len, 32) slots.
-    // Factory deps are encoded as an array of bytes32.
+    // For factory deps we only provide hashes, which are encoded as an array of bytes32.
     let dynamic_len = ceil_div(data_len, 32)
         + ceil_div(signature_len, 32)
         + ceil_div(paymaster_input_len, 32)

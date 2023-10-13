@@ -5,6 +5,7 @@ import fs from 'fs';
 
 export async function build() {
     await utils.spawn('yarn l1-contracts build');
+    await utils.spawn('yarn l2-contracts build');
 }
 
 export async function verifyL1Contracts() {
@@ -38,7 +39,16 @@ export async function initializeValidator(args: any[] = []) {
     const isLocalSetup = process.env.MICRO_LOCAL_SETUP;
     const baseCommandL1 = isLocalSetup ? `yarn --cwd /contracts/ethereum` : `yarn l1-contracts`;
 
-    await utils.spawn(`${baseCommandL1} initialize-validator ${args.join(' ')} | tee initilizeValidator.log`);
+    await utils.spawn(`${baseCommandL1} initialize-validator ${args.join(' ')} | tee initializeValidator.log`);
+}
+
+export async function initializeGovernance(args: any[] = []) {
+    await utils.confirmAction();
+
+    const isLocalSetup = process.env.MICRO_LOCAL_SETUP;
+    const baseCommandL1 = isLocalSetup ? `yarn --cwd /contracts/ethereum` : `yarn l1-contracts`;
+
+    await utils.spawn(`${baseCommandL1} initialize-governance ${args.join(' ')} | tee initializeGovernance.log`);
 }
 
 export async function initializeL1AllowList(args: any[] = []) {
@@ -47,10 +57,21 @@ export async function initializeL1AllowList(args: any[] = []) {
     const isLocalSetup = process.env.MICRO_LOCAL_SETUP;
     const baseCommandL1 = isLocalSetup ? `yarn --cwd /contracts/ethereum` : `yarn l1-contracts`;
 
-    await utils.spawn(`${baseCommandL1} initialize-allow-list ${args.join(' ')} | tee initilizeL1AllowList.log`);
+    await utils.spawn(`${baseCommandL1} initialize-allow-list ${args.join(' ')} | tee initializeL1AllowList.log`);
 }
 
-export async function deployL2(args: any[] = []) {
+export async function initializeWethToken(args: any[] = []) {
+    await utils.confirmAction();
+
+    const isLocalSetup = process.env.MICRO_LOCAL_SETUP;
+    const baseCommandL1 = isLocalSetup ? `yarn --cwd /contracts/ethereum` : `yarn l1-contracts`;
+
+    await utils.spawn(
+        `${baseCommandL1} initialize-l2-weth-token instant-call ${args.join(' ')} | tee initializeWeth.log`
+    );
+}
+
+export async function deployL2(args: any[] = [], includePaymaster?: boolean, includeWETH?: boolean) {
     await utils.confirmAction();
 
     const isLocalSetup = process.env.MICRO_LOCAL_SETUP;
@@ -65,23 +86,33 @@ export async function deployL2(args: any[] = []) {
 
     await utils.spawn(`${baseCommandL1} initialize-bridges ${args.join(' ')} | tee deployL2.log`);
 
-    await utils.spawn(`${baseCommandL2} deploy-testnet-paymaster ${args.join(' ')} | tee -a deployL2.log`);
+    if (includePaymaster) {
+        await utils.spawn(`${baseCommandL2} deploy-testnet-paymaster ${args.join(' ')} | tee -a deployL2.log`);
+    }
 
-    await utils.spawn(`${baseCommandL2} deploy-l2-weth ${args.join(' ')} | tee -a deployL2.log`);
+    if (includeWETH) {
+        await utils.spawn(`${baseCommandL2} deploy-l2-weth ${args.join(' ')} | tee -a deployL2.log`);
+    }
 
-    await utils.spawn(`${baseCommandL2} deploy-getters ${args.join(' ')} | tee -a deployL2.log`);
+    await utils.spawn(`${baseCommandL2} deploy-force-deploy-upgrader ${args.join(' ')} | tee -a deployL2.log`);
 
-    const deployLog = fs.readFileSync('deployL2.log').toString();
-    const envVars = [
-        'CONTRACTS_L2_ETH_BRIDGE_ADDR',
+    const l2DeployLog = fs.readFileSync('deployL2.log').toString();
+    const l2DeploymentEnvVars = [
         'CONTRACTS_L2_ERC20_BRIDGE_ADDR',
         'CONTRACTS_L2_TESTNET_PAYMASTER_ADDR',
-        'CONTRACTS_L2_WETH_IMPLEMENTATION_ADDR',
-        'CONTRACTS_L2_WETH_PROXY_ADDR',
-        'CONTRACTS_L2_GETTERS_ADDR'
+        'CONTRACTS_L2_WETH_TOKEN_IMPL_ADDR',
+        'CONTRACTS_L2_WETH_TOKEN_PROXY_ADDR',
+        'CONTRACTS_L2_DEFAULT_UPGRADE_ADDR'
     ];
+    updateContractsEnv(l2DeployLog, l2DeploymentEnvVars);
 
-    updateContractsEnv(deployLog, envVars);
+    if (includeWETH) {
+        await utils.spawn(`${baseCommandL1} initialize-weth-bridges ${args.join(' ')} | tee -a deployL1.log`);
+    }
+
+    const l1DeployLog = fs.readFileSync('deployL1.log').toString();
+    const l1DeploymentEnvVars = ['CONTRACTS_L2_WETH_BRIDGE_ADDR'];
+    updateContractsEnv(l1DeployLog, l1DeploymentEnvVars);
 }
 
 export async function deployL1(args: any[]) {
@@ -94,9 +125,11 @@ export async function deployL1(args: any[]) {
     await utils.spawn(`${baseCommand} deploy-no-build ${args.join(' ')} | tee deployL1.log`);
     const deployLog = fs.readFileSync('deployL1.log').toString();
     const envVars = [
-        'CONTRACTS_DIAMOND_CUT_FACET_ADDR',
+        'CONTRACTS_CREATE2_FACTORY_ADDR',
+        'CONTRACTS_ADMIN_FACET_ADDR',
         'CONTRACTS_DIAMOND_UPGRADE_INIT_ADDR',
-        'CONTRACTS_GOVERNANCE_FACET_ADDR',
+        'CONTRACTS_DEFAULT_UPGRADE_ADDR',
+        'CONTRACTS_GOVERNANCE_ADDR',
         'CONTRACTS_MAILBOX_FACET_ADDR',
         'CONTRACTS_EXECUTOR_FACET_ADDR',
         'CONTRACTS_GETTERS_FACET_ADDR',
@@ -109,8 +142,8 @@ export async function deployL1(args: any[]) {
         'CONTRACTS_L1_ERC20_BRIDGE_IMPL_ADDR',
         'CONTRACTS_L1_WETH_BRIDGE_IMPL_ADDR',
         'CONTRACTS_L1_WETH_BRIDGE_PROXY_ADDR',
-        'CONTRACTS_L1_WETH_TOKEN_ADDR',
-        'CONTRACTS_L1_ALLOW_LIST_ADDR'
+        'CONTRACTS_L1_ALLOW_LIST_ADDR',
+        'CONTRACTS_L1_MULTICALL3_ADDR'
     ];
     const updatedContracts = updateContractsEnv(deployLog, envVars);
 
@@ -119,31 +152,13 @@ export async function deployL1(args: any[]) {
     fs.writeFileSync('deployed_contracts.log', updatedContracts);
 }
 
-export async function deployZkamoeba() {
-    await utils.confirmAction();
-
-    // In the localhost setup scenario we don't have the workspace,
-    // so we have to `--cwd` into the required directory.
-    const baseCommand = process.env.MICRO_LOCAL_SETUP ? `yarn --cwd /contracts/ethereum` : `yarn l1-contracts`;
-
-    await utils.spawn(`${baseCommand} deploy-zkat deploy | tee deployZkamoeba.log`);
-    const deployLog = fs.readFileSync('deployZkamoeba.log').toString();
-    const envVars = ['CONTRACTS_L1_ZKAT_ADDR', 'CONTRACTS_L2_ZKAT_ADDR'];
-    updateContractsEnv(deployLog, envVars);
-}
-
-export async function initializeSystemContracts() {
-    await utils.confirmAction();
-    // In the localhost setup scenario we don't have the workspace,
-    // so we have to `--cwd` into the required directory.
-    const baseCommand = process.env.MICRO_LOCAL_SETUP ? `yarn --cwd /contracts/ethereum` : `yarn l1-contracts`;
-
-    await utils.spawn(`${baseCommand} initialize-system-contracts  deploy | tee initializeSystemContracts.log`);
-}
-
 export async function redeployL1(args: any[]) {
     await deployL1(args);
     await verifyL1Contracts();
+}
+
+export async function deployVerifier(args: any[]) {
+    await deployL1([...args, '--only-verifier']);
 }
 
 export const command = new Command('contract').description('contract management');
@@ -155,9 +170,9 @@ command
     .action(redeployL1);
 command.command('deploy [deploy-opts...]').allowUnknownOption(true).description('deploy contracts').action(deployL1);
 command.command('build').description('build contracts').action(build);
-command.command('initilize-validator').description('initialize validator').action(initializeValidator);
+command.command('initialize-validator').description('initialize validator').action(initializeValidator);
 command
-    .command('initilize-l1-allow-list-contract')
+    .command('initialize-l1-allow-list-contract')
     .description('initialize L1 allow list contract')
     .action(initializeL1AllowList);
 command.command('verify').description('verify L1 contracts').action(verifyL1Contracts);

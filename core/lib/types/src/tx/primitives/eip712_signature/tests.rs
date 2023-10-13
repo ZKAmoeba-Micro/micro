@@ -3,10 +3,10 @@ use crate::tx::primitives::eip712_signature::{
     typed_structure::{EIP712TypedStructure, Eip712Domain},
 };
 use crate::tx::primitives::{eip712_signature::utils::get_eip712_json, PackedEthSignature};
-use micro_basic_types::{Address, H256, U256};
-use parity_crypto::Keccak256;
+use crate::web3::signing::keccak256;
 use serde::Serialize;
 use std::str::FromStr;
+use micro_basic_types::{Address, H256, U256};
 
 #[derive(Clone, Serialize)]
 struct Person {
@@ -103,7 +103,7 @@ fn test_encode_eip712_typed_struct() {
         H256::from_str("3b98b16ad068d9d8854a6a416bd476de44a4933ec5104d7c786a422ab262ed14").unwrap()
     );
 
-    let private_key = b"cow".keccak256().into();
+    let private_key = keccak256(b"cow").into();
     let address_owner = PackedEthSignature::address_from_private_key(&private_key).unwrap();
 
     let signature = PackedEthSignature::sign_typed_data(&private_key, &domain, &message).unwrap();

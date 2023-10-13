@@ -1,5 +1,7 @@
 use micro_eth_signer::EthereumSigner;
-use micro_types::{fee::Fee, l2::L2Tx, transaction_request::PaymasterParams, Address, Nonce, U256};
+use micro_types::{
+    fee::Fee, l2::L2Tx, transaction_request::PaymasterParams, Address, Nonce, U256,
+};
 
 use crate::{
     error::ClientError, operations::SyncTransactionHandle, wallet::Wallet, EthNamespaceClient,

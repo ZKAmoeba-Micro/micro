@@ -3,8 +3,8 @@ use micro_types::L2_ETH_TOKEN_ADDRESS;
 use micro_types::{fee::Fee, l2::L2Tx, Address, Nonce, U256};
 
 use crate::ethereum::ierc20_contract;
-use crate::micro_types::{transaction_request::PaymasterParams, Execute, L2TxCommonData};
 use crate::web3::contract::tokens::Tokenize;
+use crate::micro_types::{transaction_request::PaymasterParams, Execute, L2TxCommonData};
 use crate::{
     error::ClientError, operations::SyncTransactionHandle, wallet::Wallet, EthNamespaceClient,
     ZksNamespaceClient,
@@ -176,6 +176,7 @@ where
             common_data,
             execute: tx,
             received_timestamp_ms: 0,
+            raw_bytes: None,
         };
         self.wallet
             .provider

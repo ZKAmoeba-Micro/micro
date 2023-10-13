@@ -1,0 +1,24 @@
+[package]
+name = "multivm"
+version = "0.1.0"
+edition = "2018"
+authors = []
+homepage = "https://www.zkamoeba.com/"
+repository = "https://github.com/ZKAmoeba-Micro/micro-era"
+license = "MIT OR Apache-2.0"
+keywords = ["blockchain", "micro"]
+categories = ["cryptography"]
+
+[dependencies]
+vm_m5 = { path = "../../multivm_deps/vm_m5" }
+vm_m6 = { path = "../../multivm_deps/vm_m6" }
+vm_1_3_2 = { path = "../../multivm_deps/vm_1_3_2" }
+vm_virtual_blocks= { path = "../../multivm_deps/vm_virtual_blocks" }
+vm_latest = { path = "../vm", package = "vm" }
+
+micro_types = { path = "../types" }
+micro_state = { path = "../state" }
+micro_contracts = { path = "../contracts" }
+micro_utils = { path = "../utils" }
+
+vlog = { path = "../../lib/vlog" }

@@ -1,59 +1,49 @@
 [package]
 name = "micro_types"
-version = "1.0.0"
+version = "0.1.0"
 edition = "2018"
 authors = []
-homepage = ""
-repository = "https://github.com/ZKAmoeba-Micro/micro"
-license = "Apache-2.0"
+homepage = "https://www.zkamoeba.com/"
+repository = "https://github.com/ZKAmoeba-Micro/micro-era"
+license = "MIT OR Apache-2.0"
 keywords = ["blockchain", "micro"]
 categories = ["cryptography"]
 readme = "README.md"
 
 [dependencies]
-micro_config = { path = "../config", version = "1.0" }
-micro_utils = { path = "../utils", version = "1.0" }
-micro_basic_types = { path = "../basic_types", version = "1.0" }
-micro_contracts = { path = "../contracts", version = "1.0" }
-micro_mini_merkle_tree = { path = "../mini_merkle_tree", version = "1.0"}
+micro_config = { path = "../config" }
+micro_utils = { path = "../utils" }
+micro_basic_types = { path = "../basic_types" }
+micro_contracts = { path = "../contracts" }
+micro_mini_merkle_tree = { path = "../mini_merkle_tree" }
 # We need this import because we wanat DAL to be responsible for (de)serialization
 codegen = { git = "https://github.com/ZKAmoeba-Micro/solidity_plonk_verifier.git", branch = "dev" }
+zkevm_test_harness = { git = "https://github.com/ZKAmoeba-Micro/micro-zkevm_test_harness.git", branch = "v1.3.3" }
+zk_evm = { git = "https://github.com/ZKAmoeba-Micro/micro-zk_evm.git", branch = "v1.3.3" }
+zk_evm_1_4_0 = { git = "https://github.com/ZKAmoeba-Micro/micro-zk_evm.git", branch = "v1.4.0", package = "zk_evm" }
 
-zkevm_test_harness = { git = "https://github.com/ZKAmoeba-Micro/micro-zkevm_test_harness.git", branch = "main" }
-#zkevm_test_harness = { path = "../../../../zkevm_test_harness" }
-
-
-#codegen = { path = "../../../../solidity_plonk_verifier/codegen" }
-
-zk_evm = {git = "https://github.com/ZKAmoeba-Micro/micro-zk_evm.git", branch = "main"}
-#zk_evm = { path = "../../../../zk_evm" }
-
-zkevm-assembly = { git = "https://github.com/ZKAmoeba-Micro/micro-zkEVM-assembly.git", branch = "main" }
-
-rlp = "0.5"
-metrics = "0.20"
-
+chrono = { version = "0.4", features = ["serde"] }
 num = { version = "0.3.1", features = ["serde"] }
-bigdecimal = { version = "=0.2.0", features = ["serde"]}
-hex = "0.4"
-thiserror = "1.0"
-chrono = { version = "0.4", features = ["serde", "rustc-serialize"] }
 once_cell = "1.7"
-tiny-keccak = { version = "1.5" }
-
+rlp = "0.5"
 serde = "1.0.90"
 serde_json = "1.0.0"
-serde_with = "1"
-rayon = "1.5.3"
+serde_with = { version = "1", features = ["base64"] }
 strum = { version = "0.24", features = ["derive"] }
+thiserror = "1.0"
+num_enum = "0.6"
+hex = "0.4"
 
 # Crypto stuff
+# TODO (PLA-440): remove parity-crypto
 parity-crypto = { version = "0.9", features = ["publickey"] }
-ethbloom = "0.11"
 blake2 = "0.10"
 
-[dev-dependencies]
-secp256k1 = {version = "0.21", features = ["recovery"] }
-tokio = { version = "1", features = ["rt", "macros"] }
-serde_with = {version="1", features=["hex"]}
+# TODO (PLA-440): remove parity-crypto
+# `ethereum-types` version used in `parity-crypto`
+ethereum_types_old = { package = "ethereum-types", version = "0.12.0" }
 
+[dev-dependencies]
+secp256k1 = { version = "0.27", features = ["recovery"] }
+tokio = { version = "1", features = ["rt", "macros"] }
+serde_with = { version = "1", features = ["hex"] }

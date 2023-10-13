@@ -1,0 +1,92 @@
+[package]
+name = "micro_core"
+version = "0.1.0"
+edition = "2018"
+authors = []
+homepage = "https://www.zkamoeba.com/"
+repository = "https://github.com/ZKAmoeba-Micro/micro-era"
+license = "MIT OR Apache-2.0"
+keywords = ["blockchain", "micro"]
+categories = ["cryptography"]
+
+[dependencies]
+micro_state = { path = "../state" }
+micro_types = { path = "../types" }
+micro_dal = { path = "../dal" }
+micro_config = { path = "../config" }
+micro_utils = { path = "../utils" }
+micro_contracts = { path = "../contracts" }
+micro_eth_client = { path = "../eth_client" }
+micro_eth_signer = { path = "../eth_signer" }
+micro_mempool = { path = "../mempool" }
+micro_prover_utils = { path = "../prover_utils" }
+micro_queued_job_processor = { path = "../queued_job_processor" }
+micro_circuit_breaker = { path = "../circuit_breaker" }
+vm = { path = "../vm" }
+micro_storage = { path = "../storage" }
+micro_merkle_tree = { path = "../merkle_tree" }
+micro_mini_merkle_tree = { path = "../mini_merkle_tree" }
+micro_verification_key_generator_and_server = { path = "../../bin/verification_key_generator_and_server" }
+prometheus_exporter = { path = "../prometheus_exporter" }
+micro_web3_decl = { path = "../web3_decl", default-features = false, features = [
+    "server",
+    "client",
+] }
+micro_object_store = { path = "../object_store" }
+micro_health_check = { path = "../health_check" }
+vlog = { path = "../vlog" }
+
+multivm = { path = "../multivm" }
+
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+metrics = "0.21"
+itertools = "0.10.3"
+ctrlc = { version = "3.1", features = ["termination"] }
+rand = "0.8"
+
+tokio = { version = "1", features = ["time"] }
+futures = { version = "0.3", features = ["compat"] }
+chrono = { version = "0.4", features = ["serde"] }
+anyhow = "1.0"
+thiserror = "1.0"
+async-trait = "0.1"
+bitflags = "1.3.2"
+
+# API dependencies
+jsonrpc-core = { git = "https://github.com/ZKAmoeba-Micro/jsonrpc.git", branch = "master" }
+jsonrpc-core-client = { git = "https://github.com/ZKAmoeba-Micro/jsonrpc.git", branch = "master" } # Required for the RPC trait
+jsonrpc-http-server = { git = "https://github.com/ZKAmoeba-Micro/jsonrpc.git", branch = "master" }
+jsonrpc-ws-server = { git = "https://github.com/ZKAmoeba-Micro/jsonrpc.git", branch = "master" }
+jsonrpc-derive = { git = "https://github.com/ZKAmoeba-Micro/jsonrpc.git", branch = "master" }
+jsonrpc-pubsub = { git = "https://github.com/ZKAmoeba-Micro/jsonrpc.git", branch = "master" }
+num = { version = "0.3.1", features = ["serde"] }
+bigdecimal = { version = "0.2.2", features = ["serde"] }
+reqwest = { version = "0.11", features = ["blocking", "json"] }
+hex = "0.4"
+governor = "0.4.2"
+tower-http = { version = "0.4.1", features = ["full"] }
+tower = { version = "0.4.13", features = ["full"] }
+axum = { version = "0.6.19", default-features = false, features = [
+    "http1",
+    "json",
+    "tokio",
+] }
+once_cell = "1.7"
+
+
+actix-rt = "2.2.0"
+actix-cors = "0.6.0-beta.2"
+actix-web = "4.0.0-beta.8"
+
+tracing = "0.1.26"
+
+zkevm_test_harness = { git = "https://github.com/ZKAmoeba-Micro/micro-zkevm_test_harness.git", branch = "v1.4.0" }
+
+[dev-dependencies]
+db_test_macro = { path = "../db_test_macro" }
+
+assert_matches = "1.5"
+micro_test_account = { path = "../test_account" }
+
+tempfile = "3.0.2"

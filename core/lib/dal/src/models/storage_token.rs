@@ -1,7 +1,10 @@
+use sqlx::types::{
+    chrono::{DateTime, NaiveDateTime, Utc},
+    BigDecimal,
+};
+
 use micro_types::tokens::{TokenMarketVolume, TokenMetadata, TokenPrice};
 use micro_utils::big_decimal_to_ratio;
-use sqlx::types::chrono::{DateTime, Utc};
-use sqlx::types::{chrono::NaiveDateTime, BigDecimal};
 
 #[derive(Debug, Clone, sqlx::FromRow)]
 pub struct StorageTokenMetadata {
@@ -31,11 +34,11 @@ impl From<StorageTokenPrice> for Option<TokenPrice> {
         match (&price.usd_price, price.usd_price_updated_at) {
             (Some(usd_price), Some(updated_at)) => Some(TokenPrice {
                 usd_price: big_decimal_to_ratio(usd_price).unwrap(),
-                last_updated: DateTime::<Utc>::from_utc(updated_at, Utc),
+                last_updated: DateTime::<Utc>::from_naive_utc_and_offset(updated_at, Utc),
             }),
             (None, None) => None,
             _ => {
-                vlog::warn!(
+                tracing::warn!(
                     "Found storage token with {:?} `usd_price` and {:?} `usd_price_updated_at`",
                     price.usd_price,
                     price.usd_price_updated_at
@@ -59,7 +62,7 @@ impl From<StorageTokenMarketVolume> for Option<TokenMarketVolume> {
             .as_ref()
             .map(|volume| TokenMarketVolume {
                 market_volume: big_decimal_to_ratio(volume).unwrap(),
-                last_updated: DateTime::<Utc>::from_utc(
+                last_updated: DateTime::<Utc>::from_naive_utc_and_offset(
                     market_volume
                         .market_volume_updated_at
                         .expect("If `market_volume` is Some then `updated_at` must be Some"),

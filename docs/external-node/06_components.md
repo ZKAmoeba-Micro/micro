@@ -39,10 +39,10 @@ The actual execution of batches takes place within the VM, which is identical in
 
 ## Reorg Detector
 
-In zkAmoeba, it is theoretically possible for L1 batches to be reverted before the corresponding "execute" operation is
-applied on L1, that is before the block is [final][finality]. Such situations are highly uncommon and typically occur
+In zkAmoeba, it is theoretically possible for L1 batches to be reverted before the corresponding "execute" operation
+is applied on L1, that is before the block is [final][finality]. Such situations are highly uncommon and typically occur
 due to significant issues: e.g. a bug in the sequencer implementation preventing L1 batch commitment. Prior to batch
-finality, the zkAmoeba operator can perform a rollback, reverting one or more batches and restoring the blockchain state
+finality, the micro operator can perform a rollback, reverting one or more batches and restoring the blockchain state
 to a previous point. Finalized batches cannot be reverted at all.
 
 However, even though such situations are rare, the EN must handle them correctly.
@@ -53,7 +53,7 @@ the root hashes for the latest available L1 batch do not match, the Reorg Detect
 responsible for the divergence. Subsequently, it rolls back the local state and restarts the node. Upon restart, the EN
 resumes normal operation.
 
-[finality]: https://docs.zkamoeba.com/docs/dev/developer-guides/finality.html
+[finality]: https://era.micro.io/docs/dev/developer-guides/finality.html
 
 ## Consistency Checker
 

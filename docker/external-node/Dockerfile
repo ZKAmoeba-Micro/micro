@@ -1,20 +1,33 @@
-# For using private GitHub dependencies, CI downdloads all crates outside of the contatiner
-# Not expected to work locally
-
+# Will work locally only after prior contracts build
 # syntax=docker/dockerfile:experimental
-FROM rust:1.67-buster as builder
-RUN apt-get update && apt-get install -y clang && rm -rf /var/lib/apt/lists/*
+FROM debian:bookworm-slim as builder
+
+RUN apt-get update && apt-get install -y curl clang openssl libssl-dev gcc g++ \
+    pkg-config build-essential libclang-dev && \
+    rm -rf /var/lib/apt/lists/*
+
+ENV RUSTUP_HOME=/usr/local/rustup \
+    CARGO_HOME=/usr/local/cargo \
+    PATH=/usr/local/cargo/bin:$PATH
+
+RUN curl https://sh.rustup.rs -sSf | bash -s -- -y && \
+    rustup install nightly-2023-07-21 && \
+    rustup default nightly-2023-07-21
+
 WORKDIR /usr/src/micro
 COPY . .
 
-RUN CARGO_HOME=./cargo cargo build --release --bin micro_external_node
+RUN cargo build --release
+RUN cargo install sqlx-cli --version 0.5.13
 
-FROM debian:buster-slim
+FROM debian:bookworm-slim
+
 RUN apt-get update && apt-get install -y curl libpq5 ca-certificates && rm -rf /var/lib/apt/lists/*
-EXPOSE 3000
-EXPOSE 3031
-EXPOSE 3030
+
 COPY --from=builder /usr/src/micro/target/release/micro_external_node /usr/bin
+COPY --from=builder /usr/src/micro/target/release/block_reverter /usr/bin
+COPY --from=builder /usr/local/cargo/bin/sqlx /usr/bin
+COPY --from=builder /usr/src/micro/docker/external-node/entrypoint.sh /usr/bin
 COPY etc/system-contracts/bootloader/build/artifacts/ /etc/system-contracts/bootloader/build/artifacts/
 COPY etc/system-contracts/contracts/artifacts/ /etc/system-contracts/contracts/artifacts/
 COPY etc/system-contracts/contracts/precompiles/artifacts/ /etc/system-contracts/contracts/precompiles/artifacts/
@@ -23,8 +36,9 @@ COPY contracts/ethereum/artifacts/ /contracts/ethereum/artifacts/
 COPY contracts/micro/artifacts-zk/ /contracts/micro/artifacts-zk/
 COPY etc/tokens/ /etc/tokens/
 COPY etc/ERC20/ /etc/ERC20/
-COPY core/bin/verification_key_generator_and_server/data/ /core/bin/verification_key_generator_and_server/data/
-COPY etc/env/ext-node.env /etc/env/
-COPY core/lib/dal/migrations/ /migrations/
+COPY etc/multivm_bootloaders/ /etc/multivm_bootloaders/
+COPY core/lib/dal/migrations/ /migrations
 
-ENTRYPOINT ["micro_external_node"]
+RUN chmod +x /usr/bin/entrypoint.sh
+
+ENTRYPOINT [ "sh", "/usr/bin/entrypoint.sh"]

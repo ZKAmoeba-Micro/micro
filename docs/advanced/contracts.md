@@ -2,9 +2,9 @@
 
 Now that we know how to bridge tokens back and forth, let's talk about running things on micro.
 
-We have a bunch of great tutorials (like this one <https://docs.zkamoeba.com/docs/api/hardhat/getting-started.html>)
-that you can follow to get the exact code & command line calls to create the contracts - so in this article, let's focus
-on how things differ between micro and Ethereum.
+We have a bunch of great tutorials (like this one <https://era.micro.io/docs/api/hardhat/getting-started.html>) that
+you can follow to get the exact code & command line calls to create the contracts - so in this article, let's focus on
+how things differ between micro and Ethereum.
 
 **Note** Before reading this article, I'd recommend doing the hardhat tutorial above.
 
@@ -29,20 +29,20 @@ The main part (and the main cost) of the micro is the proving system. In order t
 running a little bit different virtual machine (zkEVM) - that has a slightly different set of opcodes, and also contains
 a bunch of registers. More details on this will be written in the future articles.
 
-Having a different VM means that we must have a separate compiler [zk-solc](https://github.com/zkamoeba/zksolc-bin) - as
-the bytecode that is produced by this compiler has to use the zkEVM specific opcodes.
+Having a different VM means that we must have a separate compiler [zk-solc](https://github.com/ZKAmoeba-Micro/zksolc-bin) -
+as the bytecode that is produced by this compiler has to use the zkEVM specific opcodes.
 
 While having a separte compiler introduces a bunch of challenges (for example, we need a custom
-[hardhat plugins](https://github.com/zkamoeba/hardhat-micro) ), it brings a bunch of benefits too: for example it allows
-us to move some of the VM logic (like new contract deployment) into System contracts - which allows faster & cheaper
-modifications and increased flexibility.
+[hardhat plugins](https://github.com/ZKAmoeba-Micro/hardhat-micro) ), it brings a bunch of benefits too: for example it
+allows us to move some of the VM logic (like new contract deployment) into System contracts - which allows faster &
+cheaper modifications and increased flexibility.
 
 ### micro system contracts
 
 Small note on system contracts: as mentioned above, we moved some of the VM logic into system contracts, which allows us
 to keep VM simpler (and with this - keep the proving system simpler).
 
-You can see the full list (and codes) of the system contracts here: <https://github.com/zkamoeba/system-contracts>.
+You can see the full list (and codes) of the system contracts here: <https://github.com/ZKAmoeba-Micro/system-contracts>.
 
 While some of them are not really visible to the contract developer (like the fact that we're running a special
 `Bootleader` to package a bunch of transactions together - more info in a future article) - some others are very
@@ -59,7 +59,7 @@ If you look on your hardhat example, you'll notice that your `deploy.ts` is actu
 `hardhat-micro-deploy` plugin.
 
 Which inside uses the micro's web3.js, that calls the contract deployer
-[here](https://github.com/zkamoeba/micro-2-dev/blob/a2853871778cebe8f09faebe6f2f5c07d29b81f1/sdk/micro-web3/src/contract.ts#L62)
+[here](https://github.com/ZKAmoeba-Micro/micro-2-dev/blob/a2853871778cebe8f09faebe6f2f5c07d29b81f1/sdk/micro-web3.js/src/contract.ts#L62)
 
 ```typescript
 override getDeployTransaction(..) {
@@ -70,8 +70,8 @@ override getDeployTransaction(..) {
 ```
 
 Also `ContractDeployer` adding a special prefix for all the new contract addresses. This means that contract addesses
-WILL be different on `micro` and Ethereum (and also leaves us the possibility of adding Ethereum addresses in the future
-if needed).
+WILL be different on `micro` and Ethereum (and also leaves us the possibility of adding Ethereum addresses in the
+future if needed).
 
 You can look for `CREATE2_PREFIX` and `CREATE_PREFIX` in the code.
 

@@ -127,7 +127,7 @@ You start by installing the 'compiler-tester' repo (see its README.md instructio
 it needs the LLVM etc etc.
 
 Afterwards, you can look at one of the tests (for example
-[tests/solidity/simple/default.sol](https://github.com/zkamoeba/era-compiler-tests/blob/main/solidity/simple/default.sol)).
+[tests/solidity/simple/default.sol](https://github.com/ZKAmoeba-Micro/micro-compiler-tests/blob/main/solidity/simple/default.sol)).
 
 ```solidity
 //! { "cases": [ {

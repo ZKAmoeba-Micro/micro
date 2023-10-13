@@ -48,8 +48,8 @@
     "name": "Basic Attention Token"
   },
   {
-    "name": "Matter Labs Test Token",
-    "symbol": "MLTT",
+    "name": "ZkAmoeba Test Token",
+    "symbol": "ZATT",
     "decimals": 18,
     "address": "0xb36B2e278F5F1980631aD10F693AB3E1bEBd9f70"
   }

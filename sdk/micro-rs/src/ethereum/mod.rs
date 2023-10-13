@@ -1,6 +1,8 @@
 //! Utilities for the on-chain operations, such as `Deposit` and `FullExit`.
 
 use core::{convert::TryFrom, time::Duration};
+use serde_json::{Map, Value};
+use std::time::Instant;
 use micro_types::{
     api::BridgeAddresses,
     web3::{
@@ -12,8 +14,6 @@ use micro_types::{
     L1ChainId, REQUIRED_L1_TO_L2_GAS_PER_PUBDATA_BYTE,
 };
 use micro_web3_decl::namespaces::{EthNamespaceClient, ZksNamespaceClient};
-use serde_json::{Map, Value};
-use std::time::Instant;
 
 use micro_eth_client::{
     clients::http::SigningClient, types::Error, BoundEthInterface, EthInterface,
@@ -67,6 +67,8 @@ pub struct EthereumProvider<S: EthereumSigner> {
     polling_interval: Duration,
 }
 
+// TODO (SMA-1623): create a way to pass `Options` (e.g. nonce, gas_limit, priority_fee_per_gas)
+// into methods that perform L1 transactions. The unit is wei.
 pub const DEFAULT_PRIORITY_FEE: u64 = 2_000_000_000;
 
 impl<S: EthereumSigner> EthereumProvider<S> {
@@ -497,6 +499,7 @@ impl<S: EthereumSigner> EthereumProvider<S> {
             gas_price
         };
 
+        // TODO (PLA-85): Add gas estimations for deposits in Rust SDK
         let l2_gas_limit = U256::from(3_000_000u32);
 
         let base_cost: U256 = self

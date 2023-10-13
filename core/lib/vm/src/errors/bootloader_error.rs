@@ -1,3 +1,4 @@
+/// Error codes returned by the bootloader.
 #[derive(Debug)]
 pub(crate) enum BootloaderErrorCode {
     EthCall,
@@ -23,7 +24,13 @@ pub(crate) enum BootloaderErrorCode {
     NotEnoughGasProvided,
     AccountReturnedInvalidMagic,
     PaymasterReturnedInvalidMagic,
-    GasPriceGreaterThanMaxFeePerGas,
+    MintEtherFailed,
+    FailedToAppendTransactionToL2Block,
+    FailedToSetL2Block,
+    L1MessengerPublishingFailed,
+    L1MessengerLogSendingFailed,
+    FailedToCallSystemContext,
+    FailedToPublishTimestampDataToL1,
     Unknown,
 }
 
@@ -53,7 +60,13 @@ impl From<u8> for BootloaderErrorCode {
             20 => BootloaderErrorCode::NotEnoughGasProvided,
             21 => BootloaderErrorCode::AccountReturnedInvalidMagic,
             22 => BootloaderErrorCode::PaymasterReturnedInvalidMagic,
-            24 => BootloaderErrorCode::GasPriceGreaterThanMaxFeePerGas,
+            23 => BootloaderErrorCode::MintEtherFailed,
+            24 => BootloaderErrorCode::FailedToAppendTransactionToL2Block,
+            25 => BootloaderErrorCode::FailedToSetL2Block,
+            26 => BootloaderErrorCode::L1MessengerPublishingFailed,
+            27 => BootloaderErrorCode::L1MessengerLogSendingFailed,
+            28 => BootloaderErrorCode::FailedToCallSystemContext,
+            29 => BootloaderErrorCode::FailedToPublishTimestampDataToL1,
             _ => BootloaderErrorCode::Unknown,
         }
     }

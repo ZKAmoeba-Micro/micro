@@ -1,0 +1,22 @@
+[package]
+name = "merkle_tree_consistency_checker"
+version = "0.1.0"
+edition = "2021"
+authors = []
+homepage = "https://www.zkamoeba.com/"
+repository = "https://github.com/ZKAmoeba-Micro/micro-era"
+license = "MIT OR Apache-2.0"
+keywords = ["blockchain", "micro"]
+categories = ["cryptography"]
+publish = false # We don't want to publish our binaries.
+
+[dependencies]
+micro_config = { path = "../../lib/config" }
+micro_merkle_tree = { path = "../../lib/merkle_tree" }
+micro_types = { path = "../../lib/types" }
+micro_storage = { path = "../../lib/storage" }
+vlog = { path = "../../lib/vlog" }
+
+anyhow = "1.0"
+clap = { version = "4.2.4", features = ["derive"] }
+tracing = "0.1"

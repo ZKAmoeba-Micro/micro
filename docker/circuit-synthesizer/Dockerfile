@@ -1,8 +1,4 @@
-# For using private GitHub dependencies, CI downdloads all crates and bellman-cuda dependency outside of the contatiner
-# Not expected to work locally
-
-# syntax=docker/dockerfile:experimental
-FROM debian:buster-slim as builder
+FROM debian:bookworm-slim as builder
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -15,15 +11,19 @@ ENV RUSTUP_HOME=/usr/local/rustup \
     PATH=/usr/local/cargo/bin:$PATH
 
 RUN curl https://sh.rustup.rs -sSf | bash -s -- -y && \
-    rustup install nightly-2023-02-21 && \
-    rustup default nightly-2023-02-21
+    rustup install nightly-2023-07-21 && \
+    rustup default nightly-2023-07-21
 
 WORKDIR /usr/src/micro
 COPY . .
 
-RUN CARGO_HOME=./cargo cargo build --release
+RUN cargo build --release
 
-FROM debian:buster-slim
+FROM debian:bookworm-slim
+
 RUN apt-get update && apt-get install -y curl openssl libpq5 ca-certificates && rm -rf /var/lib/apt/lists/*
+
+COPY core/bin/verification_key_generator_and_server/data/ /core/bin/verification_key_generator_and_server/data/
 COPY --from=builder /usr/src/micro/target/release/micro_circuit_synthesizer /usr/bin/
+
 ENTRYPOINT ["micro_circuit_synthesizer"]

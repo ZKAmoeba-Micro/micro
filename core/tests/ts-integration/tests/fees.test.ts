@@ -166,7 +166,7 @@ async function updateReport(
 }
 
 async function killServerAndWaitForShutdown(provider: micro.Provider) {
-    await utils.exec('pkill -9 micro_server');
+    await utils.exec('pkill micro_server');
     // Wait until it's really stopped.
     let iter = 0;
     while (iter < 30) {
@@ -190,7 +190,8 @@ async function setInternalL1GasPrice(provider: micro.Provider, newPrice?: string
     } catch (_) {}
 
     // Run server in background.
-    let command = 'zk server --components api,tree,tree_lightweight,eth,data_fetcher,state_keeper';
+    let command = 'zk server --components api,tree,eth,data_fetcher,state_keeper';
+    command = `DATABASE_MERKLE_TREE_MODE=lightweight ${command}`;
     if (newPrice) {
         command = `ETH_SENDER_GAS_ADJUSTER_INTERNAL_ENFORCED_L1_GAS_PRICE=${newPrice} ${command}`;
     }

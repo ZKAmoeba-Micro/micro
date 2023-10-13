@@ -1,21 +1,31 @@
 [package]
 name = "micro_state"
-version = "1.0.0"
-edition = "2018"
+version = "0.1.0"
+edition = "2021"
 authors = []
-homepage = ""
-repository = "https://github.com/ZKAmoeba-Micro/micro"
-license = "Apache-2.0"
+homepage = "https://www.zkamoeba.com/"
+repository = "https://github.com/ZKAmoeba-Micro/micro-era"
+license = "MIT OR Apache-2.0"
 keywords = ["blockchain", "micro"]
 categories = ["cryptography"]
 
 [dependencies]
-micro_utils = { path = "../utils", version = "1.0" }
-micro_types = { path = "../types", version = "1.0" }
-micro_storage = { path = "../storage", version = "1.0" }
+vise = { git = "https://github.com/ZKAmoeba-Micro/vise.git", version = "0.1.0", rev = "9d097ab747b037b6e62504df1db5b975425b6bdd" }
+micro_dal = { path = "../dal" }
+micro_types = { path = "../types" }
+micro_utils = { path = "../utils" }
+micro_storage = { path = "../storage" }
 
-vlog = { path = "../../lib/vlog", version = "1.0" }
-metrics = "0.20"
+anyhow = "1.0"
+mini-moka = "0.10.0"
+tokio = { version = "1", features = ["rt"] }
+tracing = "0.1"
+itertools = "0.10.3"
+
+metrics = "0.21"
 
 [dev-dependencies]
+db_test_macro = { path = "../db_test_macro" }
+
+rand = "0.8.5"
 tempfile = "3.0.2"

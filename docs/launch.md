@@ -1,6 +1,6 @@
 # Running the application
 
-This document covers common scenarios of launching zkAmoeba applications set locally.
+This document covers common scenarios of launching micro applications set locally.
 
 ## Prerequisites
 
@@ -12,7 +12,7 @@ Prepare dev environment prerequisites: see
 
 Setup:
 
-```bash
+```
 zk # installs and builds zk itself
 zk init
 ```
@@ -20,14 +20,14 @@ zk init
 During the first initialization you have to download around 8 GB of setup files, this should be done once. If you have a
 problem on this step of the initialization, see help for the `zk run plonk-setup` command.
 
-If you face any other problems with the `zk init` command, go to the [Troubleshooting](#troubleshooting) section at the
+If you face any other problems with the `zk init` command, go to the [Troubleshooting](#Troubleshooting) section at the
 end of this file. There are solutions for some common error cases.
 
 To completely reset the dev environment:
 
 - Stop services:
 
-  ```bash
+  ```
   zk down
   ```
 
@@ -36,13 +36,13 @@ To completely reset the dev environment:
 If `zk init` has already been executed, and now you only need to start docker containers (e.g. after reboot), simply
 launch:
 
-```bash
+```
 zk up
 ```
 
 ## (Re)deploy db and contracts
 
-```bash
+```
 zk contract redeploy
 ```
 
@@ -52,13 +52,13 @@ Env config files are held in `etc/env/`
 
 List configurations:
 
-```bash
+```
 zk env
 ```
 
 Switch between configurations:
 
-```bash
+```
 zk env <ENV_NAME>
 ```
 
@@ -69,7 +69,7 @@ execution.
 
 Run server:
 
-```bash
+```
 zk server
 ```
 
@@ -85,7 +85,7 @@ Get the service_account.json file containing the GCP credentials from kubernetes
 testnet2) add that file to the default location ~/gcloud/service_account.json or update object_store.toml with the file
 location
 
-```bash
+```
 zk server
 ```
 
@@ -165,7 +165,7 @@ zk contract_verifier
 
 **Problem**. `zk init` fails with the following error:
 
-```bash
+```
 Initializing download: https://storage.googleapis.com/matterlabs-setup-keys-us/setup-keys/setup_2%5E20.key
 SSL error: certificate verify failed
 ```
@@ -176,7 +176,7 @@ SSL error: certificate verify failed
 
 **Problem**. `zk init` fails with the following error:
 
-```bash
+```
 fs_1.default.rmSync is not a function
 ```
 
@@ -256,8 +256,8 @@ Error: Genesis is not needed (either Postgres DB or tree's Rocks DB is not empty
 ```
 
 **Description**. This means that your bytecode config file has an empty entry: `"bytecode": "0x"`. This happens because
-your `micro-2-dev/etc/system-contracts/package.json`'s dependency on `"@zkamoeba/hardhat-micro-solc"` is outdated. We
-don't expect this error to happen as we've updated to latest version which fixes the problem.
+your `micro-2-dev/etc/system-contracts/package.json`'s dependency on `"@zkamoeba/hardhat-micro-solc"` is outdated.
+We don't expect this error to happen as we've updated to latest version which fixes the problem.
 
 **Solution**. Update your dependency and reinit:
 
@@ -307,8 +307,8 @@ Error: Child process exited with code 1
 ```
 
 **Description**. This means that your bytecode config file has an empty entry: `"bytecode": "0x"`. This happens because
-your `micro-2-dev/contracts/micro/package.json`'s dependency on `"@zkamoeba/hardhat-micro-solc"` is outdated. We don't
-expect this error to happen as we've updated to latest version which fixes the problem.
+your `micro-2-dev/contracts/micro/package.json`'s dependency on `"@zkamoeba/hardhat-micro-solc"` is outdated. We
+don't expect this error to happen as we've updated to latest version which fixes the problem.
 
 **Solution**. Update your dependency and reinit:
 

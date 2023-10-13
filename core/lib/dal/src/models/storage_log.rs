@@ -1,5 +1,5 @@
-use micro_types::{AccountTreeId, Address, StorageKey, StorageLog, StorageLogKind, H256};
 use sqlx::types::chrono::NaiveDateTime;
+use micro_types::{AccountTreeId, Address, StorageKey, StorageLog, StorageLogKind, H256};
 
 #[derive(sqlx::FromRow, Debug, Clone)]
 pub struct DBStorageLog {

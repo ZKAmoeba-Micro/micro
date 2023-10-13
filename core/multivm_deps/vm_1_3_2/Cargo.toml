@@ -1,0 +1,33 @@
+[package]
+name = "vm_1_3_2"
+version = "0.1.0"
+edition = "2018"
+authors = []
+homepage = "https://www.zkamoeba.com/"
+repository = "https://github.com/ZKAmoeba-Micro/micro-era"
+license = "MIT OR Apache-2.0"
+keywords = ["blockchain", "micro"]
+categories = ["cryptography"]
+
+[dependencies]
+zkevm-assembly = { git = "https://github.com/ZKAmoeba-Micro/micro-zkEVM-assembly.git", branch = "v1.3.2" }
+zk_evm = { git = "https://github.com/ZKAmoeba-Micro/micro-zk_evm.git", branch = "v1.3.3" }
+
+micro_config = { path = "../../lib/config" }
+micro_types = { path = "../../lib/types" }
+micro_utils = { path = "../../lib/utils" }
+micro_state = { path = "../../lib/state" }
+
+micro_contracts = { path = "../../lib/contracts" }
+
+anyhow = "1.0"
+hex = "0.4"
+itertools = "0.10"
+ethabi = "18.0.0"
+once_cell = "1.7"
+thiserror = "1.0"
+tracing = "0.1"
+
+[dev-dependencies]
+micro_eth_signer = { path = "../../lib/eth_signer" }
+tokio = { version = "1", features = ["time"] }

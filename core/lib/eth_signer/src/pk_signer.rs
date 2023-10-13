@@ -104,7 +104,7 @@ mod test {
             max_priority_fee_per_gas: U256::from(1u32),
             value: Default::default(),
             data: vec![1, 2, 3],
-            chain_id: 380,
+            chain_id: 270,
             transaction_type: Some(U64::from(1u32)),
             access_list: None,
         };

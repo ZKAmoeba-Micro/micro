@@ -1,0 +1,37 @@
+[package]
+name = "setup_key_generator_and_server"
+version = "0.1.0"
+edition = "2018"
+authors = []
+homepage = "https://www.zkamoeba.com/"
+repository = "https://github.com/ZKAmoeba-Micro/micro-era"
+license = "MIT OR Apache-2.0"
+keywords = ["blockchain", "micro"]
+categories = ["cryptography"]
+
+[lib]
+name = "micro_setup_key_server"
+path = "src/lib.rs"
+
+[[bin]]
+name = "micro_setup_key_generator"
+path = "src/main.rs"
+
+[dependencies]
+micro_types = { path = "../../core/lib/types" }
+vlog = { path = "../../core/lib/vlog" }
+micro_config = { path = "../../core/lib/config" }
+
+circuit_testing = { git = "https://github.com/ZKAmoeba-Micro/micro-circuit_testing.git", branch = "main" }
+api = { git = "https://github.com/ZKAmoeba-Micro/micro-heavy-ops-service.git", branch = "v1.3.3", features = [
+    "gpu",
+], default-features = false }
+prover-service = { git = "https://github.com/ZKAmoeba-Micro/micro-heavy-ops-service.git", branch = "v1.3.3", features = [
+    "gpu",
+], default-features = false }
+zkevm_test_harness = { git = "https://github.com/ZKAmoeba-Micro/micro-zkevm_test_harness.git", branch = "v1.3.3" }
+
+anyhow = "1.0"
+tracing = "0.1"
+structopt = "0.3.26"
+itertools = "0.10.5"

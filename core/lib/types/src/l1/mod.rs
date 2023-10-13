@@ -1,24 +1,24 @@
 //! Definition of micro network priority operations: operations initiated from the L1.
 
-use micro_basic_types::{
-    ethabi::{decode, ParamType, Token},
-    Address, Log, PriorityOpId, H160, H256, U256,
-};
-use micro_utils::u256_to_account_address;
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
 
+use micro_basic_types::{
+    ethabi::{decode, ParamType, Token},
+    Address, L1BlockNumber, Log, PriorityOpId, H160, H256, U256,
+};
+use micro_utils::u256_to_account_address;
+
 use crate::{
+    helpers::unix_timestamp_ms,
     l1::error::L1TxParseError,
+    l2::TransactionType,
     priority_op_onchain_data::{PriorityOpOnchainData, PriorityOpOnchainMetadata},
     tx::Execute,
-    ExecuteTransactionCommon,
+    ExecuteTransactionCommon, PRIORITY_OPERATION_L2_TX_TYPE, PROTOCOL_UPGRADE_TX_TYPE,
 };
 
 use super::Transaction;
-
-use crate::helpers::unix_timestamp_ms;
-use crate::l2::TransactionType;
 
 pub mod error;
 
@@ -47,9 +47,10 @@ impl Default for OpProcessingType {
     }
 }
 
-#[derive(Debug, PartialEq, Serialize, Deserialize, Clone, Copy)]
+#[derive(Debug, PartialEq, Serialize, Deserialize, Clone, Copy, Default)]
 #[repr(u8)]
 pub enum PriorityQueueType {
+    #[default]
     Deque = 0,
     HeapBuffer = 1,
     Heap = 2,
@@ -68,10 +69,8 @@ impl TryFrom<u8> for PriorityQueueType {
     }
 }
 
-impl Default for PriorityQueueType {
-    fn default() -> Self {
-        PriorityQueueType::Deque
-    }
+pub fn is_l1_tx_type(tx_type: u8) -> bool {
+    tx_type == PRIORITY_OPERATION_L2_TX_TYPE || tx_type == PROTOCOL_UPGRADE_TX_TYPE
 }
 
 #[derive(Default, Debug, Clone, Serialize, Deserialize)]
@@ -152,18 +151,20 @@ impl From<L1Tx> for Transaction {
             common_data: ExecuteTransactionCommon::L1(common_data),
             execute,
             received_timestamp_ms,
+            raw_bytes: None,
         }
     }
 }
 
 impl TryFrom<Transaction> for L1Tx {
-    type Error = ();
+    type Error = &'static str;
 
     fn try_from(value: Transaction) -> Result<Self, Self::Error> {
         let Transaction {
             common_data,
             execute,
             received_timestamp_ms,
+            ..
         } = value;
         match common_data {
             ExecuteTransactionCommon::L1(common_data) => Ok(L1Tx {
@@ -171,7 +172,10 @@ impl TryFrom<Transaction> for L1Tx {
                 common_data,
                 received_timestamp_ms,
             }),
-            ExecuteTransactionCommon::L2(_) => Err(()),
+            ExecuteTransactionCommon::L2(_) => Err("Cannot convert L2Tx to L1Tx"),
+            ExecuteTransactionCommon::ProtocolUpgrade(_) => {
+                Err("Cannot convert ProtocolUpgradeTx to L1Tx")
+            }
         }
     }
 }
@@ -181,8 +185,8 @@ impl L1Tx {
         self.common_data.serial_id
     }
 
-    pub fn eth_block(&self) -> u64 {
-        self.common_data.eth_block
+    pub fn eth_block(&self) -> L1BlockNumber {
+        L1BlockNumber(self.common_data.eth_block as u32)
     }
 
     pub fn hash(&self) -> H256 {
@@ -194,6 +198,7 @@ impl TryFrom<Log> for L1Tx {
     type Error = L1TxParseError;
 
     fn try_from(event: Log) -> Result<Self, Self::Error> {
+        // TODO: refactor according to tx type
         let transaction_param_type = ParamType::Tuple(vec![
             ParamType::Uint(8),                                       // txType
             ParamType::Address,                                       // sender
@@ -215,11 +220,11 @@ impl TryFrom<Log> for L1Tx {
 
         let mut dec_ev = decode(
             &[
-                ParamType::Uint(256),      // tx ID
-                ParamType::FixedBytes(32), // tx hash
-                ParamType::Uint(64),       // expiration block
-                transaction_param_type,    // transaction data
-                                           // ParamType::Array(Box::new(ParamType::Bytes)), // factory deps
+                ParamType::Uint(256),                         // tx ID
+                ParamType::FixedBytes(32),                    // tx hash
+                ParamType::Uint(64),                          // expiration block
+                transaction_param_type,                       // transaction data
+                ParamType::Array(Box::new(ParamType::Bytes)), // factory deps
             ],
             &event.data.0,
         )?;
@@ -254,7 +259,7 @@ impl TryFrom<Log> for L1Tx {
         assert_eq!(transaction.len(), 16);
 
         let tx_type = transaction.remove(0).into_uint().unwrap();
-        assert_eq!(tx_type.clone(), U256::from(255u8)); // L1TxType
+        assert_eq!(tx_type.clone(), U256::from(PRIORITY_OPERATION_L2_TX_TYPE));
 
         let sender = transaction.remove(0).into_address().unwrap();
         let contract_address = transaction.remove(0).into_address().unwrap();
@@ -298,6 +303,7 @@ impl TryFrom<Log> for L1Tx {
         let signature = transaction.remove(0).into_bytes().unwrap();
         assert_eq!(signature.len(), 0);
 
+        // TODO (SMA-1621): check that reservedDynamic are constructed correctly.
         let _factory_deps_hashes = transaction.remove(0).into_array().unwrap();
         let _paymaster_input = transaction.remove(0).into_bytes().unwrap();
         let _reserved_dynamic = transaction.remove(0).into_bytes().unwrap();
@@ -305,15 +311,15 @@ impl TryFrom<Log> for L1Tx {
         // Decoding metadata
 
         // Finally, decode the factory dependencies
-        // let factory_deps = match dec_ev.remove(0) {
-        //     Token::Array(factory_deps) => factory_deps,
-        //     _ => unreachable!(),
-        // };
+        let factory_deps = match dec_ev.remove(0) {
+            Token::Array(factory_deps) => factory_deps,
+            _ => unreachable!(),
+        };
 
-        // let factory_deps = factory_deps
-        //     .into_iter()
-        //     .map(|token| token.into_bytes().unwrap())
-        //     .collect::<Vec<_>>();
+        let factory_deps = factory_deps
+            .into_iter()
+            .map(|token| token.into_bytes().unwrap())
+            .collect::<Vec<_>>();
 
         let common_data = L1TxCommonData {
             serial_id,
@@ -336,69 +342,13 @@ impl TryFrom<Log> for L1Tx {
         let execute = Execute {
             contract_address,
             calldata: calldata.to_vec(),
-            factory_deps: None,
+            factory_deps: Some(factory_deps),
             value: msg_value,
         };
         Ok(Self {
             common_data,
             execute,
             received_timestamp_ms: unix_timestamp_ms(),
-        })
-    }
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct L1FactoryDep {
-    pub serial_id: PriorityOpId,
-    pub dep_index: u64,
-    pub splitted_index: u64,
-    pub bytes: Vec<u8>,
-}
-
-impl TryFrom<Log> for L1FactoryDep {
-    type Error = L1TxParseError;
-
-    fn try_from(event: Log) -> Result<Self, Self::Error> {
-        let mut dec_ev = decode(
-            &[
-                ParamType::Uint(256), // tx ID
-                ParamType::Uint(256), // dep index
-                ParamType::Uint(256), // splitted index
-                ParamType::Bytes,     // factory dep
-            ],
-            &event.data.0,
-        )?;
-
-        let serial_id = PriorityOpId(
-            dec_ev
-                .remove(0)
-                .into_uint()
-                .as_ref()
-                .map(U256::as_u64)
-                .unwrap(),
-        );
-
-        let dep_index = dec_ev
-            .remove(0)
-            .into_uint()
-            .as_ref()
-            .map(U256::as_u64)
-            .unwrap();
-
-        let splitted_index = dec_ev
-            .remove(0)
-            .into_uint()
-            .as_ref()
-            .map(U256::as_u64)
-            .unwrap();
-
-        let bytes = dec_ev.remove(0).into_bytes().unwrap();
-
-        Ok(Self {
-            serial_id,
-            dep_index,
-            splitted_index,
-            bytes,
         })
     }
 }

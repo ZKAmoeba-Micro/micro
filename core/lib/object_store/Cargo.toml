@@ -1,27 +1,27 @@
 [package]
 name = "micro_object_store"
-version = "1.0.0"
+version = "0.1.0"
 edition = "2021"
 authors = []
-homepage = ""
-repository = "https://github.com/ZKAmoeba-Micro/micro"
-license = "Apache-2.0"
+homepage = "https://www.zkamoeba.com/"
+repository = "https://github.com/ZKAmoeba-Micro/micro-era"
+license = "MIT OR Apache-2.0"
 keywords = ["blockchain", "micro"]
 categories = ["cryptography"]
 
 [dependencies]
-micro_config = { path = "../../lib/config", version = "1.0" }
-micro_types = { path = "../types", version = "1.0" }
+vise = { git = "https://github.com/ZKAmoeba-Micro/vise.git", version = "0.1.0", rev = "9d097ab747b037b6e62504df1db5b975425b6bdd" }
+micro_config = { path = "../config" }
+micro_types = { path = "../types" }
 
+anyhow = "1.0"
+async-trait = "0.1"
 bincode = "1"
+google-cloud-storage = "0.12.0"
+google-cloud-auth = "0.11.0"
 http = "0.2.9"
-metrics = "0.20"
 tokio = { version = "1.21.2", features = ["full"] }
-vlog = { path = "../vlog", version = "1.0" }
-reqwest = { version = "0.11.18", features = ["blocking"] }
-oss-rust-sdk = "0.10.0"
-serde = "1.0"
-serde_json = "1.0"
+tracing = "0.1"
 
 [dev-dependencies]
 tempdir = "0.3.7"
