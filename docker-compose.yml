@@ -1,13 +1,14 @@
 version: '3.2'
 services:
-  lotus:
-    image: "zkamoeba/lotus:latest"
+  geth:
+    image: "matterlabs/geth:latest"
     ports:
-      - "1234:1234"
+      - "8545:8545"
+      - "8546:8546"
     volumes:
       - type: bind
-        source: ./volumes/lotus
-        target: /root
+        source: ./volumes/geth
+        target: /var/lib/geth/data
   postgres:
     image: "postgres:14"
     ports:
@@ -18,4 +19,3 @@ services:
         target: /var/lib/postgresql/data
     environment:
       - POSTGRES_HOST_AUTH_METHOD=trust
-

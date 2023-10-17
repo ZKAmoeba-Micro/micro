@@ -115,7 +115,7 @@ use micro_dal::connection::DbVariant;
 use structopt::StructOpt;
 
 #[derive(StructOpt)]
-#[structopt(name = "micro contract code verifier", author = "")]
+#[structopt(name = "micro contract code verifier", author = "zka")]
 struct Opt {
     /// Number of jobs to process. If None, runs indefinitely.
     #[structopt(long)]

@@ -8,7 +8,7 @@ const IMAGES = [
     'cross-external-nodes-checker',
     'contract-verifier',
     'prover-v2',
-    'lotus',
+    'geth',
     'local-node',
     'zk-environment',
     'circuit-synthesizer',
