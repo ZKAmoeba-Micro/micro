@@ -354,10 +354,7 @@ function eip712TxHash(transaction: any, ethSignature?: EthereumSignature) {
     return ethers.utils.keccak256(ethers.utils.hexConcat([signedDigest, hashedSignature]));
 }
 
-export function getL2HashFromPriorityOp(
-    txReceipt: ethers.providers.TransactionReceipt,
-    microAddress: Address
-): string {
+export function getL2HashFromPriorityOp(txReceipt: ethers.providers.TransactionReceipt, microAddress: Address): string {
     let txHash: string = null;
     for (const log of txReceipt.logs) {
         if (log.address.toLowerCase() != microAddress.toLowerCase()) {

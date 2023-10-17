@@ -1,7 +1,7 @@
 # Advanced documentation
 
-This documentation is aimed at advanced users who are interested in developing the zkAmoeba itself (rather than just
-the contracts on top) - and would like to understand how the system works internally.
+This documentation is aimed at advanced users who are interested in developing the zkAmoeba itself (rather than just the
+contracts on top) - and would like to understand how the system works internally.
 
 The documents in this directory are not meant to be a full specification, but give you the rough understanding of the
 system internals.

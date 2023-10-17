@@ -136,8 +136,8 @@ finalization hints if the circuit changes. Below steps can be used to perform ci
    generation can be done in parallel), this step is important, since the setup data requires the new VK, we need to
    wait for it to finish.
 6. Run the cpu setup data generation
-   [workflow](https://github.com/ZKAmoeba-Micro/micro-2-dev/actions/workflows/fri-setup-data-generator.yml) against the PR
-   to generate the cpu setup data.
+   [workflow](https://github.com/ZKAmoeba-Micro/micro-2-dev/actions/workflows/fri-setup-data-generator.yml) against the
+   PR to generate the cpu setup data.
 7. Run the gpu setup data generation
    [workflow](https://github.com/ZKAmoeba-Micro/micro-2-dev/actions/workflows/fri-gpu-setup-data-generator.yml) against
    the PR to generate the gpu setup data.
@@ -146,5 +146,5 @@ finalization hints if the circuit changes. Below steps can be used to perform ci
    [fri-gpu-prover-integration-test.yml](../../.github/workflows/fri-gpu-prover-integration-test.yml), make sure to only
    do it from `FRI prover` not old.
 9. Run the GPU integration test
-   [workflow](https://github.com/ZKAmoeba-Micro/micro-2-dev/actions/workflows/fri-gpu-prover-integration-test.yml) against
-   the PR to verify the GPU prover is working fine with new circuits.
+   [workflow](https://github.com/ZKAmoeba-Micro/micro-2-dev/actions/workflows/fri-gpu-prover-integration-test.yml)
+   against the PR to verify the GPU prover is working fine with new circuits.

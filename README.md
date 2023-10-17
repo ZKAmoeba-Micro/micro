@@ -17,7 +17,7 @@ The following questions will be answered by the following resources:
 | How can I set up my dev environment?                    | [setup-dev.md](docs/setup-dev.md)       |
 | How can I run the project?                              | [launch.md](docs/launch.md)             |
 | What is the logical project structure and architecture? | [architecture.md](docs/architecture.md) |
-| Where can I find developer docs?                        | [docs](https://v2-docs.micro.io/dev/)  |
+| Where can I find developer docs?                        | [docs](https://v2-docs.micro.io/dev/)   |
 
 ## Policies
 

@@ -15,7 +15,6 @@ There are many ways to contribute to the ZK Stack:
    and opening a PR.
 4. Report security issues, see [our security policy](./github/SECURITY.md).
 
-
 ## Fixing issues
 
 To contribute code fixing issues, please fork the repo, fix an issue, commit, add documentation as per the PR template,

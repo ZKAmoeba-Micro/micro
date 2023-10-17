@@ -10,8 +10,7 @@ If you'd like to report a security issue in the repositories of ZKAmoeba-Micro o
 ## Other Security Issues
 
 We take an impact-first approach instead of a rules-first approach. Therefore, if you believe you found the impactful
-issue but can't report it via the Bug Bounty, please email us at
-[security@zkamoeba.dev](mailto:security@zkamoeba.dev).
+issue but can't report it via the Bug Bounty, please email us at [security@zkamoeba.dev](mailto:security@zkamoeba.dev).
 
 ### PGP Key
 

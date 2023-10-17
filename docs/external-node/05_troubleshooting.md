@@ -20,7 +20,7 @@ will immediately crash.
   you see this panic, look for a panic that happened shortly before it to find the real cause.
 
 Other kinds of panic aren't normally expected. While in most cases, the state will be recovered after a restart, please
-[report][contact_us] such cases to ZKAmoeba  regardless.
+[report][contact_us] such cases to ZKAmoeba regardless.
 
 ## Genesis Issues
 
@@ -39,7 +39,7 @@ you don't consider actionable, you may disable logs for a component by tweaking 
 | ERROR | "One of the tokio actors unexpectedly finished"       | One of the components crashed, and the node is restarting.                                               |
 | WARN  | "Stop signal received, <component> is shutting down"  | Satellite log of the message above                                                                       |
 | ERROR | "A lot of requests to the remote API failed in a row" | The remote API used to update token lists is probably down. Logs should disappear once API is available. |
-| WARN  | "Server returned an error status code: 429"           | The main API rate limits are too strict. [Contact][contact_us] ZKAmoeba to discuss the situation.     |
+| WARN  | "Server returned an error status code: 429"           | The main API rate limits are too strict. [Contact][contact_us] ZKAmoeba to discuss the situation.        |
 | WARN  | "Following transport error occurred"                  | There was a problem with fetching data from the main node.                                               |
 | WARN  | "Unable to get the gas price"                         | There was a problem with fetching data from the main node.                                               |
 | WARN  | "Consistency checker error"                           | There are problems querying L1, check the Web3 URL you specified in the config.                          |
