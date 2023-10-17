@@ -4,13 +4,13 @@ version = "0.1.0"
 edition = "2021"
 authors = []
 homepage = "https://www.zkamoeba.com/"
-repository = "https://github.com/ZKAmoeba-Micro/micro-era"
+repository = "https://github.com/ZKAmoeba-Micro/micro"
 license = "MIT OR Apache-2.0"
 keywords = ["blockchain", "micro"]
 categories = ["cryptography"]
 
 [dependencies]
-vise = { git = "https://github.com/ZKAmoeba-Micro/vise.git", version = "0.1.0", rev = "9d097ab747b037b6e62504df1db5b975425b6bdd" }
+vise = { git = "https://github.com/ZKAmoeba-Micro/vise.git", branch = "main"}
 
 num_cpus = "1.13"
 once_cell = "1.18.0"

@@ -4,13 +4,13 @@ version = "0.1.0"
 edition = "2018"
 authors = []
 homepage = "https://www.zkamoeba.com/"
-repository = "https://github.com/ZKAmoeba-Micro/micro-era"
+repository = "https://github.com/ZKAmoeba-Micro/micro"
 license = "MIT OR Apache-2.0"
 keywords = ["blockchain", "micro"]
 categories = ["cryptography"]
 
 [dependencies]
-vise = { git = "https://github.com/ZKAmoeba-Micro/vise.git", version = "0.1.0", rev = "9d097ab747b037b6e62504df1db5b975425b6bdd" }
+vise = { git = "https://github.com/ZKAmoeba-Micro/vise.git", branch = "main"}
 zk_evm = { git = "https://github.com/ZKAmoeba-Micro/micro-zk_evm.git", branch = "v1.3.3" }
 micro_config = { path = "../../lib/config" }
 micro_types = { path = "../../lib/types" }
