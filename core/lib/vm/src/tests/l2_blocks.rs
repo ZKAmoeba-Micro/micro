@@ -13,7 +13,6 @@ use crate::{
     ExecutionResult, Halt, HistoryEnabled, HistoryMode, L2BlockEnv, TxExecutionMode, Vm,
     VmExecutionMode,
 };
-use zk_evm::aux_structures::Timestamp;
 use micro_config::constants::{
     CURRENT_VIRTUAL_BLOCK_INFO_POSITION, REQUIRED_L1_TO_L2_GAS_PER_PUBDATA_BYTE,
 };
@@ -27,6 +26,7 @@ use micro_types::{
     SYSTEM_CONTEXT_CURRENT_TX_ROLLING_HASH_POSITION, U256,
 };
 use micro_utils::{h256_to_u256, u256_to_h256};
+use zk_evm::aux_structures::Timestamp;
 
 fn get_l1_noop() -> Transaction {
     Transaction {

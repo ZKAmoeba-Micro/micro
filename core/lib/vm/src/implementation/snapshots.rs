@@ -2,8 +2,8 @@ use vise::{Buckets, EncodeLabelSet, EncodeLabelValue, Family, Histogram, Metrics
 
 use std::time::Duration;
 
-use zk_evm::aux_structures::Timestamp;
 use micro_state::WriteStorage;
+use zk_evm::aux_structures::Timestamp;
 
 use crate::{
     old_vm::{history_recorder::HistoryEnabled, oracles::OracleWithHistory},

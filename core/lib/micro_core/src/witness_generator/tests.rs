@@ -1,7 +1,7 @@
 use crate::witness_generator::precalculated_merkle_paths_provider::PrecalculatedMerklePathsProvider;
-use std::convert::TryInto;
 use micro_types::proofs::StorageLogMetadata;
 use micro_types::zkevm_test_harness::witness::tree::{BinarySparseStorageTree, MicroStorageLeaf};
+use std::convert::TryInto;
 
 #[test]
 fn test_filter_renumerate_all_first_writes() {

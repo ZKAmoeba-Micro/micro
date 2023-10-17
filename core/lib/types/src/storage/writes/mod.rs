@@ -1,8 +1,8 @@
 use std::convert::TryInto;
 
 use crate::H256;
-use serde::{Deserialize, Serialize};
 use micro_basic_types::{Address, U256};
+use serde::{Deserialize, Serialize};
 
 use self::compression::compress_with_best_strategy;
 

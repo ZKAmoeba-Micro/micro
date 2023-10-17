@@ -1,10 +1,10 @@
-use std::convert::TryInto;
 use micro_contracts::BaseSystemContractsHashes;
 use micro_types::{
     api,
     protocol_version::{self, L1VerifierConfig, ProtocolUpgradeTx, VerifierParams},
     Address, H256,
 };
+use std::convert::TryInto;
 
 use sqlx::types::chrono::NaiveDateTime;
 

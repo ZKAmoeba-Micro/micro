@@ -1,10 +1,10 @@
 use crate::{get_vk_for_circuit_type, get_vks_for_basic_circuits, get_vks_for_commitment};
 use itertools::Itertools;
-use serde_json::Value;
-use std::collections::HashMap;
 use micro_types::zkevm_test_harness::abstract_micro_circuit::concrete_circuits::MicroCircuit;
 use micro_types::zkevm_test_harness::bellman::bn256::Bn256;
 use micro_types::zkevm_test_harness::bellman::plonk::better_better_cs::setup::VerificationKey;
+use serde_json::Value;
+use std::collections::HashMap;
 
 use micro_types::zkevm_test_harness::witness::oracle::VmWitnessOracle;
 

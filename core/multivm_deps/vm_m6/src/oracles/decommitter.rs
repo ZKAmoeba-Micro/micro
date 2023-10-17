@@ -3,15 +3,15 @@ use std::collections::HashMap;
 use crate::history_recorder::{HistoryEnabled, HistoryMode, HistoryRecorder, WithHistory};
 use crate::storage::{Storage, StoragePtr};
 
+use micro_types::U256;
+use micro_utils::bytecode::bytecode_len_in_words;
+use micro_utils::{bytes_to_be_words, u256_to_h256};
 use zk_evm::abstractions::MemoryType;
 use zk_evm::aux_structures::Timestamp;
 use zk_evm::{
     abstractions::{DecommittmentProcessor, Memory},
     aux_structures::{DecommittmentQuery, MemoryIndex, MemoryLocation, MemoryPage, MemoryQuery},
 };
-use micro_types::U256;
-use micro_utils::bytecode::bytecode_len_in_words;
-use micro_utils::{bytes_to_be_words, u256_to_h256};
 
 use super::OracleWithHistory;
 

@@ -9,9 +9,9 @@ mod pubsub_checker;
 use crate::config::CheckerConfig;
 use crate::helpers::setup_sigint_handler;
 use checker::Checker;
+use micro_utils::wait_for_tasks::wait_for_tasks;
 use pubsub_checker::PubSubChecker;
 use tokio::sync::watch;
-use micro_utils::wait_for_tasks::wait_for_tasks;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {

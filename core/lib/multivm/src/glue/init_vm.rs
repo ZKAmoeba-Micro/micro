@@ -2,9 +2,9 @@ use super::GlueInto;
 use crate::glue::history_mode::HistoryMode;
 use crate::vm_instance::{VmInstanceData, VmInstanceVersion};
 use crate::VmInstance;
-use vm_latest::{L1BatchEnv, SystemEnv};
 use micro_state::ReadStorage;
 use micro_utils::h256_to_u256;
+use vm_latest::{L1BatchEnv, SystemEnv};
 
 impl<'a, S: ReadStorage, H: HistoryMode> VmInstance<'a, S, H> {
     pub fn new(

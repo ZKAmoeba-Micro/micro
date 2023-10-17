@@ -2,16 +2,16 @@ use crate::glue::GlueInto;
 use crate::{memory::SimpleMemory, vm_with_bootloader::BlockContext};
 use once_cell::sync::Lazy;
 
+use micro_config::constants::ZKPORTER_IS_AVAILABLE;
+use micro_contracts::{read_zbin_bytecode, BaseSystemContracts};
+use micro_types::{Address, StorageLogQuery, H160, MAX_L2_TX_GAS_LIMIT, U256};
+use micro_utils::h256_to_u256;
 use zk_evm::block_properties::BlockProperties;
 use zk_evm::{
     aux_structures::{LogQuery, MemoryPage, Timestamp},
     vm_state::PrimitiveValue,
     zkevm_opcode_defs::FatPointer,
 };
-use micro_config::constants::ZKPORTER_IS_AVAILABLE;
-use micro_contracts::{read_zbin_bytecode, BaseSystemContracts};
-use micro_types::{Address, StorageLogQuery, H160, MAX_L2_TX_GAS_LIMIT, U256};
-use micro_utils::h256_to_u256;
 
 pub const INITIAL_TIMESTAMP: u32 = 1024;
 pub const INITIAL_MEMORY_COUNTER: u32 = 2048;

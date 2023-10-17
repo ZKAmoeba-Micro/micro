@@ -10,14 +10,14 @@ use zk_evm::{
     },
 };
 
-use zk_evm::zkevm_opcode_defs::{
-    BOOTLOADER_BASE_PAGE, BOOTLOADER_CODE_PAGE, STARTING_BASE_PAGE, STARTING_TIMESTAMP,
-};
 use micro_config::constants::BOOTLOADER_ADDRESS;
 use micro_state::{StoragePtr, WriteStorage};
 use micro_types::block::legacy_miniblock_hash;
 use micro_types::{zkevm_test_harness::INITIAL_MONOTONIC_CYCLE_COUNTER, Address, MiniblockNumber};
 use micro_utils::h256_to_u256;
+use zk_evm::zkevm_opcode_defs::{
+    BOOTLOADER_BASE_PAGE, BOOTLOADER_CODE_PAGE, STARTING_BASE_PAGE, STARTING_TIMESTAMP,
+};
 
 use crate::bootloader_state::BootloaderState;
 use crate::constants::BOOTLOADER_HEAP_PAGE;

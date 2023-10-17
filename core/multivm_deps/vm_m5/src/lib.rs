@@ -28,8 +28,8 @@ pub use crate::oracles::storage::StorageOracle;
 pub use crate::vm::VmBlockResult;
 pub use crate::vm::VmExecutionResult;
 pub use crate::vm::VmInstance;
-pub use zk_evm;
 pub use micro_types::vm_trace::VmExecutionTrace;
+pub use zk_evm;
 
 pub type Word = micro_types::U256;
 

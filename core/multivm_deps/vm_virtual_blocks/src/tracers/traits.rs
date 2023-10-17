@@ -1,7 +1,7 @@
+use micro_state::{StoragePtr, WriteStorage};
 use zk_evm::tracing::{
     AfterDecodingData, AfterExecutionData, BeforeExecutionData, VmLocalStateData,
 };
-use micro_state::{StoragePtr, WriteStorage};
 
 use crate::bootloader_state::BootloaderState;
 use crate::old_vm::history_recorder::HistoryMode;

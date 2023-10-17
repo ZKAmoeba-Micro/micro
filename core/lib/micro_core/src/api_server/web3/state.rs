@@ -1,5 +1,5 @@
-use tokio::sync::RwLock;
 use micro_utils::h256_to_u256;
+use tokio::sync::RwLock;
 
 use std::{
     collections::HashMap,

@@ -327,10 +327,10 @@ impl JsonRpcSigner {
 mod messages {
     use crate::raw_ethereum_tx::TransactionParameters;
     use hex::encode;
-    use serde::{Deserialize, Serialize};
     use micro_types::{
         eip712_signature::utils::get_eip712_json, Address, EIP712TypedStructure, Eip712Domain,
     };
+    use serde::{Deserialize, Serialize};
 
     #[derive(Debug, Serialize, Deserialize)]
     pub struct JsonRpcRequest {

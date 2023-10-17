@@ -1,9 +1,9 @@
+use micro_state::WriteStorage;
+use micro_types::vm_trace::Call;
 use multivm::MultivmTracer;
 use once_cell::sync::OnceCell;
 use std::sync::Arc;
 use vm::{CallTracer, HistoryMode};
-use micro_state::WriteStorage;
-use micro_types::vm_trace::Call;
 
 /// Custom tracers supported by our api
 #[derive(Debug)]

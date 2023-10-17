@@ -773,8 +773,8 @@ impl<S: WriteStorage, H: HistoryMode> HistoryRecorder<StorageWrapper<S>, H> {
 mod tests {
     use crate::old_vm::history_recorder::{HistoryRecorder, MemoryWrapper};
     use crate::HistoryDisabled;
-    use zk_evm::{aux_structures::Timestamp, vm_state::PrimitiveValue};
     use micro_types::U256;
+    use zk_evm::{aux_structures::Timestamp, vm_state::PrimitiveValue};
 
     #[test]
     fn memory_equality() {

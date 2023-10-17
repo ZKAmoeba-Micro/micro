@@ -11,7 +11,7 @@ use crate::errors::BytecodeCompressionError;
 use crate::tracers::traits::VmTracer;
 use crate::types::{
     inputs::{L1BatchEnv, SystemEnv, VmExecutionMode},
-    internals::{new_vm_state, VmSnapshot, MicroVmState},
+    internals::{new_vm_state, MicroVmState, VmSnapshot},
     outputs::{BootloaderMemory, CurrentExecutionState, VmExecutionResultAndLogs},
 };
 use crate::L2BlockEnv;

@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
+use micro_state::WriteStorage;
 use zk_evm::aux_structures::Timestamp;
 use zk_evm::vm_state::VmLocalState;
-use micro_state::WriteStorage;
 
 use micro_types::{StorageKey, StorageLogQuery, StorageValue, U256};
 

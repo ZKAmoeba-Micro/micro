@@ -1,9 +1,9 @@
 use crate::commitment::SerializeCommitment;
 use crate::{Address, H256};
+use micro_utils::u256_to_h256;
 use serde::{Deserialize, Serialize};
 use zk_evm::reference_impls::event_sink::EventMessage;
 use zk_evm_1_4_0::reference_impls::event_sink::EventMessage as EventMessage_1_4_0;
-use micro_utils::u256_to_h256;
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Default, Eq)]
 pub struct L2ToL1Log {

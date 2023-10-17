@@ -9,7 +9,6 @@
 use std::collections::HashMap;
 
 use itertools::Itertools;
-use zk_evm::{aux_structures::Timestamp, vm_state::VmLocalState};
 use micro_contracts::test_contracts::LoadnextContractExecutionParams;
 use micro_contracts::{deployer_contract, get_loadnext_contract, load_contract};
 use micro_state::WriteStorage;
@@ -24,6 +23,7 @@ use micro_types::{
 use micro_utils::{
     address_to_h256, bytecode::hash_bytecode, h256_to_account_address, u256_to_h256,
 };
+use zk_evm::{aux_structures::Timestamp, vm_state::VmLocalState};
 
 /// The tests here help us with the testing the VM
 use crate::{

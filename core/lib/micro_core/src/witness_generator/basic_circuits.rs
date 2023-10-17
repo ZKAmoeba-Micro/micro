@@ -10,7 +10,6 @@ use async_trait::async_trait;
 use rand::Rng;
 use serde::{Deserialize, Serialize};
 
-use vm::{constants::MAX_CYCLES_FOR_TX, HistoryDisabled, SimpleMemory, StorageOracle};
 use micro_config::configs::witness_generator::BasicWitnessGeneratorDataSource;
 use micro_config::configs::WitnessGeneratorConfig;
 use micro_config::constants::BOOTLOADER_ADDRESS;
@@ -32,6 +31,7 @@ use micro_types::{
     Address, L1BatchNumber, ProtocolVersionId, H256, U256,
 };
 use micro_utils::{bytes_to_chunks, h256_to_u256, u256_to_h256};
+use vm::{constants::MAX_CYCLES_FOR_TX, HistoryDisabled, SimpleMemory, StorageOracle};
 
 use crate::witness_generator::precalculated_merkle_paths_provider::PrecalculatedMerklePathsProvider;
 use crate::witness_generator::track_witness_generation_stage;

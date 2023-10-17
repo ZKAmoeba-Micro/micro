@@ -1,5 +1,5 @@
-use std::time::Duration;
 use micro_types::proofs::{GpuProverInstanceStatus, SocketAddress};
+use std::time::Duration;
 
 use crate::time_utils::pg_interval_from_duration;
 use crate::StorageProcessor;

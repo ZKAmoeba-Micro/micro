@@ -1,10 +1,10 @@
 use crate::bootloader_state::l2_block::BootloaderL2Block;
 use crate::bootloader_state::snapshot::BootloaderStateSnapshot;
 use crate::bootloader_state::utils::{apply_l2_block, apply_tx_to_memory};
-use once_cell::sync::OnceCell;
-use std::cmp::Ordering;
 use micro_types::{L2ChainId, U256};
 use micro_utils::bytecode::CompressedBytecodeInfo;
+use once_cell::sync::OnceCell;
+use std::cmp::Ordering;
 
 use crate::constants::TX_DESCRIPTION_OFFSET;
 use crate::types::inputs::system_env::TxExecutionMode;

@@ -16,7 +16,7 @@ use micro_config::configs::database::MerkleTreeMode;
 use micro_dal::StorageProcessor;
 use micro_health_check::{Health, HealthStatus};
 use micro_merkle_tree::{
-    domain::{TreeMetadata, MicroTree},
+    domain::{MicroTree, TreeMetadata},
     MerkleTreeColumnFamily,
 };
 use micro_storage::RocksDB;

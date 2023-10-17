@@ -1,10 +1,10 @@
-use std::fmt;
-use vm::constants::{ERGS_PER_CIRCUIT, MAX_CYCLES_FOR_TX};
 use micro_config::configs::chain::StateKeeperConfig;
 use micro_types::{
     circuit::{GEOMETRY_CONFIG, SCHEDULER_UPPER_BOUND},
     tx::tx_execution_info::{DeduplicatedWritesMetrics, ExecutionMetrics},
 };
+use std::fmt;
+use vm::constants::{ERGS_PER_CIRCUIT, MAX_CYCLES_FOR_TX};
 
 // Local uses
 use crate::state_keeper::seal_criteria::{SealCriterion, SealData, SealResolution};

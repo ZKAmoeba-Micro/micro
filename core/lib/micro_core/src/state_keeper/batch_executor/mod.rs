@@ -9,14 +9,14 @@ use tokio::{
     task::JoinHandle,
 };
 
+use micro_dal::ConnectionPool;
+use micro_state::{ReadStorage, RocksdbStorage, StorageView};
+use micro_types::{vm_trace::Call, witness_block_state::WitnessBlockState, Transaction, U256};
 use multivm::{MultivmTracer, VmInstance, VmInstanceData};
 use vm::{
     CallTracer, ExecutionResult, FinishedL1Batch, Halt, HistoryEnabled, L1BatchEnv, L2BlockEnv,
     SystemEnv, VmExecutionResultAndLogs,
 };
-use micro_dal::ConnectionPool;
-use micro_state::{ReadStorage, RocksdbStorage, StorageView};
-use micro_types::{vm_trace::Call, witness_block_state::WitnessBlockState, Transaction, U256};
 
 use micro_utils::bytecode::CompressedBytecodeInfo;
 

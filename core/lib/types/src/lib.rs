@@ -29,8 +29,8 @@ pub use zk_evm::{
     zkevm_opcode_defs::FarCallOpcode,
 };
 
-pub use zkevm_test_harness;
 pub use micro_basic_types::*;
+pub use zkevm_test_harness;
 
 pub mod aggregated_operations;
 pub mod block;

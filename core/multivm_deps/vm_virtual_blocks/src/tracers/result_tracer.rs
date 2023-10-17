@@ -1,9 +1,9 @@
+use micro_state::{StoragePtr, WriteStorage};
 use zk_evm::{
     tracing::{AfterDecodingData, BeforeExecutionData, VmLocalStateData},
     vm_state::{ErrorFlags, VmLocalState},
     zkevm_opcode_defs::FatPointer,
 };
-use micro_state::{StoragePtr, WriteStorage};
 
 use micro_types::U256;
 

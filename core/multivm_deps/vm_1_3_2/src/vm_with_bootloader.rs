@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 
+use micro_config::constants::MAX_TXS_IN_BLOCK;
+use micro_contracts::BaseSystemContracts;
 use zk_evm::{
     aux_structures::{MemoryPage, Timestamp},
     block_properties::BlockProperties,
@@ -10,8 +12,6 @@ use zk_evm::{
         STARTING_TIMESTAMP,
     },
 };
-use micro_config::constants::MAX_TXS_IN_BLOCK;
-use micro_contracts::BaseSystemContracts;
 
 use micro_types::{
     l1::is_l1_tx_type, zkevm_test_harness::INITIAL_MONOTONIC_CYCLE_COUNTER, Address, Transaction,

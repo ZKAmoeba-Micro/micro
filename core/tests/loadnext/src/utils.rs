@@ -1,5 +1,5 @@
-use std::ops::Div;
 use micro_types::U256;
+use std::ops::Div;
 
 pub fn format_eth(value: U256) -> String {
     format!(

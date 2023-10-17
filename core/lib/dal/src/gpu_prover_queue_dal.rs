@@ -2,8 +2,8 @@ use std::time::Duration;
 
 use crate::time_utils::pg_interval_from_duration;
 use crate::StorageProcessor;
-use std::collections::HashMap;
 use micro_types::proofs::{GpuProverInstanceStatus, SocketAddress};
+use std::collections::HashMap;
 
 #[derive(Debug)]
 pub struct GpuProverQueueDal<'a, 'c> {

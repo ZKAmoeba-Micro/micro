@@ -3,10 +3,10 @@
 use core::fmt::Debug;
 
 use bigdecimal::BigDecimal;
-use num::{rational::Ratio, BigUint};
-use vm::utils::fee::base_fee_to_gas_per_pubdata;
 use micro_types::Address;
 use micro_utils::ratio_to_big_decimal_normalized;
+use num::{rational::Ratio, BigUint};
+use vm::utils::fee::base_fee_to_gas_per_pubdata;
 
 use self::error::TickerError;
 use micro_dal::tokens_web3_dal::TokensWeb3Dal;

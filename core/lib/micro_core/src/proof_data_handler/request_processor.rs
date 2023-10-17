@@ -1,14 +1,14 @@
 use axum::extract::Path;
 use axum::response::Response;
 use axum::{http::StatusCode, response::IntoResponse, Json};
-use std::convert::TryFrom;
-use std::sync::Arc;
 use micro_config::configs::{
     proof_data_handler::ProtocolVersionLoadingMode, ProofDataHandlerConfig,
 };
 use micro_types::commitment::serialize_commitments;
 use micro_types::web3::signing::keccak256;
 use micro_utils::u256_to_h256;
+use std::convert::TryFrom;
+use std::sync::Arc;
 
 use micro_dal::{ConnectionPool, SqlxError};
 use micro_object_store::{ObjectStore, ObjectStoreError};

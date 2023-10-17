@@ -8,7 +8,6 @@ use std::{
 use actix_rt::time::Instant;
 use async_trait::async_trait;
 
-use vm::{FinishedL1Batch, L1BatchEnv, SystemEnv};
 use micro_contracts::{BaseSystemContracts, SystemContractCode};
 use micro_dal::ConnectionPool;
 use micro_types::block::legacy_miniblock_hash;
@@ -18,6 +17,7 @@ use micro_types::{
     L1BlockNumber, L2ChainId, MiniblockNumber, ProtocolVersionId, Transaction, H256, U256,
 };
 use micro_utils::{be_words_to_bytes, bytes_to_be_words};
+use vm::{FinishedL1Batch, L1BatchEnv, SystemEnv};
 
 use crate::state_keeper::{
     extractors,

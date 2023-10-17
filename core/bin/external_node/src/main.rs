@@ -4,7 +4,6 @@ use tokio::{sync::watch, task, time::sleep};
 
 use std::{sync::Arc, time::Duration};
 
-use prometheus_exporter::PrometheusExporterConfig;
 use micro_basic_types::{Address, L2ChainId};
 use micro_core::{
     api_server::{
@@ -22,7 +21,7 @@ use micro_core::{
     reorg_detector::ReorgDetector,
     setup_sigint_handler,
     state_keeper::{
-        L1BatchExecutorBuilder, MainBatchExecutorBuilder, SealManager, MicroStateKeeper,
+        L1BatchExecutorBuilder, MainBatchExecutorBuilder, MicroStateKeeper, SealManager,
     },
     sync_layer::{
         batch_status_updater::BatchStatusUpdater, external_io::ExternalIO,
@@ -35,6 +34,7 @@ use micro_health_check::CheckHealth;
 use micro_state::PostgresStorageCaches;
 use micro_storage::RocksDB;
 use micro_utils::wait_for_tasks::wait_for_tasks;
+use prometheus_exporter::PrometheusExporterConfig;
 
 mod config;
 

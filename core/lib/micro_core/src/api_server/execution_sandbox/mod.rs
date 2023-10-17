@@ -2,12 +2,12 @@ use std::sync::Arc;
 use std::time::{Duration, Instant};
 use tokio::runtime::Handle;
 
-use vm::utils::fee::derive_base_fee_and_gas_per_pubdata;
 use micro_config::constants::PUBLISH_BYTECODE_OVERHEAD;
 use micro_dal::{ConnectionPool, SqlxError, StorageProcessor};
 use micro_state::{PostgresStorage, PostgresStorageCaches, ReadStorage, StorageView};
 use micro_types::{api, AccountTreeId, L2ChainId, MiniblockNumber, U256};
 use micro_utils::bytecode::{compress_bytecode, hash_bytecode};
+use vm::utils::fee::derive_base_fee_and_gas_per_pubdata;
 
 use super::tx_sender::MultiVMBaseSystemContracts;
 

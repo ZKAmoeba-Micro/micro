@@ -1,6 +1,6 @@
 use crate::glue::tracer::IntoVmVirtualBlocksTracer;
-use vm_latest::{CallTracer, StorageInvocations, ValidationTracer};
 use micro_state::WriteStorage;
+use vm_latest::{CallTracer, StorageInvocations, ValidationTracer};
 
 impl<S, H> IntoVmVirtualBlocksTracer<S, H> for StorageInvocations
 where

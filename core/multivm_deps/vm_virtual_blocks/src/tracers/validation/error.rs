@@ -1,6 +1,6 @@
 use crate::Halt;
-use std::fmt::Display;
 use micro_types::vm_trace::ViolatedValidationRule;
+use std::fmt::Display;
 
 #[derive(Debug, Clone)]
 pub enum ValidationError {

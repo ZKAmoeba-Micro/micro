@@ -1,7 +1,7 @@
 //! Tying the Merkle tree implementation to the problem domain.
 
-use rayon::{ThreadPool, ThreadPoolBuilder};
 use micro_utils::h256_to_u256;
+use rayon::{ThreadPool, ThreadPoolBuilder};
 
 use crate::{
     storage::{MerkleTreeColumnFamily, PatchSet, Patched, RocksDBWrapper},

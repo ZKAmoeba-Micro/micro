@@ -1,8 +1,8 @@
+use micro_types::U256;
 use zk_evm::abstractions::{Memory, MemoryType};
 use zk_evm::aux_structures::{MemoryPage, MemoryQuery, Timestamp};
 use zk_evm::vm_state::PrimitiveValue;
 use zk_evm::zkevm_opcode_defs::FatPointer;
-use micro_types::U256;
 
 use crate::history_recorder::{
     FramedStack, HistoryEnabled, HistoryMode, IntFrameManagerWithHistory, MemoryWithHistory,

@@ -8,14 +8,14 @@ use std::{
     time::{Duration, Instant},
 };
 
-use vm::{
-    constants::BLOCK_GAS_LIMIT, ExecutionResult, FinishedL1Batch, L1BatchEnv, L2BlockEnv,
-    SystemEnv, TxExecutionMode, VmExecutionResultAndLogs,
-};
 use micro_types::{
     block::MiniblockReexecuteData, protocol_version::ProtocolUpgradeTx,
     witness_block_state::WitnessBlockState, Address, L1BatchNumber, L2ChainId, MiniblockNumber,
     ProtocolVersionId, Transaction, H256,
+};
+use vm::{
+    constants::BLOCK_GAS_LIMIT, ExecutionResult, FinishedL1Batch, L1BatchEnv, L2BlockEnv,
+    SystemEnv, TxExecutionMode, VmExecutionResultAndLogs,
 };
 
 use crate::state_keeper::{

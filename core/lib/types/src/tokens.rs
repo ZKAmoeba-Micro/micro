@@ -1,9 +1,9 @@
 use chrono::{DateTime, Utc};
-use num::{rational::Ratio, BigUint};
-use serde::{Deserialize, Serialize};
 use micro_basic_types::Address;
 pub use micro_config::constants::ETHEREUM_ADDRESS;
 use micro_utils::UnsignedRatioSerializeAsDecimal;
+use num::{rational::Ratio, BigUint};
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct TokenInfo {

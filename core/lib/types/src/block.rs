@@ -1,5 +1,5 @@
-use serde::{Deserialize, Serialize};
 use micro_config::constants::SYSTEM_BLOCK_INFO_BLOCK_NUMBER_MULTIPLIER;
+use serde::{Deserialize, Serialize};
 
 use std::{fmt, ops};
 

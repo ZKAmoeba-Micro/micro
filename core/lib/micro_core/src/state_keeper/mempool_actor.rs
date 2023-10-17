@@ -1,11 +1,11 @@
 use super::types::MempoolGuard;
 use crate::l1_gas_price::L1GasPriceProvider;
+use micro_config::configs::chain::MempoolConfig;
 use std::sync::Arc;
 use std::time::Duration;
 use std::time::Instant;
 use tokio::sync::watch;
 use vm::utils::fee::derive_base_fee_and_gas_per_pubdata;
-use micro_config::configs::chain::MempoolConfig;
 
 use micro_dal::ConnectionPool;
 use micro_mempool::L2TxFilter;

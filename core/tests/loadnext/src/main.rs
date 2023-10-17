@@ -8,8 +8,8 @@ use tokio::sync::watch;
 
 use std::time::Duration;
 
-use prometheus_exporter::PrometheusExporterConfig;
 use micro_config::configs::api::PrometheusConfig;
+use prometheus_exporter::PrometheusExporterConfig;
 
 use loadnext::{
     command::TxType,

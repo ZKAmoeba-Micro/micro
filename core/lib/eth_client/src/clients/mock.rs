@@ -2,8 +2,6 @@ use std::sync::atomic::{AtomicU64, Ordering};
 
 use async_trait::async_trait;
 use jsonrpc_core::types::error::Error as RpcError;
-use std::collections::{BTreeMap, HashMap};
-use std::sync::RwLock;
 use micro_types::{
     web3::{
         contract::{
@@ -16,6 +14,8 @@ use micro_types::{
     },
     Address, L1ChainId, ProtocolVersionId, H160, H256, U256,
 };
+use std::collections::{BTreeMap, HashMap};
+use std::sync::RwLock;
 
 use crate::{
     types::{Error, ExecutedTxStatus, FailureInfo, SignedCallResult},

@@ -5,11 +5,11 @@ use crate::{
     Address, L1BatchNumber, CONTRACT_DEPLOYER_ADDRESS, H256, KNOWN_CODES_STORAGE_ADDRESS,
     L1_MESSENGER_ADDRESS, U256,
 };
+use micro_basic_types::ethabi::Token;
+use micro_utils::{h256_to_account_address, u256_to_bytes_be, u256_to_h256};
 use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
-use micro_basic_types::ethabi::Token;
-use micro_utils::{h256_to_account_address, u256_to_bytes_be, u256_to_h256};
 
 #[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub struct VmEvent {

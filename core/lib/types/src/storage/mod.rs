@@ -1,8 +1,8 @@
 use core::fmt::Debug;
 
 use blake2::{Blake2s256, Digest};
-use serde::{Deserialize, Serialize};
 use micro_basic_types::{web3::signing::keccak256, L2ChainId};
+use serde::{Deserialize, Serialize};
 
 use crate::{AccountTreeId, Address, H160, H256, U256};
 

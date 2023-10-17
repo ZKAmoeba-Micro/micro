@@ -2,8 +2,6 @@ use crate::proof_data_handler::request_processor::RequestProcessor;
 use anyhow::Context as _;
 use axum::extract::Path;
 use axum::{routing::post, Json, Router};
-use std::net::SocketAddr;
-use tokio::sync::watch;
 use micro_config::{
     configs::{proof_data_handler::ProtocolVersionLoadingMode, ProofDataHandlerConfig},
     ContractsConfig,
@@ -15,6 +13,8 @@ use micro_types::{
     prover_server_api::{ProofGenerationDataRequest, SubmitProofRequest},
     H256,
 };
+use std::net::SocketAddr;
+use tokio::sync::watch;
 
 mod request_processor;
 

@@ -3,6 +3,7 @@ use crate::old_vm::{
     oracles::OracleWithHistory,
 };
 use itertools::Itertools;
+use micro_types::U256;
 use std::{cmp::Ordering, collections::HashMap};
 use zk_evm::{
     abstractions::EventSink,
@@ -12,7 +13,6 @@ use zk_evm::{
         BOOTLOADER_FORMAL_ADDRESS, EVENT_AUX_BYTE, L1_MESSAGE_AUX_BYTE,
     },
 };
-use micro_types::U256;
 
 #[derive(Debug, Clone, PartialEq, Default)]
 pub struct InMemoryEventSink<H: HistoryMode> {

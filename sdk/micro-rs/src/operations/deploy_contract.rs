@@ -5,7 +5,7 @@ use micro_types::{
 use micro_utils::bytecode::hash_bytecode;
 
 use crate::{
-    error::ClientError, operations::SyncTransactionHandle, wallet::Wallet, micro_types::fee::Fee,
+    error::ClientError, micro_types::fee::Fee, operations::SyncTransactionHandle, wallet::Wallet,
     EthNamespaceClient, ZksNamespaceClient,
 };
 

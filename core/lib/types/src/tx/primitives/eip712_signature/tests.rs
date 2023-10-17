@@ -4,9 +4,9 @@ use crate::tx::primitives::eip712_signature::{
 };
 use crate::tx::primitives::{eip712_signature::utils::get_eip712_json, PackedEthSignature};
 use crate::web3::signing::keccak256;
+use micro_basic_types::{Address, H256, U256};
 use serde::Serialize;
 use std::str::FromStr;
-use micro_basic_types::{Address, H256, U256};
 
 #[derive(Clone, Serialize)]
 struct Person {

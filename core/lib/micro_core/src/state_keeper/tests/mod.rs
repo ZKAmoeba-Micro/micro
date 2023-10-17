@@ -8,11 +8,6 @@ use std::{
     time::Instant,
 };
 
-use vm::{
-    constants::BLOCK_GAS_LIMIT, CurrentExecutionState, ExecutionResult, FinishedL1Batch,
-    L1BatchEnv, L2BlockEnv, SystemEnv, TxExecutionMode, VmExecutionLogs, VmExecutionResultAndLogs,
-    VmExecutionStatistics,
-};
 use micro_config::{configs::chain::StateKeeperConfig, constants::ZKPORTER_IS_AVAILABLE};
 use micro_contracts::{BaseSystemContracts, BaseSystemContractsHashes};
 use micro_types::{
@@ -27,6 +22,11 @@ use micro_types::{
     transaction_request::PaymasterParams,
     Address, L1BatchNumber, L2ChainId, LogQuery, MiniblockNumber, Nonce, ProtocolVersionId,
     StorageLogQuery, StorageLogQueryType, Timestamp, Transaction, H256, U256,
+};
+use vm::{
+    constants::BLOCK_GAS_LIMIT, CurrentExecutionState, ExecutionResult, FinishedL1Batch,
+    L1BatchEnv, L2BlockEnv, SystemEnv, TxExecutionMode, VmExecutionLogs, VmExecutionResultAndLogs,
+    VmExecutionStatistics,
 };
 
 use self::tester::{

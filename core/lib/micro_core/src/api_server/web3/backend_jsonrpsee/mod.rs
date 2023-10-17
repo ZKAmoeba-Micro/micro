@@ -2,9 +2,9 @@
 //! Consists mostly of boilerplate code implementing the `jsonrpsee` server traits for the corresponding
 //! namespace structures defined in `micro_core`.
 
-use std::error::Error;
 use micro_web3_decl::error::Web3Error;
 use micro_web3_decl::jsonrpsee::types::{error::ErrorCode, ErrorObjectOwned};
+use std::error::Error;
 
 pub mod namespaces;
 

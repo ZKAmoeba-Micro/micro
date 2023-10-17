@@ -1,7 +1,7 @@
 use crate::{web3::ethabi, Address, EIP712TypedStructure, StructBuilder, H256, U256};
+use micro_utils::ZeroPrefixHexSerde;
 use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
-use micro_utils::ZeroPrefixHexSerde;
 
 /// `Execute` transaction executes a previously deployed smart contract in the L2 rollup.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]

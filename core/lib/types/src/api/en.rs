@@ -1,9 +1,9 @@
 //! API types related to the External Node specific methods.
 
-use serde::{Deserialize, Serialize};
-use zk_evm::ethereum_types::Address;
 use micro_basic_types::{L1BatchNumber, MiniblockNumber, H256};
 use micro_contracts::BaseSystemContractsHashes;
+use serde::{Deserialize, Serialize};
+use zk_evm::ethereum_types::Address;
 
 use crate::ProtocolVersionId;
 

@@ -1,7 +1,7 @@
-use std::time::Duration;
 use micro_dal::ConnectionPool;
 use micro_types::web3::{error, ethabi, transports::Http, types::TransactionId, Web3};
 use micro_types::L1BatchNumber;
+use std::time::Duration;
 
 #[derive(Debug)]
 pub struct ConsistencyChecker {

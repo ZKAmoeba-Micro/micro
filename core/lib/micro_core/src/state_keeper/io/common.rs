@@ -1,6 +1,5 @@
 use std::time::Duration;
 
-use vm::{constants::BLOCK_GAS_LIMIT, L1BatchEnv, L2BlockEnv, SystemEnv, TxExecutionMode};
 use micro_contracts::BaseSystemContracts;
 use micro_dal::StorageProcessor;
 use micro_types::{
@@ -8,6 +7,7 @@ use micro_types::{
     ZKPORTER_IS_AVAILABLE,
 };
 use micro_utils::u256_to_h256;
+use vm::{constants::BLOCK_GAS_LIMIT, L1BatchEnv, L2BlockEnv, SystemEnv, TxExecutionMode};
 
 use super::PendingBatchData;
 use crate::state_keeper::extractors;

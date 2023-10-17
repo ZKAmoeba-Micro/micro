@@ -1,6 +1,6 @@
 use crate::glue::{GlueFrom, GlueInto};
-use vm_latest::{ExecutionResult, Refunds, TxRevertReason, VmExecutionResultAndLogs};
 use micro_types::tx::tx_execution_info::TxExecutionStatus;
+use vm_latest::{ExecutionResult, Refunds, TxRevertReason, VmExecutionResultAndLogs};
 
 impl GlueFrom<vm_m5::vm::VmTxExecutionResult> for VmExecutionResultAndLogs {
     fn glue_from(value: vm_m5::vm::VmTxExecutionResult) -> Self {

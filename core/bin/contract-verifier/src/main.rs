@@ -1,11 +1,11 @@
 use std::cell::RefCell;
 
 use anyhow::Context as _;
-use prometheus_exporter::PrometheusExporterConfig;
 use micro_config::{configs::PrometheusConfig, ApiConfig, ContractVerifierConfig};
 use micro_dal::ConnectionPool;
 use micro_queued_job_processor::JobProcessor;
 use micro_utils::wait_for_tasks::wait_for_tasks;
+use prometheus_exporter::PrometheusExporterConfig;
 
 use futures::{channel::mpsc, executor::block_on, SinkExt, StreamExt};
 use tokio::sync::watch;
@@ -111,8 +111,8 @@ async fn update_compiler_versions(connection_pool: &ConnectionPool) {
     transaction.commit().await.unwrap();
 }
 
-use structopt::StructOpt;
 use micro_dal::connection::DbVariant;
+use structopt::StructOpt;
 
 #[derive(StructOpt)]
 #[structopt(name = "micro contract code verifier", author = "")]

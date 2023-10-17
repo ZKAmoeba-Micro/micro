@@ -7,8 +7,8 @@ use crate::oracles::{
     decommitter::DecommitterOracle, precompile::PrecompilesProcessorWithHistory,
     storage::StorageOracle,
 };
-use zk_evm::witness_trace::DummyTracer;
 use micro_state::{StoragePtr, WriteStorage};
+use zk_evm::witness_trace::DummyTracer;
 
 /// zkEVM requires a bunch of objects implementing given traits to work.
 /// For example: Storage, Memory, PrecompilerProcessor etc

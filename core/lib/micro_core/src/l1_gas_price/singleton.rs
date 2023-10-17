@@ -1,10 +1,10 @@
 use crate::l1_gas_price::{BoundedGasAdjuster, GasAdjuster};
 use anyhow::Context as _;
+use micro_config::{ETHClientConfig, GasAdjusterConfig};
+use micro_eth_client::clients::http::QueryClient;
 use std::sync::Arc;
 use tokio::sync::{watch, OnceCell};
 use tokio::task::JoinHandle;
-use micro_config::{ETHClientConfig, GasAdjusterConfig};
-use micro_eth_client::clients::http::QueryClient;
 
 /// Special struct for creating a singleton of `GasAdjuster`.
 /// This is needed only for running the server. This struct uses all configs from env.

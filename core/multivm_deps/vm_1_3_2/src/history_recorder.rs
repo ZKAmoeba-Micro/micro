@@ -769,8 +769,8 @@ mod tests {
         history_recorder::{HistoryRecorder, MemoryWrapper},
         HistoryDisabled,
     };
-    use zk_evm::{aux_structures::Timestamp, vm_state::PrimitiveValue};
     use micro_types::U256;
+    use zk_evm::{aux_structures::Timestamp, vm_state::PrimitiveValue};
 
     #[test]
     fn memory_equality() {

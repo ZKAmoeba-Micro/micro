@@ -1,9 +1,3 @@
-use once_cell::sync::Lazy;
-use std::{cell::RefCell, rc::Rc};
-use vm::{
-    constants::BLOCK_GAS_LIMIT, HistoryEnabled, L2BlockEnv, TxExecutionMode, Vm, VmExecutionMode,
-    VmExecutionResultAndLogs,
-};
 use micro_config::constants::ethereum::MAX_GAS_PER_PUBDATA_BYTE;
 use micro_contracts::{deployer_contract, BaseSystemContracts};
 use micro_state::{InMemoryStorage, StorageView};
@@ -18,6 +12,12 @@ use micro_types::{
     ProtocolVersionId, Transaction, CONTRACT_DEPLOYER_ADDRESS, H256, U256,
 };
 use micro_utils::bytecode::hash_bytecode;
+use once_cell::sync::Lazy;
+use std::{cell::RefCell, rc::Rc};
+use vm::{
+    constants::BLOCK_GAS_LIMIT, HistoryEnabled, L2BlockEnv, TxExecutionMode, Vm, VmExecutionMode,
+    VmExecutionResultAndLogs,
+};
 
 /// Bytecodes have consist of an odd number of 32 byte words
 /// This function "fixes" bytecodes of wrong length by cutting off their end.

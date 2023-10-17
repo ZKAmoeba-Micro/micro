@@ -2,14 +2,14 @@ use crate::eth_watch::{
     client::{Error, EthClient},
     event_processors::EventProcessor,
 };
-use std::convert::TryFrom;
-use std::time::Instant;
 use micro_contracts::{governance_contract, micro_contract};
 use micro_dal::StorageProcessor;
 use micro_types::{
     protocol_version::GovernanceOperation, web3::types::Log, Address, ProtocolUpgrade,
     ProtocolVersionId, H256,
 };
+use std::convert::TryFrom;
+use std::time::Instant;
 
 /// Responsible for saving new protocol upgrade proposals to the database.
 #[derive(Debug)]

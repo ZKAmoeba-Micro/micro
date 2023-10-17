@@ -1,5 +1,5 @@
-use zk_evm::aux_structures::Timestamp;
 use micro_state::WriteStorage;
+use zk_evm::aux_structures::Timestamp;
 
 use micro_types::U256;
 

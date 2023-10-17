@@ -1,4 +1,5 @@
 use bigdecimal::BigDecimal;
+use micro_basic_types::{Address, H256, U128, U256};
 use num::{
     bigint::ToBigInt,
     rational::Ratio,
@@ -6,7 +7,6 @@ use num::{
     BigUint,
 };
 use std::convert::TryInto;
-use micro_basic_types::{Address, H256, U128, U256};
 
 pub fn u256_to_big_decimal(value: U256) -> BigDecimal {
     let ratio = Ratio::new_raw(u256_to_biguint(value), BigUint::from(1u8));

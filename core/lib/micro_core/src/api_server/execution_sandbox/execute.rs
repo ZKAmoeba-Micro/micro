@@ -2,11 +2,11 @@
 
 use tracing::{span, Level};
 
+use micro_dal::ConnectionPool;
 use multivm::MultivmTracer;
 use vm::{
     constants::ETH_CALL_GAS_LIMIT, StorageInvocations, TxExecutionMode, VmExecutionResultAndLogs,
 };
-use micro_dal::ConnectionPool;
 
 use micro_types::{
     fee::TransactionExecutionMetrics, l2::L2Tx, ExecuteTransactionCommon, Nonce,

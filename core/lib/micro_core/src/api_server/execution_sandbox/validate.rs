@@ -1,11 +1,11 @@
 use std::{collections::HashSet, time::Instant};
 
+use micro_dal::{ConnectionPool, StorageProcessor};
 use multivm::MultivmTracer;
 use vm::{
     ExecutionResult, HistoryDisabled, StorageInvocations, ValidationError, ValidationTracer,
     ValidationTracerParams,
 };
-use micro_dal::{ConnectionPool, StorageProcessor};
 
 use micro_types::{l2::L2Tx, Transaction, TRUSTED_ADDRESS_SLOTS, TRUSTED_TOKEN_SLOTS, U256};
 

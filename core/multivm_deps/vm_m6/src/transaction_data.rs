@@ -1,4 +1,3 @@
-use zk_evm::zkevm_opcode_defs::system_params::MAX_TX_ERGS_LIMIT;
 use micro_types::ethabi::{encode, Address, Token};
 use micro_types::fee::encoding_len;
 use micro_types::l1::is_l1_tx_type;
@@ -6,6 +5,7 @@ use micro_types::{l2::TransactionType, ExecuteTransactionCommon, Transaction, U2
 use micro_types::{MAX_L2_TX_GAS_LIMIT, MAX_TXS_IN_BLOCK};
 use micro_utils::{address_to_h256, ceil_div_u256};
 use micro_utils::{bytecode::hash_bytecode, bytes_to_be_words, h256_to_u256};
+use zk_evm::zkevm_opcode_defs::system_params::MAX_TX_ERGS_LIMIT;
 
 use crate::vm_with_bootloader::{
     BLOCK_OVERHEAD_GAS, BLOCK_OVERHEAD_PUBDATA, BOOTLOADER_TX_ENCODING_SPACE,

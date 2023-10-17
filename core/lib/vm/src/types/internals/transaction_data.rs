@@ -1,4 +1,3 @@
-use std::convert::TryInto;
 use micro_types::ethabi::{encode, Address, Token};
 use micro_types::fee::{encoding_len, Fee};
 use micro_types::l1::is_l1_tx_type;
@@ -10,6 +9,7 @@ use micro_types::{
 };
 use micro_utils::address_to_h256;
 use micro_utils::{bytecode::hash_bytecode, bytes_to_be_words, h256_to_u256};
+use std::convert::TryInto;
 
 use crate::utils::overhead::{get_amortized_overhead, OverheadCoeficients};
 

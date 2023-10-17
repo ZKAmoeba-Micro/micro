@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 
+use micro_config::constants::MAX_TXS_IN_BLOCK;
+use micro_contracts::BaseSystemContracts;
 use zk_evm::{
     abstractions::{MAX_HEAP_PAGE_SIZE_IN_WORDS, MAX_MEMORY_BYTES},
     aux_structures::{MemoryPage, Timestamp},
@@ -10,8 +12,6 @@ use zk_evm::{
         BOOTLOADER_CALLDATA_PAGE, STARTING_BASE_PAGE, STARTING_TIMESTAMP,
     },
 };
-use micro_config::constants::MAX_TXS_IN_BLOCK;
-use micro_contracts::BaseSystemContracts;
 
 use micro_types::{
     zkevm_test_harness::INITIAL_MONOTONIC_CYCLE_COUNTER, Address, Transaction, BOOTLOADER_ADDRESS,
@@ -29,7 +29,7 @@ use crate::{
     utils::{
         code_page_candidate_from_base, heap_page_from_base, BLOCK_GAS_LIMIT, INITIAL_BASE_PAGE,
     },
-    vm::{MultiVMSubversion, MicroVmState},
+    vm::{MicroVmState, MultiVMSubversion},
     OracleTools, VmInstance,
 };
 

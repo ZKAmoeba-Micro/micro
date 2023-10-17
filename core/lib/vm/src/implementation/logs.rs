@@ -1,5 +1,5 @@
-use zk_evm::aux_structures::Timestamp;
 use micro_state::WriteStorage;
+use zk_evm::aux_structures::Timestamp;
 
 use micro_types::event::extract_l2tol1logs_from_l1_messenger;
 use micro_types::l2_to_l1_log::L2ToL1Log;

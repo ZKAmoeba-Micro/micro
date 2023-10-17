@@ -1,9 +1,9 @@
 use std::collections::HashMap;
 
 use crate::L2BlockEnv;
-use zk_evm::address_to_u256;
 use micro_types::{Address, L1BatchNumber, H256, U256};
 use micro_utils::h256_to_u256;
+use zk_evm::address_to_u256;
 
 use crate::utils::fee::derive_base_fee_and_gas_per_pubdata;
 

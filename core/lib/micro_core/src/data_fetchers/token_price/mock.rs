@@ -2,11 +2,11 @@ use std::collections::HashMap;
 
 use async_trait::async_trait;
 use chrono::Utc;
-use num::{rational::Ratio, BigUint};
 use micro_types::{
     tokens::{TokenPrice, ETHEREUM_ADDRESS},
     Address,
 };
+use num::{rational::Ratio, BigUint};
 
 use crate::data_fetchers::error::ApiFetchError;
 

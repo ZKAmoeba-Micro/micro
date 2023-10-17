@@ -2,6 +2,9 @@ use crate::errors::VmRevertReason;
 use crate::glue::GlueInto;
 use crate::history_recorder::HistoryMode;
 use crate::memory::SimpleMemory;
+use micro_config::constants::CONTRACT_DEPLOYER_ADDRESS;
+use micro_types::vm_trace::{Call, CallType};
+use micro_types::U256;
 use std::convert::TryFrom;
 use std::marker::PhantomData;
 use std::mem;
@@ -13,9 +16,6 @@ use zk_evm::zkevm_opcode_defs::{
     RET_IMPLICIT_RETURNDATA_PARAMS_REGISTER,
 };
 use zkevm_assembly::zkevm_opcode_defs::FatPointer;
-use micro_config::constants::CONTRACT_DEPLOYER_ADDRESS;
-use micro_types::vm_trace::{Call, CallType};
-use micro_types::U256;
 
 /// NOTE Auto implementing clone for this tracer can cause stack overflow.
 /// This is because of the stack field which is a Vec with nested vecs inside.

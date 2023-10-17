@@ -4,18 +4,18 @@ use crate::utils::{aux_heap_page_from_base, heap_page_from_base};
 use crate::vm::{get_vm_hook_params, VM_HOOK_POSITION};
 use crate::vm_with_bootloader::BOOTLOADER_HEAP_PAGE;
 
-use zk_evm::aux_structures::MemoryPage;
-use zk_evm::zkevm_opcode_defs::{FarCallABI, FarCallForwardPageType};
-use zk_evm::{
-    abstractions::{BeforeExecutionData, VmLocalStateData},
-    zkevm_opcode_defs::{FatPointer, LogOpcode, Opcode, UMAOpcode},
-};
 use micro_config::constants::{
     ECRECOVER_PRECOMPILE_ADDRESS, KECCAK256_PRECOMPILE_ADDRESS, KNOWN_CODES_STORAGE_ADDRESS,
     L1_MESSENGER_ADDRESS, SHA256_PRECOMPILE_ADDRESS,
 };
 use micro_types::U256;
 use micro_utils::u256_to_h256;
+use zk_evm::aux_structures::MemoryPage;
+use zk_evm::zkevm_opcode_defs::{FarCallABI, FarCallForwardPageType};
+use zk_evm::{
+    abstractions::{BeforeExecutionData, VmLocalStateData},
+    zkevm_opcode_defs::{FatPointer, LogOpcode, Opcode, UMAOpcode},
+};
 
 #[derive(Clone, Debug, Copy)]
 pub(crate) enum VmHook {

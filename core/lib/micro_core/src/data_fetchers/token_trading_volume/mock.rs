@@ -3,8 +3,8 @@ use std::collections::HashMap;
 use async_trait::async_trait;
 use bigdecimal::FromPrimitive;
 use chrono::Utc;
-use num::{rational::Ratio, BigUint};
 use micro_types::{tokens::TokenMarketVolume, Address};
+use num::{rational::Ratio, BigUint};
 
 use crate::data_fetchers::error::ApiFetchError;
 

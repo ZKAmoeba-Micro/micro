@@ -1,9 +1,9 @@
 use crate::constants::BOOTLOADER_HEAP_PAGE;
 use crate::implementation::bytecode::{bytecode_to_factory_dep, compress_bytecodes};
-use zk_evm::aux_structures::Timestamp;
 use micro_state::WriteStorage;
 use micro_types::l1::is_l1_tx_type;
 use micro_types::Transaction;
+use zk_evm::aux_structures::Timestamp;
 
 use crate::old_vm::history_recorder::HistoryMode;
 use crate::types::internals::TransactionData;

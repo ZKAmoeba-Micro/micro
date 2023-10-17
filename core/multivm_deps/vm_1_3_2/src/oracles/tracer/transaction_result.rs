@@ -1,3 +1,4 @@
+use micro_types::{vm_trace, U256};
 use zk_evm::{
     tracing::{
         AfterDecodingData, AfterExecutionData, BeforeExecutionData, Tracer, VmLocalStateData,
@@ -5,7 +6,6 @@ use zk_evm::{
     vm_state::VmLocalState,
     zkevm_opcode_defs::FatPointer,
 };
-use micro_types::{vm_trace, U256};
 
 use crate::memory::SimpleMemory;
 use crate::oracles::tracer::{

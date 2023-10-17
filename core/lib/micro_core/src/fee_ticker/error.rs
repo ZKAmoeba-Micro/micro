@@ -1,5 +1,5 @@
-use thiserror::Error;
 use micro_types::Address;
+use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum TickerError {

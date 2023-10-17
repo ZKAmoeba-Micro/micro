@@ -3,6 +3,8 @@ use crate::old_vm::memory::SimpleMemory;
 use crate::types::internals::MicroVmState;
 use crate::HistoryMode;
 
+use micro_config::constants::L1_GAS_PER_PUBDATA_BYTE;
+use micro_state::WriteStorage;
 use zk_evm::zkevm_opcode_defs::decoding::{AllowedPcOrImm, EncodingModeProduction, VmEncodingMode};
 use zk_evm::zkevm_opcode_defs::RET_IMPLICIT_RETURNDATA_PARAMS_REGISTER;
 use zk_evm::{
@@ -10,8 +12,6 @@ use zk_evm::{
     vm_state::PrimitiveValue,
     zkevm_opcode_defs::FatPointer,
 };
-use micro_config::constants::L1_GAS_PER_PUBDATA_BYTE;
-use micro_state::WriteStorage;
 
 use micro_types::{Address, U256};
 

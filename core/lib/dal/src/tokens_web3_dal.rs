@@ -1,13 +1,13 @@
 use crate::models::storage_token::{StorageTokenMetadata, StorageTokenPrice};
 use crate::SqlxError;
 use crate::StorageProcessor;
-use num::{rational::Ratio, BigUint};
-use sqlx::postgres::types::PgInterval;
 use micro_types::{
     tokens::{TokenInfo, TokenMetadata, TokenPrice},
     Address,
 };
 use micro_utils::ratio_to_big_decimal;
+use num::{rational::Ratio, BigUint};
+use sqlx::postgres::types::PgInterval;
 
 // Precision of the USD price per token
 pub(crate) const STORED_USD_PRICE_PRECISION: usize = 6;

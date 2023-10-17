@@ -13,8 +13,8 @@ use crate::tests::utils::read_test_contract;
 use crate::types::inputs::system_env::TxExecutionMode;
 use crate::{
     BootloaderState, DynTracer, ExecutionEndTracer, ExecutionProcessing, HistoryEnabled,
-    HistoryMode, TracerExecutionStatus, TracerExecutionStopReason, VmExecutionMode, VmTracer,
-    MicroVmState,
+    HistoryMode, MicroVmState, TracerExecutionStatus, TracerExecutionStopReason, VmExecutionMode,
+    VmTracer,
 };
 
 #[test]

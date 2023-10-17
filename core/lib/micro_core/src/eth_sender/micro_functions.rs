@@ -1,4 +1,4 @@
-use micro_contracts::{multicall_contract, verifier_contract, micro_contract};
+use micro_contracts::{micro_contract, multicall_contract, verifier_contract};
 use micro_types::ethabi::{Contract, Function};
 
 #[derive(Debug)]

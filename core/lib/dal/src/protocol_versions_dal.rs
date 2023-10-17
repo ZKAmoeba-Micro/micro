@@ -1,9 +1,9 @@
-use std::convert::{TryFrom, TryInto};
 use micro_contracts::{BaseSystemContracts, BaseSystemContractsHashes};
 use micro_types::{
     protocol_version::{L1VerifierConfig, ProtocolUpgradeTx, ProtocolVersion, VerifierParams},
     Address, ProtocolVersionId, H256,
 };
+use std::convert::{TryFrom, TryInto};
 
 use crate::models::storage_protocol_version::{
     protocol_version_from_storage, StorageProtocolVersion,

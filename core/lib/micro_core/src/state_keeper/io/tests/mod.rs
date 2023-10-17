@@ -4,7 +4,6 @@ use std::time::Duration;
 
 use db_test_macro::db_test;
 
-use vm::utils::fee::derive_base_fee_and_gas_per_pubdata;
 use micro_contracts::BaseSystemContractsHashes;
 use micro_dal::ConnectionPool;
 use micro_mempool::L2TxFilter;
@@ -13,6 +12,7 @@ use micro_types::{
     MiniblockNumber, ProtocolVersionId, StorageKey, VmEvent, H256, U256,
 };
 use micro_utils::time::seconds_since_epoch;
+use vm::utils::fee::derive_base_fee_and_gas_per_pubdata;
 
 use crate::state_keeper::tests::{create_l1_batch_metadata, default_l1_batch_env};
 

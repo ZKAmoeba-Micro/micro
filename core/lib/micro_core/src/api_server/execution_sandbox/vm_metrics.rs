@@ -1,10 +1,10 @@
-use std::time::Duration;
-use vm::{VmExecutionResultAndLogs, VmMemoryMetrics};
 use micro_state::StorageViewMetrics;
 use micro_types::event::{extract_long_l2_to_l1_messages, extract_published_bytecodes};
 use micro_types::fee::TransactionExecutionMetrics;
 use micro_types::storage_writes_deduplicator::StorageWritesDeduplicator;
 use micro_utils::bytecode::bytecode_len_in_bytes;
+use std::time::Duration;
+use vm::{VmExecutionResultAndLogs, VmMemoryMetrics};
 
 pub fn report_vm_memory_metrics(
     tx_id: &str,

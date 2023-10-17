@@ -12,13 +12,13 @@ use std::{
     time::{Duration, Instant},
 };
 
-use vise::Registry;
 use micro_crypto::hasher::blake2::Blake2Hasher;
 use micro_merkle_tree::{
     Database, HashTree, MerkleTree, MerkleTreePruner, PatchSet, RocksDBWrapper, TreeInstruction,
 };
 use micro_storage::RocksDB;
 use micro_types::{AccountTreeId, Address, StorageKey, H256, U256};
+use vise::Registry;
 
 mod batch;
 

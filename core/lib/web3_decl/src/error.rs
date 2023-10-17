@@ -1,7 +1,7 @@
 //! Definition of errors that can occur in the micro Web3 API.
 
-use thiserror::Error;
 use micro_types::api::SerializationTransactionError;
+use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum Web3Error {

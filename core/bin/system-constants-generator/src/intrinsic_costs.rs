@@ -9,8 +9,8 @@ use crate::utils::{
     get_l2_txs,
 };
 use crate::utils::{metrics_from_txs, TransactionGenerator};
-use vm::constants::BOOTLOADER_TX_ENCODING_SPACE;
 use micro_types::{ethabi::Address, IntrinsicSystemGasConstants, U256};
+use vm::constants::BOOTLOADER_TX_ENCODING_SPACE;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub(crate) struct VmSpentResourcesResult {

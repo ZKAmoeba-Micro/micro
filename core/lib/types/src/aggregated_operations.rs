@@ -2,12 +2,12 @@ use codegen::serialize_proof;
 
 use std::{fmt, ops, str::FromStr};
 
+use micro_basic_types::{ethabi::Token, L1BatchNumber};
 use serde::{Deserialize, Serialize};
 use zkevm_test_harness::abstract_micro_circuit::concrete_circuits::MicroCircuit;
 use zkevm_test_harness::bellman::bn256::Bn256;
 use zkevm_test_harness::bellman::plonk::better_better_cs::proof::Proof;
 use zkevm_test_harness::witness::oracle::VmWitnessOracle;
-use micro_basic_types::{ethabi::Token, L1BatchNumber};
 
 use crate::commitment::L1BatchWithMetadata;
 

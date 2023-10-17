@@ -2,9 +2,9 @@ use crate::constants::BLOCK_GAS_LIMIT;
 use crate::tests::tester::VmTesterBuilder;
 use crate::tests::utils::{read_max_depth_contract, read_test_contract};
 use crate::{CallTracer, HistoryEnabled, TxExecutionMode, VmExecutionMode};
+use micro_types::{Address, Execute};
 use once_cell::sync::OnceCell;
 use std::sync::Arc;
-use micro_types::{Address, Execute};
 
 // This test is ultra slow, so it's ignored by default.
 #[test]

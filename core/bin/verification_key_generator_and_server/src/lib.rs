@@ -1,15 +1,14 @@
 use ff::to_hex;
-use once_cell::sync::Lazy;
-use std::collections::HashMap;
-use std::path::Path;
-use std::str::FromStr;
 use micro_types::zkevm_test_harness::abstract_micro_circuit::concrete_circuits::MicroCircuit;
 use micro_types::zkevm_test_harness::bellman::bn256::Bn256;
 use micro_types::zkevm_test_harness::bellman::plonk::better_better_cs::setup::VerificationKey;
 use micro_types::zkevm_test_harness::witness::oracle::VmWitnessOracle;
+use once_cell::sync::Lazy;
+use std::collections::HashMap;
+use std::path::Path;
+use std::str::FromStr;
 
 use itertools::Itertools;
-use structopt::lazy_static::lazy_static;
 use micro_types::circuit::SCHEDULER_CIRCUIT_INDEX;
 use micro_types::circuit::{
     GEOMETRY_CONFIG, LEAF_CIRCUIT_INDEX, LEAF_SPLITTING_FACTOR, NODE_CIRCUIT_INDEX,
@@ -24,6 +23,7 @@ use micro_types::zkevm_test_harness::witness::recursive_aggregation::{
 };
 use micro_types::zkevm_test_harness::witness::vk_set_generator::circuits_for_vk_generation;
 use micro_types::H256;
+use structopt::lazy_static::lazy_static;
 
 #[cfg(test)]
 mod tests;

@@ -35,9 +35,9 @@ use crate::tracers::utils::{
 pub use error::ValidationError;
 pub use params::ValidationTracerParams;
 
+use micro_types::vm_trace::ViolatedValidationRule;
 use types::NewTrustedValidationItems;
 use types::ValidationTracerMode;
-use micro_types::vm_trace::ViolatedValidationRule;
 
 use crate::VmExecutionResultAndLogs;
 

@@ -1,9 +1,9 @@
 use crate::api_server::execution_sandbox::SandboxExecutionError;
 use thiserror::Error;
 
-use vm::{ExecutionResult, ValidationError, VmExecutionResultAndLogs};
 use micro_types::l2::error::TxCheckError;
 use micro_types::U256;
+use vm::{ExecutionResult, ValidationError, VmExecutionResultAndLogs};
 
 #[derive(Debug, Error)]
 pub enum SubmitTxError {

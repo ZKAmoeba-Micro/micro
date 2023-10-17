@@ -1,13 +1,13 @@
 use crate::models::storage_token::StorageTokenMarketVolume;
 use crate::StorageProcessor;
-use num::{rational::Ratio, BigUint};
-use sqlx::types::chrono::Utc;
 use micro_types::{
     tokens::{TokenInfo, TokenMarketVolume, TokenMetadata, TokenPrice},
     Address, MiniblockNumber, ACCOUNT_CODE_STORAGE_ADDRESS,
     FAILED_CONTRACT_DEPLOYMENT_BYTECODE_HASH,
 };
 use micro_utils::ratio_to_big_decimal;
+use num::{rational::Ratio, BigUint};
+use sqlx::types::chrono::Utc;
 
 // Precision of the USD price per token
 pub(crate) const STORED_USD_PRICE_PRECISION: usize = 6;

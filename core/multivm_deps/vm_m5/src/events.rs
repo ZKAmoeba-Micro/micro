@@ -1,6 +1,6 @@
-use zk_evm::{ethereum_types::Address, reference_impls::event_sink::EventMessage};
 use micro_types::{L1BatchNumber, VmEvent, EVENT_WRITER_ADDRESS, H256};
 use micro_utils::{be_chunks_to_h256_words, h256_to_account_address};
+use zk_evm::{ethereum_types::Address, reference_impls::event_sink::EventMessage};
 
 #[derive(Clone)]
 pub struct SolidityLikeEvent {

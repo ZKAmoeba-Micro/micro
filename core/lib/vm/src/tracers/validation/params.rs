@@ -1,5 +1,5 @@
-use std::collections::HashSet;
 use micro_types::{Address, U256};
+use std::collections::HashSet;
 
 #[derive(Debug, Clone)]
 pub struct ValidationTracerParams {

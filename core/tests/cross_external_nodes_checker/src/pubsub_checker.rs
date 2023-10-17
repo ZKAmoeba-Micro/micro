@@ -4,16 +4,6 @@ use crate::{
     helpers::{compare_json, ExponentialBackoff},
 };
 use anyhow::Context as _;
-use std::{
-    collections::HashMap,
-    sync::Arc,
-    time::{Duration, Instant},
-};
-use tokio::{
-    select, spawn,
-    sync::{watch::Receiver, Mutex as TokioMutex},
-    time::timeout,
-};
 use micro_types::{web3::types::U64, MiniblockNumber};
 use micro_utils::wait_for_tasks::wait_for_tasks;
 use micro_web3_decl::{
@@ -26,6 +16,16 @@ use micro_web3_decl::{
         ws_client::{WsClient, WsClientBuilder},
     },
     types::{BlockHeader, PubSubResult},
+};
+use std::{
+    collections::HashMap,
+    sync::Arc,
+    time::{Duration, Instant},
+};
+use tokio::{
+    select, spawn,
+    sync::{watch::Receiver, Mutex as TokioMutex},
+    time::timeout,
 };
 
 const MAX_RETRIES: u32 = 6;

@@ -1,6 +1,6 @@
-use std::cmp::Ordering;
 use micro_types::{MiniblockNumber, H256};
 use micro_utils::concat_and_hash;
+use std::cmp::Ordering;
 
 use crate::bootloader_state::snapshot::L2BlockSnapshot;
 use crate::bootloader_state::tx::BootloaderTx;

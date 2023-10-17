@@ -1,12 +1,12 @@
 use std::convert::TryFrom;
 use std::fmt::Debug;
 
+use micro_config::constants::MAX_TXS_IN_BLOCK;
 use zk_evm::aux_structures::Timestamp;
 use zk_evm::vm_state::{PrimitiveValue, VmLocalState, VmState};
 use zk_evm::witness_trace::DummyTracer;
 use zk_evm::zkevm_opcode_defs::decoding::{AllowedPcOrImm, EncodingModeProduction, VmEncodingMode};
 use zk_evm::zkevm_opcode_defs::definitions::RET_IMPLICIT_RETURNDATA_PARAMS_REGISTER;
-use micro_config::constants::MAX_TXS_IN_BLOCK;
 
 use micro_types::l2_to_l1_log::L2ToL1Log;
 use micro_types::tx::tx_execution_info::TxExecutionStatus;

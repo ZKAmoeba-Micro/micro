@@ -9,10 +9,10 @@
 //! Every data fetcher is represented by an autonomic routine, which spend most of the time sleeping;
 //! once in the configurable interval it fetches the data from an API and store it into the database.
 
-use tokio::sync::watch;
-use tokio::task::JoinHandle;
 use micro_config::FetcherConfig;
 use micro_dal::ConnectionPool;
+use tokio::sync::watch;
+use tokio::task::JoinHandle;
 
 pub mod error;
 pub mod token_list;

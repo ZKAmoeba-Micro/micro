@@ -1,6 +1,6 @@
-use std::io::Write;
 use micro_dal::{connection::DbVariant, ConnectionPool};
 use micro_types::contract_verification_api::SourceCodeData;
+use std::io::Write;
 
 #[tokio::main]
 async fn main() {

@@ -4,9 +4,9 @@
 //! it makes more sense to define the contents of each transaction chain-agnostic, and extent this data
 //! with metadata (such as fees and/or signatures) for L1 and L2 separately.
 
-use std::fmt::Debug;
 use micro_basic_types::{Address, H256};
 use micro_utils::bytecode::CompressedBytecodeInfo;
+use std::fmt::Debug;
 
 pub mod execute;
 pub mod primitives;

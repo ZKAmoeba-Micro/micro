@@ -1,8 +1,8 @@
 use anyhow::Context as _;
 use clap::Parser;
 
-use std::{str::FromStr, time::Duration};
 use micro_config::configs::chain::NetworkConfig;
+use std::{str::FromStr, time::Duration};
 
 use micro_config::{ContractsConfig, ETHClientConfig, ETHSenderConfig};
 use micro_core::{

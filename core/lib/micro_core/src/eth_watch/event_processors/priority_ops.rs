@@ -2,11 +2,11 @@ use crate::eth_watch::{
     client::{Error, EthClient},
     event_processors::EventProcessor,
 };
-use std::convert::TryFrom;
-use std::time::Instant;
 use micro_contracts::micro_contract;
 use micro_dal::StorageProcessor;
 use micro_types::{l1::L1Tx, web3::types::Log, PriorityOpId, H256};
+use std::convert::TryFrom;
+use std::time::Instant;
 
 /// Responsible for saving new priority L1 transactions to the database.
 #[derive(Debug)]

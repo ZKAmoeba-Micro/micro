@@ -1,6 +1,6 @@
-use once_cell::sync::Lazy;
 use micro_basic_types::{H256, U256};
 use micro_utils::h256_to_u256;
+use once_cell::sync::Lazy;
 
 ///
 /// Well known-slots (e.g. proxy addresses in popular EIPs).

@@ -8,18 +8,18 @@ use crate::history_recorder::{
     HistoryRecorder, StorageWrapper, WithHistory,
 };
 
-use zk_evm::abstractions::RefundedAmounts;
-use zk_evm::zkevm_opcode_defs::system_params::INITIAL_STORAGE_WRITE_PUBDATA_BYTES;
-use zk_evm::{
-    abstractions::{RefundType, Storage as VmStorageOracle},
-    aux_structures::{LogQuery, Timestamp},
-};
 use micro_types::utils::storage_key_for_eth_balance;
 use micro_types::{
     AccountTreeId, Address, StorageKey, StorageLogQuery, StorageLogQueryType, BOOTLOADER_ADDRESS,
     U256,
 };
 use micro_utils::u256_to_h256;
+use zk_evm::abstractions::RefundedAmounts;
+use zk_evm::zkevm_opcode_defs::system_params::INITIAL_STORAGE_WRITE_PUBDATA_BYTES;
+use zk_evm::{
+    abstractions::{RefundType, Storage as VmStorageOracle},
+    aux_structures::{LogQuery, Timestamp},
+};
 
 use super::OracleWithHistory;
 

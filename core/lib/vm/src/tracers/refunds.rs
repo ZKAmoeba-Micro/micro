@@ -1,10 +1,5 @@
 use vise::{Buckets, EncodeLabelSet, EncodeLabelValue, Family, Histogram, Metrics};
 
-use zk_evm::{
-    aux_structures::Timestamp,
-    tracing::{BeforeExecutionData, VmLocalStateData},
-    vm_state::VmLocalState,
-};
 use micro_config::constants::{PUBLISH_BYTECODE_OVERHEAD, SYSTEM_CONTEXT_ADDRESS};
 use micro_state::{StoragePtr, WriteStorage};
 use micro_types::{
@@ -14,6 +9,11 @@ use micro_types::{
 };
 use micro_utils::bytecode::bytecode_len_in_bytes;
 use micro_utils::{ceil_div_u256, u256_to_h256};
+use zk_evm::{
+    aux_structures::Timestamp,
+    tracing::{BeforeExecutionData, VmLocalStateData},
+    vm_state::VmLocalState,
+};
 
 use crate::constants::{BOOTLOADER_HEAP_PAGE, OPERATOR_REFUNDS_OFFSET, TX_GAS_LIMIT_OFFSET};
 use crate::old_vm::{

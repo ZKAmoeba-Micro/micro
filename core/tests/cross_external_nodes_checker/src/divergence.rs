@@ -1,5 +1,5 @@
-use std::fmt;
 use micro_types::{web3::types::U64, MiniblockNumber};
+use std::fmt;
 
 #[derive(Debug, Clone)]
 pub(crate) enum Divergence {

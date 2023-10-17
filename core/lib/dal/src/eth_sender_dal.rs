@@ -2,15 +2,15 @@ use crate::models::storage_eth_tx::{
     L1BatchEthSenderStats, StorageEthTx, StorageTxHistory, StorageTxHistoryToSend,
 };
 use crate::StorageProcessor;
+use micro_types::aggregated_operations::AggregatedActionType;
+use micro_types::eth_sender::{EthTx, TxHistory, TxHistoryToSend};
+use micro_types::{Address, L1BatchNumber, H256, U256};
 use sqlx::{
     types::chrono::{DateTime, Utc},
     Row,
 };
 use std::convert::TryFrom;
 use std::str::FromStr;
-use micro_types::aggregated_operations::AggregatedActionType;
-use micro_types::eth_sender::{EthTx, TxHistory, TxHistoryToSend};
-use micro_types::{Address, L1BatchNumber, H256, U256};
 
 #[derive(Debug)]
 pub struct EthSenderDal<'a, 'c> {

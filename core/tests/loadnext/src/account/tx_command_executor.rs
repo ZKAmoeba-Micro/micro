@@ -1,4 +1,3 @@
-use std::time::Instant;
 use micro::web3::ethabi;
 use micro::EthNamespaceClient;
 use micro::{
@@ -15,6 +14,7 @@ use micro_types::{
     l2::L2Tx,
     Address, H256, U256,
 };
+use std::time::Instant;
 
 use crate::account::ExecutionType;
 use crate::utils::format_gwei;

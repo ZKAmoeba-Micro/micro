@@ -25,9 +25,9 @@ pub use crate::history_recorder::{HistoryDisabled, HistoryEnabled, HistoryMode};
 pub use crate::oracle_tools::OracleTools;
 pub use crate::oracles::storage::StorageOracle;
 pub use crate::vm::{VmBlockResult, VmExecutionResult, VmInstance};
+pub use micro_types::vm_trace::VmExecutionTrace;
 pub use zk_evm;
 pub use zk_evm::block_properties::BlockProperties;
-pub use micro_types::vm_trace::VmExecutionTrace;
 
 pub type Word = micro_types::U256;
 

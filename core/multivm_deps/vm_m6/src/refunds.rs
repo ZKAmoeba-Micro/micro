@@ -4,9 +4,9 @@ use crate::vm_with_bootloader::{
     eth_price_per_pubdata_byte, BOOTLOADER_HEAP_PAGE, TX_GAS_LIMIT_OFFSET,
 };
 use crate::VmInstance;
-use zk_evm::aux_structures::Timestamp;
 use micro_types::U256;
 use micro_utils::ceil_div_u256;
+use zk_evm::aux_structures::Timestamp;
 
 impl<H: HistoryMode, S: Storage> VmInstance<'_, S, H> {
     pub(crate) fn tx_body_refund(

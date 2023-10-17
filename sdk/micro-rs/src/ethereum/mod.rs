@@ -1,8 +1,6 @@
 //! Utilities for the on-chain operations, such as `Deposit` and `FullExit`.
 
 use core::{convert::TryFrom, time::Duration};
-use serde_json::{Map, Value};
-use std::time::Instant;
 use micro_types::{
     api::BridgeAddresses,
     web3::{
@@ -14,6 +12,8 @@ use micro_types::{
     L1ChainId, REQUIRED_L1_TO_L2_GAS_PER_PUBDATA_BYTE,
 };
 use micro_web3_decl::namespaces::{EthNamespaceClient, ZksNamespaceClient};
+use serde_json::{Map, Value};
+use std::time::Instant;
 
 use micro_eth_client::{
     clients::http::SigningClient, types::Error, BoundEthInterface, EthInterface,

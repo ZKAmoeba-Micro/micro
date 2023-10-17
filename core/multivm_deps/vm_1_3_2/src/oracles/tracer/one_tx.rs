@@ -10,13 +10,13 @@ use crate::{
 };
 
 use crate::oracles::tracer::{CallTracer, StorageInvocationTracer};
+use micro_types::vm_trace::Call;
 use zk_evm::{
     tracing::{
         AfterDecodingData, AfterExecutionData, BeforeExecutionData, Tracer, VmLocalStateData,
     },
     vm_state::VmLocalState,
 };
-use micro_types::vm_trace::Call;
 
 /// Allows any opcodes, but tells the VM to end the execution once the tx is over.
 // Internally depeds on Bootloader's VMHooks to get the notification once the transaction is finished.

@@ -1,5 +1,5 @@
-use serde::{Deserialize, Serialize};
 use micro_utils::ceil_div;
+use serde::{Deserialize, Serialize};
 
 use crate::U256;
 

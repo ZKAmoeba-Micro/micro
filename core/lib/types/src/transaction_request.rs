@@ -2,10 +2,10 @@
 use std::convert::{TryFrom, TryInto};
 
 // External uses
+use micro_basic_types::H256;
 use rlp::{DecoderError, Rlp, RlpStream};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
-use micro_basic_types::H256;
 
 use micro_config::constants::{MAX_GAS_PER_PUBDATA_BYTE, USED_BOOTLOADER_MEMORY_BYTES};
 use micro_utils::bytecode::{hash_bytecode, validate_bytecode, InvalidBytecodeError};
