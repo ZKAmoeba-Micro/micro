@@ -8,10 +8,11 @@ use micro_contracts::{read_sys_contract_bytecode, ContractLanguage, SystemContra
 
 use crate::{
     block::DeployedContract, ACCOUNT_CODE_STORAGE_ADDRESS, BOOTLOADER_ADDRESS,
-    COMPLEX_UPGRADER_ADDRESS, CONTRACT_DEPLOYER_ADDRESS, ECRECOVER_PRECOMPILE_ADDRESS,
-    IMMUTABLE_SIMULATOR_STORAGE_ADDRESS, KECCAK256_PRECOMPILE_ADDRESS, KNOWN_CODES_STORAGE_ADDRESS,
-    L1_MESSENGER_ADDRESS, L2_ETH_TOKEN_ADDRESS, MSG_VALUE_SIMULATOR_ADDRESS, NONCE_HOLDER_ADDRESS,
-    SHA256_PRECOMPILE_ADDRESS, SYSTEM_CONTEXT_ADDRESS,
+    COMPLEX_UPGRADER_ADDRESS, CONTRACT_DEPLOYER_ADDRESS, DAO_ADDRESS, DEPOSIT_ADDRESS,
+    ECRECOVER_PRECOMPILE_ADDRESS, FEE_POOL_ADDRESS, IMMUTABLE_SIMULATOR_STORAGE_ADDRESS,
+    KECCAK256_PRECOMPILE_ADDRESS, KNOWN_CODES_STORAGE_ADDRESS, L1_MESSENGER_ADDRESS,
+    L2_ETH_TOKEN_ADDRESS, MSG_VALUE_SIMULATOR_ADDRESS, NONCE_HOLDER_ADDRESS,
+    PROOF_REWARD_POOL_ADDRESS, SHA256_PRECOMPILE_ADDRESS, SYSTEM_CONTEXT_ADDRESS,
 };
 use once_cell::sync::Lazy;
 
@@ -23,7 +24,7 @@ use once_cell::sync::Lazy;
 pub const TX_NONCE_INCREMENT: U256 = U256([1, 0, 0, 0]); // 1
 pub const DEPLOYMENT_NONCE_INCREMENT: U256 = U256([0, 0, 1, 0]); // 2^128
 
-static SYSTEM_CONTRACT_LIST: [(&str, &str, Address, ContractLanguage); 18] = [
+static SYSTEM_CONTRACT_LIST: [(&str, &str, Address, ContractLanguage); 22] = [
     (
         "",
         "AccountCodeStorage",
@@ -124,6 +125,15 @@ static SYSTEM_CONTRACT_LIST: [(&str, &str, Address, ContractLanguage); 18] = [
         BOOTLOADER_ADDRESS,
         ContractLanguage::Sol,
     ),
+    ("", "Deposit", DEPOSIT_ADDRESS, ContractLanguage::Sol),
+    ("", "FeePool", FEE_POOL_ADDRESS, ContractLanguage::Sol),
+    (
+        "",
+        "ProofRewardPool",
+        PROOF_REWARD_POOL_ADDRESS,
+        ContractLanguage::Sol,
+    ),
+    ("", "Dao", DAO_ADDRESS, ContractLanguage::Sol),
 ];
 
 static SYSTEM_CONTRACTS: Lazy<Vec<DeployedContract>> = Lazy::new(|| {
