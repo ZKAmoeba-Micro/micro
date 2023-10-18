@@ -4955,6 +4955,24 @@
     },
     "query": "SELECT hashed_key, index FROM initial_writes WHERE l1_batch_number = $1 ORDER BY index"
   },
+  "59b547779f15c903cca098a3a264a7d48ffccec6ec5151b3f4cd37d18c141730": {
+    "describe": {
+      "columns": [
+        {
+          "name": "updated_at?",
+          "ordinal": 0,
+          "type_info": "Timestamp"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Left": []
+      }
+    },
+    "query": "SELECT updated_at as \"updated_at?\"  from eth_txs WHERE confirmed_eth_tx_history_id IS NOT NULL and tx_type = 'PublishProofBlocksOnchain'  ORDER BY id DESC limit 1"
+  },
   "5a27a65fa105897b60a99c1e0015e4b8c93c45e0c448e77b03565db5c36695ed": {
     "describe": {
       "columns": [
@@ -5262,6 +5280,24 @@
       }
     },
     "query": "SELECT (SELECT l1_batch_number FROM miniblocks WHERE number = $1) as \"block_batch?\", (SELECT MAX(number) + 1 FROM l1_batches) as \"max_batch?\""
+  },
+  "5f28e3dbd4971759449ed72fd163f5c8a2c5eed03aabae578c9053580805ee77": {
+    "describe": {
+      "columns": [
+        {
+          "name": "number",
+          "ordinal": 0,
+          "type_info": "Int8"
+        }
+      ],
+      "nullable": [
+        null
+      ],
+      "parameters": {
+        "Left": []
+      }
+    },
+    "query": "SELECT COALESCE(MAX( NUMBER ),0) AS \"number\" FROM miniblocks\n                WHERE l1_batch_number = ( SELECT MAX ( NUMBER ) FROM l1_batches WHERE eth_prove_tx_id IS NOT NULL)"
   },
   "5f42bcbba9857c62874ecdbd9ae71f7580e7ed1f2dd5c13e9e4d4427e4dc9d32": {
     "describe": {
@@ -5693,6 +5729,24 @@
       }
     },
     "query": "\n                UPDATE node_aggregation_witness_jobs_fri\n                SET status ='failed', error= $1, updated_at = now()\n                WHERE id = $2\n               "
+  },
+  "66f1f192849b412798bc36dfebaff120cdb2db500fea9e05d63938b93d344a39": {
+    "describe": {
+      "columns": [
+        {
+          "name": "count!",
+          "ordinal": 0,
+          "type_info": "Int8"
+        }
+      ],
+      "nullable": [
+        null
+      ],
+      "parameters": {
+        "Left": []
+      }
+    },
+    "query": "SELECT COUNT(*) as \"count!\" FROM transactions WHERE in_mempool=TRUE"
   },
   "67a47f1e7d5f8dafcef94bea3f268b4baec1888c6ef11c92ab66480ecdcb9aef": {
     "describe": {

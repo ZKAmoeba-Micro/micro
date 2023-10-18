@@ -13,6 +13,7 @@ use micro_types::{
         TransactionDetails,
     },
     fee::Fee,
+    statistics_info::StatiticsInfo,
     transaction_request::CallRequest,
     Address, L1BatchNumber, MiniblockNumber, H256, U256, U64,
 };
@@ -111,6 +112,9 @@ pub trait ZksNamespaceT {
 
     #[rpc(name = "zks_getLogsWithVirtualBlocks")]
     fn get_logs_with_virtual_blocks(&self, filter: Filter) -> BoxFuture<Result<Vec<Log>>>;
+
+    #[rpc(name = "zks_getStatistics")]
+    fn get_statistics_info(&self) -> BoxFuture<Result<StatiticsInfo>>;
 }
 
 impl<G: L1GasPriceProvider + Send + Sync + 'static> ZksNamespaceT for ZksNamespace<G> {
@@ -307,5 +311,10 @@ impl<G: L1GasPriceProvider + Send + Sync + 'static> ZksNamespaceT for ZksNamespa
                 .await
                 .map_err(into_jsrpc_error)
         })
+    }
+
+    fn get_statistics_info(&self) -> BoxFuture<Result<StatiticsInfo>> {
+        let self_ = self.clone();
+        Box::pin(async move { Ok(self_.get_statistics_info_impl().await) })
     }
 }

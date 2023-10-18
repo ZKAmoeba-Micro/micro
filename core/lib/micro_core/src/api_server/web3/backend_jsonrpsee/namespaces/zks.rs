@@ -8,6 +8,7 @@ use micro_types::{
         TransactionDetails,
     },
     fee::Fee,
+    statistics_info::StatiticsInfo,
     transaction_request::CallRequest,
     Address, L1BatchNumber, MiniblockNumber, H256, U256, U64,
 };
@@ -157,5 +158,9 @@ impl<G: L1GasPriceProvider + Send + Sync + 'static> ZksNamespaceServer for ZksNa
         self.get_logs_with_virtual_blocks_impl(filter)
             .await
             .map_err(into_jsrpc_error)
+    }
+
+    async fn get_statistics_info(&self) -> RpcResult<StatiticsInfo> {
+        Ok(self.get_statistics_info_impl().await)
     }
 }

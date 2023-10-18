@@ -9,6 +9,7 @@ use micro_types::{
         TransactionDetails,
     },
     fee::Fee,
+    statistics_info::StatiticsInfo,
     transaction_request::CallRequest,
     Address, L1BatchNumber, MiniblockNumber, H256, U256, U64,
 };
@@ -110,4 +111,7 @@ pub trait ZksNamespace {
 
     #[method(name = "getLogsWithVirtualBlocks")]
     async fn get_logs_with_virtual_blocks(&self, filter: Filter) -> RpcResult<Vec<Log>>;
+
+    #[method(name = "getStatistics")]
+    async fn get_statistics_info(&self) -> RpcResult<StatiticsInfo>;
 }

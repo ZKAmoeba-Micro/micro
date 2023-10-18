@@ -1,4 +1,4 @@
-use std::{collections::HashMap, convert::TryInto, time::Instant};
+use std::{collections::HashMap, convert::TryInto, ops::Add, time::Instant};
 
 use bigdecimal::{BigDecimal, Zero};
 use micro_dal::StorageProcessor;
@@ -13,6 +13,7 @@ use micro_types::{
     l1::L1Tx,
     l2::L2Tx,
     l2_to_l1_log::L2ToL1Log,
+    statistics_info::StatiticsInfo,
     tokens::ETHEREUM_ADDRESS,
     transaction_request::CallRequest,
     L1BatchNumber, MiniblockNumber, Transaction, L1_MESSENGER_ADDRESS, L2_ETH_TOKEN_ADDRESS,
@@ -611,5 +612,69 @@ impl<G: L1GasPriceProvider> ZksNamespace<G> {
         filter: Filter,
     ) -> Result<Vec<Log>, Web3Error> {
         self.state.translate_get_logs(filter).await
+    }
+
+    #[tracing::instrument(skip(self))]
+    pub async fn get_statistics_info_impl(&self) -> StatiticsInfo {
+        let start = Instant::now();
+        let endpoint_name = "get_statistics_info_impl";
+        let mut l2_block_id = self
+            .state
+            .connection_pool
+            .access_storage_tagged("api")
+            .await
+            .unwrap()
+            .blocks_web3_dal()
+            .get_sealed_l2_miniblok_number()
+            .await
+            .map(|n| U64::from(n.0))
+            .map_err(|err| internal_error(endpoint_name, err))
+            .unwrap();
+
+        let l2_verify_block_id = self
+            .state
+            .connection_pool
+            .access_storage_tagged("api")
+            .await
+            .unwrap()
+            .blocks_web3_dal()
+            .get_sealed_prove_miniblock_number()
+            .await
+            .map(|n| U64::from(n.0))
+            .map_err(|err| internal_error(endpoint_name, err))
+            .unwrap();
+
+        let tx_mempool = self
+            .state
+            .connection_pool
+            .access_storage_tagged("api")
+            .await
+            .unwrap()
+            .transactions_dal()
+            .get_tx_memory()
+            .await;
+        let un_verified_blocks = l2_block_id.saturating_sub(l2_verify_block_id);
+
+        let latest_proof_time = self
+            .state
+            .connection_pool
+            .access_storage_tagged("api")
+            .await
+            .unwrap()
+            .eth_sender_dal()
+            .get_latest_proof_time()
+            .await;
+
+        l2_block_id = l2_block_id.add(1);
+
+        metrics::histogram!("api.web3.call", start.elapsed(), "endpoint" => endpoint_name);
+
+        StatiticsInfo {
+            tx_mempool: tx_mempool,
+            last_verified_block: l2_verify_block_id,
+            next_block_id: l2_block_id,
+            un_verified_blocks: un_verified_blocks,
+            latest_proof_time: latest_proof_time,
+        }
     }
 }

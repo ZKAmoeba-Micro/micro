@@ -52,6 +52,31 @@ impl BlocksWeb3Dal<'_, '_> {
         Ok(L1BatchNumber(number as u32))
     }
 
+    pub async fn get_sealed_l2_miniblok_number(&mut self) -> Result<MiniblockNumber, sqlx::Error> {
+        let number: i64 = sqlx::query!(r#"SELECT MAX(number) as "number" FROM miniblocks"#)
+            .fetch_one(self.storage.conn())
+            .await?
+            .number
+            .expect("DAL invocation before genesis");
+
+        Ok(MiniblockNumber(number as u32))
+    }
+
+    pub async fn get_sealed_prove_miniblock_number(
+        &mut self,
+    ) -> Result<MiniblockNumber, sqlx::Error> {
+        let number: i64 = sqlx::query!(
+                r#"SELECT COALESCE(MAX( NUMBER ),0) AS "number" FROM miniblocks
+                WHERE l1_batch_number = ( SELECT MAX ( NUMBER ) FROM l1_batches WHERE eth_prove_tx_id IS NOT NULL)"#
+            )
+            .fetch_one(self.storage.conn())
+            .await?
+            .number
+            .expect("DAL invocation before genesis");
+
+        Ok(MiniblockNumber(number as u32))
+    }
+
     pub async fn get_block_by_web3_block_id(
         &mut self,
         block_id: api::BlockId,
