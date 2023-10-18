@@ -67,6 +67,8 @@ export async function init(initArgs: InitArgs = DEFAULT_ARGS) {
         await announced('Initializing L2 WETH token', contract.initializeWethToken(governorPrivateKeyArgs));
     }
     await announced('Initializing governance', contract.initializeGovernance(governorPrivateKeyArgs));
+    await announced('Deploying Zkamoeba', contract.deployZkamoeba());
+    await announced('Initialize System Contracts', contract.initializeSystemContracts());
 }
 
 // A smaller version of `init` that "resets" the localhost environment, for which `init` was already called before.
@@ -89,6 +91,8 @@ export async function reinit() {
     await announced('Initializing L2 WETH token', contract.initializeWethToken());
     await announced('Initializing governance', contract.initializeGovernance());
     await announced('Initializing validator', contract.initializeValidator());
+    await announced('Deploying Zkamoeba', contract.deployZkamoeba());
+    await announced('Initialize System Contracts', contract.initializeSystemContracts());
 }
 
 // A lightweight version of `init` that sets up local databases, generates genesis and deploys precompiled contracts
@@ -103,6 +107,8 @@ export async function lightweightInit() {
     await announced('Initializing L1 Allow list', contract.initializeL1AllowList());
     await announced('Deploying L2 contracts', contract.deployL2([], true, false));
     await announced('Initializing governance', contract.initializeGovernance());
+    await announced('Deploying Zkamoeba', contract.deployZkamoeba());
+    await announced('Initialize System Contracts', contract.initializeSystemContracts());
 }
 
 // Wrapper that writes an announcement and completion notes for each executed task.

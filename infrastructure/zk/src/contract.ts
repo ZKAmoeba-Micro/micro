@@ -96,6 +96,8 @@ export async function deployL2(args: any[] = [], includePaymaster?: boolean, inc
 
     await utils.spawn(`${baseCommandL2} deploy-force-deploy-upgrader ${args.join(' ')} | tee -a deployL2.log`);
 
+    await utils.spawn(`${baseCommandL2} deploy-getters ${args.join(' ')} | tee -a deployL2.log`);
+
     const l2DeployLog = fs.readFileSync('deployL2.log').toString();
     const l2DeploymentEnvVars = [
         'CONTRACTS_L2_ERC20_BRIDGE_ADDR',
@@ -150,6 +152,28 @@ export async function deployL1(args: any[]) {
     // Write updated contract addresses and tx hashes to the separate file
     // Currently it's used by loadtest github action to update deployment configmap.
     fs.writeFileSync('deployed_contracts.log', updatedContracts);
+}
+
+export async function deployZkamoeba() {
+    await utils.confirmAction();
+
+    // In the localhost setup scenario we don't have the workspace,
+    // so we have to `--cwd` into the required directory.
+    const baseCommand = process.env.MICRO_LOCAL_SETUP ? `yarn --cwd /contracts/ethereum` : `yarn l1-contracts`;
+
+    await utils.spawn(`${baseCommand} deploy-zkat deploy | tee deployZkamoeba.log`);
+    const deployLog = fs.readFileSync('deployZkamoeba.log').toString();
+    const envVars = ['CONTRACTS_L1_ZKAT_ADDR', 'CONTRACTS_L2_ZKAT_ADDR'];
+    updateContractsEnv(deployLog, envVars);
+}
+
+export async function initializeSystemContracts() {
+    await utils.confirmAction();
+    // In the localhost setup scenario we don't have the workspace,
+    // so we have to `--cwd` into the required directory.
+    const baseCommand = process.env.MICRO_LOCAL_SETUP ? `yarn --cwd /contracts/ethereum` : `yarn l1-contracts`;
+
+    await utils.spawn(`${baseCommand} initialize-system-contracts  deploy | tee initializeSystemContracts.log`);
 }
 
 export async function redeployL1(args: any[]) {
