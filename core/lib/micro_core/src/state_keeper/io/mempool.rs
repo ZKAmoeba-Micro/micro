@@ -1,16 +1,18 @@
 use anyhow::Context as _;
 use async_trait::async_trait;
+use micro_state::PostgresStorageCaches;
 
 use std::{
     cmp,
     collections::HashMap,
+    ops::Add,
     sync::Arc,
     time::{Duration, Instant},
 };
 
 use vm::{utils::fee::derive_base_fee_and_gas_per_pubdata, FinishedL1Batch, L1BatchEnv, SystemEnv};
 
-use micro_config::configs::chain::StateKeeperConfig;
+use micro_config::configs::{api::Web3JsonRpcConfig, chain::StateKeeperConfig};
 use micro_dal::ConnectionPool;
 use micro_mempool::L2TxFilter;
 use micro_object_store::ObjectStoreFactory;
@@ -23,6 +25,9 @@ use micro_types::{
 use micro_utils::time::millis_since_epoch;
 
 use crate::{
+    api_server::{
+        execution_sandbox::VmConcurrencyLimiter, system_contract_caller::SystemContractCaller,
+    },
     l1_gas_price::L1GasPriceProvider,
     state_keeper::{
         extractors,
@@ -61,6 +66,7 @@ pub(crate) struct MempoolIO<G> {
 
     virtual_blocks_interval: u32,
     virtual_blocks_per_miniblock: u32,
+    system_contract_caller: SystemContractCaller,
 }
 
 #[async_trait]
@@ -157,10 +163,27 @@ impl<G: L1GasPriceProvider + 'static + Send + Sync> StateKeeperIO for MempoolIO<
                 .protocol_versions_dal()
                 .base_system_contracts_by_timestamp(current_timestamp)
                 .await;
-
+            let mut operator_address = self.fee_account;
+            let node_list = self
+                .system_contract_caller
+                .deposit_node_list()
+                .await
+                .unwrap();
+            if !node_list.is_empty() {
+                let block_number = U256::from(self.current_l1_batch_number.0);
+                let len = node_list.len();
+                let len: U256 = U256::from(len);
+                let (_, mod_result) = block_number.add(prev_l1_batch_hash).div_mod(len);
+                operator_address = node_list.get(mod_result.as_usize()).unwrap().node_address;
+            }
+            tracing::info!(
+                "new_batch  #{} fee_account  #{}",
+                self.current_l1_batch_number.0,
+                operator_address
+            );
             return Some(l1_batch_params(
                 self.current_l1_batch_number,
-                self.fee_account,
+                operator_address,
                 current_timestamp,
                 prev_l1_batch_hash,
                 self.filter.l1_gas_price,
@@ -403,6 +426,9 @@ impl<G: L1GasPriceProvider> MempoolIO<G> {
         l2_erc20_bridge_addr: Address,
         validation_computational_gas_limit: u32,
         chain_id: L2ChainId,
+        web3_json_config: &Web3JsonRpcConfig,
+        replica_connection_pool: ConnectionPool,
+        storage_caches: PostgresStorageCaches,
     ) -> Self {
         assert!(
             config.virtual_blocks_interval > 0,
@@ -427,6 +453,20 @@ impl<G: L1GasPriceProvider> MempoolIO<G> {
 
         drop(storage);
 
+        let max_concurrency = web3_json_config.vm_concurrency_limit();
+        let (vm_concurrency_limiter, _) = VmConcurrencyLimiter::new(max_concurrency);
+        let vm_execution_cache_misses_limit = web3_json_config.vm_execution_cache_misses_limit;
+
+        let system_contract_caller = SystemContractCaller::new(
+            replica_connection_pool,
+            config.fair_l2_gas_price,
+            chain_id,
+            storage_caches,
+            vm_execution_cache_misses_limit,
+            Arc::new(vm_concurrency_limiter),
+        )
+        .await;
+
         Self {
             mempool,
             pool,
@@ -444,6 +484,7 @@ impl<G: L1GasPriceProvider> MempoolIO<G> {
             chain_id,
             virtual_blocks_interval: config.virtual_blocks_interval,
             virtual_blocks_per_miniblock: config.virtual_blocks_per_miniblock,
+            system_contract_caller,
         }
     }
 

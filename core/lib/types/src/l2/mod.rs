@@ -17,6 +17,7 @@ use crate::{
 use serde::{Deserialize, Serialize};
 
 pub mod error;
+pub mod system_contracts;
 
 use crate::api::TransactionRequest;
 use crate::fee::{encoding_len, Fee};
