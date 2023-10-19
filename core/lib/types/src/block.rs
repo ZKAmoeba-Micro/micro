@@ -152,9 +152,9 @@ impl L1BatchHeader {
 
 #[derive(Clone, Copy, Eq, PartialEq, Default)]
 pub struct BlockGasCount {
-    pub commit: u32,
-    pub prove: u32,
-    pub execute: u32,
+    pub commit: u64,
+    pub prove: u64,
+    pub execute: u64,
 }
 
 impl fmt::Debug for BlockGasCount {
@@ -168,7 +168,7 @@ impl fmt::Debug for BlockGasCount {
 }
 
 impl BlockGasCount {
-    pub fn any_field_greater_than(&self, bound: u32) -> bool {
+    pub fn any_field_greater_than(&self, bound: u64) -> bool {
         self.commit > bound || self.prove > bound || self.execute > bound
     }
 }

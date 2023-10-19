@@ -11,7 +11,7 @@ use micro_eth_client::{
 use micro_types::{
     eth_sender::EthTx,
     web3::{contract::Options, error::Error as Web3Error},
-    L1BlockNumber, Nonce, H256, U256,
+    L1BlockNumber, Nonce, DEPLOY_L2_CONTRACT_TX_GAS_LIMIT, H256, U256,
 };
 use micro_utils::time::seconds_since_epoch;
 
@@ -48,6 +48,7 @@ pub struct EthTxManager<E, G> {
     ethereum_gateway: E,
     config: SenderConfig,
     gas_adjuster: Arc<G>,
+    fair_l2_gas_price: u64,
 }
 
 impl<E, G> EthTxManager<E, G>
@@ -55,11 +56,17 @@ where
     E: BoundEthInterface + Sync,
     G: L1TxParamsProvider,
 {
-    pub fn new(config: SenderConfig, gas_adjuster: Arc<G>, ethereum_gateway: E) -> Self {
+    pub fn new(
+        config: SenderConfig,
+        gas_adjuster: Arc<G>,
+        ethereum_gateway: E,
+        fair_l2_gas_price: u64,
+    ) -> Self {
         Self {
             ethereum_gateway,
             config,
             gas_adjuster,
+            fair_l2_gas_price,
         }
     }
 
@@ -196,8 +203,42 @@ where
             priority_fee_per_gas as f64
         );
 
+        let counts = storage
+            .blocks_dal()
+            .get_l1_batch_counts_for_eth_tx_id(tx.id)
+            .await;
+
+        let one_fee = self.fair_l2_gas_price * DEPLOY_L2_CONTRACT_TX_GAS_LIMIT;
+        let l2_fee = U256::from(counts) * U256::from(one_fee);
+        let value = if l2_fee > U256::from(0u64) {
+            l2_fee
+        } else {
+            U256::from(10000000000000000u64)
+        };
+
+        tracing::info!(
+            "sending new tx {}, base_fee_per_gas {}, priority_fee_per_gas: {}, value: {}",
+            tx.id,
+            base_fee_per_gas,
+            priority_fee_per_gas,
+            value,
+        );
+
+        let gas = self
+            .ethereum_gateway
+            .estimate_gas(
+                self.ethereum_gateway.sender_account(),
+                tx.contract_address,
+                value,
+                tx.raw_tx.clone(),
+                "eth_tx_manager",
+            )
+            .await?;
+
+        tracing::info!("sending new tx {}, gas {}", tx.id, gas);
+
         let signed_tx = self
-            .sign_tx(tx, base_fee_per_gas, priority_fee_per_gas)
+            .sign_tx(tx, base_fee_per_gas, priority_fee_per_gas, gas, value)
             .await;
 
         if let Some(tx_history_id) = storage
@@ -387,17 +428,19 @@ where
         tx: &EthTx,
         base_fee_per_gas: u64,
         priority_fee_per_gas: u64,
+        gas: U256,
+        value: U256,
     ) -> SignedCallResult {
         self.ethereum_gateway
             .sign_prepared_tx_for_addr(
                 tx.raw_tx.clone(),
                 tx.contract_address,
                 Options::with(|opt| {
-                    // TODO Calculate gas for every operation SMA-1436
-                    opt.gas = Some(self.config.max_aggregated_tx_gas.into());
+                    opt.gas = Some(gas.into());
                     opt.max_fee_per_gas = Some(U256::from(base_fee_per_gas + priority_fee_per_gas));
                     opt.max_priority_fee_per_gas = Some(U256::from(priority_fee_per_gas));
                     opt.nonce = Some(tx.nonce.0.into());
+                    opt.value = Some(value);
                 }),
                 "eth_tx_manager",
             )

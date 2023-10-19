@@ -218,6 +218,19 @@ impl<S: EthereumSigner> EthInterface for SigningClient<S> {
     ) -> Result<Option<Block<H256>>, Error> {
         self.query_client.block(block_id, component).await
     }
+
+    async fn estimate_gas(
+        &self,
+        from: Address,
+        to: Address,
+        value: U256,
+        data: Vec<u8>,
+        component: &'static str,
+    ) -> Result<U256, Error> {
+        self.query_client
+            .estimate_gas(from, to, value, data, component)
+            .await
+    }
 }
 
 #[async_trait]

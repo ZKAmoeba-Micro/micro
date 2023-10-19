@@ -220,11 +220,10 @@ impl TryFrom<Log> for L1Tx {
 
         let mut dec_ev = decode(
             &[
-                ParamType::Uint(256),                         // tx ID
-                ParamType::FixedBytes(32),                    // tx hash
-                ParamType::Uint(64),                          // expiration block
-                transaction_param_type,                       // transaction data
-                ParamType::Array(Box::new(ParamType::Bytes)), // factory deps
+                ParamType::Uint(256),      // tx ID
+                ParamType::FixedBytes(32), // tx hash
+                ParamType::Uint(64),       // expiration block
+                transaction_param_type,    // transaction data
             ],
             &event.data.0,
         )?;
@@ -311,15 +310,15 @@ impl TryFrom<Log> for L1Tx {
         // Decoding metadata
 
         // Finally, decode the factory dependencies
-        let factory_deps = match dec_ev.remove(0) {
-            Token::Array(factory_deps) => factory_deps,
-            _ => unreachable!(),
-        };
+        // let factory_deps = match dec_ev.remove(0) {
+        //     Token::Array(factory_deps) => factory_deps,
+        //     _ => unreachable!(),
+        // };
 
-        let factory_deps = factory_deps
-            .into_iter()
-            .map(|token| token.into_bytes().unwrap())
-            .collect::<Vec<_>>();
+        // let factory_deps = factory_deps
+        //     .into_iter()
+        //     .map(|token| token.into_bytes().unwrap())
+        //     .collect::<Vec<_>>();
 
         let common_data = L1TxCommonData {
             serial_id,
@@ -342,13 +341,69 @@ impl TryFrom<Log> for L1Tx {
         let execute = Execute {
             contract_address,
             calldata: calldata.to_vec(),
-            factory_deps: Some(factory_deps),
+            factory_deps: None,
             value: msg_value,
         };
         Ok(Self {
             common_data,
             execute,
             received_timestamp_ms: unix_timestamp_ms(),
+        })
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct L1FactoryDep {
+    pub serial_id: PriorityOpId,
+    pub dep_index: u64,
+    pub splitted_index: u64,
+    pub bytes: Vec<u8>,
+}
+
+impl TryFrom<Log> for L1FactoryDep {
+    type Error = L1TxParseError;
+
+    fn try_from(event: Log) -> Result<Self, Self::Error> {
+        let mut dec_ev = decode(
+            &[
+                ParamType::Uint(256), // tx ID
+                ParamType::Uint(256), // dep index
+                ParamType::Uint(256), // splitted index
+                ParamType::Bytes,     // factory dep
+            ],
+            &event.data.0,
+        )?;
+
+        let serial_id = PriorityOpId(
+            dec_ev
+                .remove(0)
+                .into_uint()
+                .as_ref()
+                .map(U256::as_u64)
+                .unwrap(),
+        );
+
+        let dep_index = dec_ev
+            .remove(0)
+            .into_uint()
+            .as_ref()
+            .map(U256::as_u64)
+            .unwrap();
+
+        let splitted_index = dec_ev
+            .remove(0)
+            .into_uint()
+            .as_ref()
+            .map(U256::as_u64)
+            .unwrap();
+
+        let bytes = dec_ev.remove(0).into_bytes().unwrap();
+
+        Ok(Self {
+            serial_id,
+            dep_index,
+            splitted_index,
+            bytes,
         })
     }
 }

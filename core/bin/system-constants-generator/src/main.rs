@@ -1,5 +1,6 @@
 use std::fs;
 
+use micro_types::DEPLOY_L2_CONTRACT_TX_GAS_LIMIT;
 use micro_types::{
     IntrinsicSystemGasConstants, GUARANTEED_PUBDATA_IN_TX, L1_GAS_PER_PUBDATA_BYTE,
     MAX_GAS_PER_PUBDATA_BYTE, MAX_NEW_FACTORY_DEPS, MAX_TXS_IN_BLOCK,
@@ -40,6 +41,7 @@ struct L1SystemConfig {
     l1_tx_delta_factory_deps_pubdata: u32,
     max_new_factory_deps: u32,
     required_l2_gas_price_per_pubdata: u64,
+    deploy_l2_contract_tx_gas_limit: u64,
 }
 
 pub fn generate_l1_contracts_system_config(gas_constants: &IntrinsicSystemGasConstants) -> String {
@@ -67,6 +69,7 @@ pub fn generate_l1_contracts_system_config(gas_constants: &IntrinsicSystemGasCon
         l1_tx_delta_factory_deps_pubdata: gas_constants.l1_tx_delta_factory_dep_pubdata,
         max_new_factory_deps: MAX_NEW_FACTORY_DEPS as u32,
         required_l2_gas_price_per_pubdata: MAX_GAS_PER_PUBDATA_BYTE,
+        deploy_l2_contract_tx_gas_limit: DEPLOY_L2_CONTRACT_TX_GAS_LIMIT,
     };
 
     serde_json::to_string_pretty(&l1_contracts_config).unwrap()

@@ -35,7 +35,7 @@ mod tests {
     fn expected_config() -> ETHClientConfig {
         ETHClientConfig {
             chain_id: 9,
-            web3_url: "http://127.0.0.1:8545".into(),
+            web3_url: "http://127.0.0.1:1234/rpc/v1".into(),
         }
     }
 
@@ -44,7 +44,7 @@ mod tests {
         let mut lock = MUTEX.lock();
         let config = r#"
             ETH_CLIENT_CHAIN_ID="9"
-            ETH_CLIENT_WEB3_URL="http://127.0.0.1:8545"
+            ETH_CLIENT_WEB3_URL="http://127.0.0.1:1234/rpc/v1"
         "#;
         lock.set_env(config);
 

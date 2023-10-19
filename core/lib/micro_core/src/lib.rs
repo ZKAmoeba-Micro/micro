@@ -586,6 +586,8 @@ pub async fn initialize_components(
     if components.contains(&Component::EthTxManager) {
         let started_at = Instant::now();
         tracing::info!("initializing ETH-TxManager");
+        let state_keeper_config =
+            StateKeeperConfig::from_env().context("StateKeeperConfig::from_env()")?;
         let eth_manager_pool = ConnectionPool::singleton(DbVariant::Master)
             .build()
             .await
@@ -600,6 +602,7 @@ pub async fn initialize_components(
                 .await
                 .context("gas_adjuster.get_or_init()")?,
             eth_client,
+            state_keeper_config.fair_l2_gas_price,
         );
         task_futures.extend([tokio::spawn(
             eth_tx_manager_actor.run(eth_manager_pool, stop_receiver.clone()),

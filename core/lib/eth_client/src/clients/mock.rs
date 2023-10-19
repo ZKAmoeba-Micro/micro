@@ -347,6 +347,17 @@ impl EthInterface for MockEthereum {
     ) -> Result<Option<Block<H256>>, Error> {
         unimplemented!("Not needed right now")
     }
+
+    async fn estimate_gas(
+        &self,
+        _from: Address,
+        _to: Address,
+        _value: U256,
+        _data: Vec<u8>,
+        _component: &'static str,
+    ) -> Result<U256, Error> {
+        unimplemented!("Not needed right now")
+    }
 }
 
 #[async_trait::async_trait]
@@ -528,6 +539,19 @@ impl<T: AsRef<MockEthereum> + Send + Sync> EthInterface for T {
         component: &'static str,
     ) -> Result<Option<Block<H256>>, Error> {
         self.as_ref().block(block_id, component).await
+    }
+
+    async fn estimate_gas(
+        &self,
+        from: Address,
+        to: Address,
+        value: U256,
+        data: Vec<u8>,
+        component: &'static str,
+    ) -> Result<U256, Error> {
+        self.as_ref()
+            .estimate_gas(from, to, value, data, component)
+            .await
     }
 }
 

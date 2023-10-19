@@ -17,8 +17,8 @@ use micro_types::web3::{
     helpers::CallFuture,
     transports::Http,
     types::{
-        Address, Block, BlockId, BlockNumber, Bytes, Filter, Log, Transaction, TransactionId,
-        TransactionReceipt, H256, U256, U64,
+        Address, Block, BlockId, BlockNumber, Bytes, CallRequest, Filter, Log, Transaction,
+        TransactionId, TransactionReceipt, H256, U256, U64,
     },
     Transport, Web3,
 };
@@ -94,7 +94,7 @@ impl EthInterface for QueryClient {
         block_count: usize,
         component: &'static str,
     ) -> Result<Vec<u64>, Error> {
-        const MAX_REQUEST_CHUNK: usize = 1024;
+        const MAX_REQUEST_CHUNK: usize = 128;
 
         COUNTERS.call[&(Method::BaseFeeHistory, component)].inc();
         let latency = LATENCIES.direct[&Method::BaseFeeHistory].start();
@@ -305,5 +305,27 @@ impl EthInterface for QueryClient {
         .await?;
         latency.observe();
         Ok(block)
+    }
+
+    async fn estimate_gas(
+        &self,
+        from: Address,
+        to: Address,
+        value: U256,
+        data: Vec<u8>,
+        component: &'static str,
+    ) -> Result<U256, Error> {
+        COUNTERS.call[&(Method::EstimateGas, component)].inc();
+        let latency = LATENCIES.direct[&Method::EstimateGas].start();
+        let req = CallRequest::builder()
+            .from(from)
+            .to(to)
+            .value(value)
+            .data(Bytes(data))
+            .build();
+
+        let gas = self.web3.eth().estimate_gas(req, None).await?;
+        latency.observe();
+        Ok(gas)
     }
 }

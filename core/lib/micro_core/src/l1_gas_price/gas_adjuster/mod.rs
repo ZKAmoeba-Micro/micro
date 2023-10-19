@@ -18,7 +18,10 @@ mod tests;
 /// It is used to adjust the base_fee of transactions sent to L1.
 #[derive(Debug)]
 pub struct GasAdjuster<E> {
+    // base fee
     pub(super) statistics: GasStatistics,
+    // priority fee
+    pub(super) statistics2: GasStatistics,
     pub(super) config: GasAdjusterConfig,
     eth_client: E,
 }
@@ -36,8 +39,15 @@ impl<E: EthInterface> GasAdjuster<E> {
         let history = eth_client
             .base_fee_history(current_block, config.max_base_fee_samples, "gas_adjuster")
             .await?;
+        let gas_price = eth_client.get_gas_price("gas_adjuster").await?;
+        let gas_price_history = vec![gas_price.as_u64()];
         Ok(Self {
             statistics: GasStatistics::new(config.max_base_fee_samples, current_block, &history),
+            statistics2: GasStatistics::new(
+                config.max_base_fee_samples,
+                current_block,
+                &gas_price_history,
+            ),
             eth_client,
             config,
         })
@@ -75,6 +85,16 @@ impl<E: EthInterface> GasAdjuster<E> {
             );
 
             self.statistics.add_samples(&history);
+
+            let gas_price = self.eth_client.get_gas_price("gas_adjuster").await?;
+            let gas_price_history = vec![gas_price.as_u64()];
+
+            metrics::gauge!(
+                "server.gas_adjuster.current_priority_fee_per_gas",
+                *gas_price_history.last().unwrap() as f64
+            );
+
+            self.statistics2.add_samples(&gas_price_history);
         }
         Ok(())
     }
@@ -148,7 +168,12 @@ impl<E: EthInterface> L1TxParamsProvider for GasAdjuster<E> {
     // base_fee will balance out priority_fee in such a way that
     // priority_fee will be a small fraction of the overall fee.
     fn get_priority_fee(&self) -> u64 {
-        self.config.default_priority_fee_per_gas
+        let median = self.statistics2.median();
+        if median > self.config.default_priority_fee_per_gas {
+            self.config.default_priority_fee_per_gas
+        } else {
+            median
+        }
     }
 }
 

@@ -14,7 +14,7 @@ mod constants;
 
 use self::constants::*;
 
-pub fn agg_l1_batch_base_cost(op: AggregatedActionType) -> u32 {
+pub fn agg_l1_batch_base_cost(op: AggregatedActionType) -> u64 {
     match op {
         AggregatedActionType::Commit => AGGR_L1_BATCH_COMMIT_BASE_COST,
         AggregatedActionType::PublishProofOnchain => AGGR_L1_BATCH_PROVE_BASE_COST,
@@ -22,7 +22,7 @@ pub fn agg_l1_batch_base_cost(op: AggregatedActionType) -> u32 {
     }
 }
 
-pub fn l1_batch_base_cost(op: AggregatedActionType) -> u32 {
+pub fn l1_batch_base_cost(op: AggregatedActionType) -> u64 {
     match op {
         AggregatedActionType::Commit => L1_BATCH_COMMIT_BASE_COST,
         AggregatedActionType::PublishProofOnchain => L1_BATCH_PROVE_BASE_COST,
@@ -30,7 +30,7 @@ pub fn l1_batch_base_cost(op: AggregatedActionType) -> u32 {
     }
 }
 
-fn base_tx_cost(tx: &Transaction, op: AggregatedActionType) -> u32 {
+fn base_tx_cost(tx: &Transaction, op: AggregatedActionType) -> u64 {
     match op {
         AggregatedActionType::Commit => EXECUTE_COMMIT_COST,
         AggregatedActionType::PublishProofOnchain => 0,
@@ -42,12 +42,12 @@ fn base_tx_cost(tx: &Transaction, op: AggregatedActionType) -> u32 {
     }
 }
 
-fn additional_pubdata_commit_cost(execution_metrics: &ExecutionMetrics) -> u32 {
-    (execution_metrics.size() as u32) * GAS_PER_BYTE
+fn additional_pubdata_commit_cost(execution_metrics: &ExecutionMetrics) -> u64 {
+    (execution_metrics.size() as u64) * GAS_PER_BYTE
 }
 
-fn additional_writes_commit_cost(writes_metrics: &DeduplicatedWritesMetrics) -> u32 {
-    (writes_metrics.size() as u32) * GAS_PER_BYTE
+fn additional_writes_commit_cost(writes_metrics: &DeduplicatedWritesMetrics) -> u64 {
+    (writes_metrics.size() as u64) * GAS_PER_BYTE
 }
 
 pub fn new_block_gas_count() -> BlockGasCount {
@@ -91,21 +91,21 @@ pub(crate) fn commit_gas_count_for_l1_batch(
     header: &L1BatchHeader,
     unsorted_factory_deps: &HashMap<H256, Vec<u8>>,
     metadata: &L1BatchMetadata,
-) -> u32 {
+) -> u64 {
     let base_cost = l1_batch_base_cost(AggregatedActionType::Commit);
-    let total_messages_len: u32 = header
+    let total_messages_len: u64 = header
         .l2_to_l1_messages
         .iter()
-        .map(|message| message.len() as u32)
+        .map(|message| message.len() as u64)
         .sum();
     let sorted_factory_deps =
         L1BatchWithMetadata::factory_deps_in_appearance_order(header, unsorted_factory_deps);
-    let total_factory_deps_len: u32 = sorted_factory_deps
-        .map(|factory_dep| factory_dep.len() as u32)
+    let total_factory_deps_len: u64 = sorted_factory_deps
+        .map(|factory_dep| factory_dep.len() as u64)
         .sum();
-    let additional_calldata_bytes = metadata.initial_writes_compressed.len() as u32
-        + metadata.repeated_writes_compressed.len() as u32
-        + metadata.l2_l1_messages_compressed.len() as u32
+    let additional_calldata_bytes = metadata.initial_writes_compressed.len() as u64
+        + metadata.repeated_writes_compressed.len() as u64
+        + metadata.l2_l1_messages_compressed.len() as u64
         + total_messages_len
         + total_factory_deps_len;
     let additional_cost = additional_calldata_bytes * GAS_PER_BYTE;

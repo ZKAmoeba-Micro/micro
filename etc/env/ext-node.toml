@@ -23,7 +23,7 @@ merkle_tree_path = "./db/ext-node/lightweight"
 max_l1_batches_per_tree_iter = 20
 
 main_node_url = "http://127.0.0.1:3050"
-eth_client_url = "http://127.0.0.1:8545"
+eth_client_url = "http://127.0.0.1:1234/rpc/v1"
 
 api_namespaces = ["eth", "web3", "net", "pubsub", "zks", "en", "debug"]
 

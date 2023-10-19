@@ -169,6 +169,18 @@ impl BlocksDal<'_, '_> {
         Ok(l1_batches.into_iter().map(Into::into).collect())
     }
 
+    pub async fn get_l1_batch_counts_for_eth_tx_id(&mut self, eth_tx_id: u32) -> u32 {
+        let counts: i64 =sqlx::query!(
+                r#"SELECT COUNT(*) as "count!" FROM l1_batches WHERE eth_commit_tx_id = $1 OR eth_prove_tx_id = $1 OR eth_execute_tx_id = $1"#,
+                eth_tx_id as i32
+            )
+            .fetch_one(self.storage.conn())
+            .await
+            .unwrap()
+            .count;
+        counts as u32
+    }
+
     pub async fn get_storage_l1_batch(
         &mut self,
         number: L1BatchNumber,
@@ -1104,12 +1116,12 @@ impl BlocksDal<'_, '_> {
     }
 
     /// Returns sum of predicted gas costs on the given L1 batch range.
-    /// Panics if the sum doesn't fit into `u32`.
+    /// Panics if the sum doesn't fit into `u64`.
     pub async fn get_l1_batches_predicted_gas(
         &mut self,
         number_range: ops::RangeInclusive<L1BatchNumber>,
         op_type: AggregatedActionType,
-    ) -> anyhow::Result<u32> {
+    ) -> anyhow::Result<u64> {
         let column_name = match op_type {
             AggregatedActionType::Commit => "predicted_commit_gas_cost",
             AggregatedActionType::PublishProofOnchain => "predicted_prove_gas_cost",
@@ -1125,14 +1137,14 @@ impl BlocksDal<'_, '_> {
             .fetch_one(self.storage.conn())
             .await?
             .get::<BigDecimal, &str>("sum")
-            .to_u32()
-            .context("Sum of predicted gas costs should fit into u32")
+            .to_u64()
+            .context("Sum of predicted gas costs should fit into u64")
     }
 
     pub async fn update_predicted_l1_batch_commit_gas(
         &mut self,
         number: L1BatchNumber,
-        predicted_gas_cost: u32,
+        predicted_gas_cost: u64,
     ) -> sqlx::Result<()> {
         sqlx::query!(
             "UPDATE l1_batches \

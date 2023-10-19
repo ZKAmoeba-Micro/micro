@@ -203,6 +203,17 @@ impl EthInterface for ETHDirectClientMock {
     ) -> Result<Option<Block<H256>>, Error> {
         Ok(Default::default())
     }
+
+    async fn estimate_gas(
+        &self,
+        _from: Address,
+        _to: Address,
+        _value: U256,
+        _data: Vec<u8>,
+        _component: &'static str,
+    ) -> Result<U256, Error> {
+        Ok(Default::default())
+    }
 }
 
 #[async_trait]

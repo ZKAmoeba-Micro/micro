@@ -148,7 +148,7 @@ fn default_max_inflight_txs() -> usize {
 }
 
 fn default_l1_rpc_address() -> String {
-    let result = "http://127.0.0.1:8545".to_string();
+    let result = "http://127.0.0.1:1234/rpc/v1".to_string();
     tracing::info!("Using default L1_RPC_ADDRESS: {result}");
     result
 }

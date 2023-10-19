@@ -16,17 +16,11 @@ use crate::L1ChainId;
 #[derive(Debug, Serialize, Deserialize, Clone, Copy, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub enum Network {
-    /// Ethereum Mainnet.
+    /// Filecoin Mainnet.
     Mainnet,
-    /// Ethereum Rinkeby testnet.
-    Rinkeby,
-    /// Ethereum Ropsten testnet.
-    Ropsten,
-    /// Ethereum Görli testnet.
-    Goerli,
-    /// Ethereum Sepolia testnet.
-    Sepolia,
-    /// Self-hosted Ethereum network.
+    /// Filecoin Calibration testnet.
+    Calibration,
+    /// Self-hosted Filecoin network.
     Localhost,
     /// Unknown network type.
     Unknown,
@@ -40,11 +34,8 @@ impl FromStr for Network {
     fn from_str(string: &str) -> Result<Self, Self::Err> {
         Ok(match string {
             "mainnet" => Self::Mainnet,
-            "rinkeby" => Self::Rinkeby,
-            "ropsten" => Self::Ropsten,
-            "goerli" => Self::Goerli,
+            "calibration" => Self::Calibration,
             "localhost" => Self::Localhost,
-            "sepolia" => Self::Sepolia,
             "test" => Self::Test,
             another => return Err(another.to_owned()),
         })
@@ -55,11 +46,8 @@ impl fmt::Display for Network {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::Mainnet => write!(f, "mainnet"),
-            Self::Rinkeby => write!(f, "rinkeby"),
-            Self::Ropsten => write!(f, "ropsten"),
-            Self::Goerli => write!(f, "goerli"),
+            Self::Calibration => write!(f, "calibration"),
             Self::Localhost => write!(f, "localhost"),
-            Self::Sepolia => write!(f, "sepolia"),
             Self::Unknown => write!(f, "unknown"),
             Self::Test => write!(f, "test"),
         }
@@ -70,12 +58,9 @@ impl Network {
     /// Returns the network chain ID on the Ethereum side.
     pub fn from_chain_id(chain_id: L1ChainId) -> Self {
         match *chain_id {
-            1 => Self::Mainnet,
-            3 => Self::Ropsten,
-            4 => Self::Rinkeby,
-            5 => Self::Goerli,
-            9 => Self::Localhost,
-            11155111 => Self::Sepolia,
+            314 => Self::Mainnet,
+            314159 => Self::Calibration,
+            31415926 => Self::Localhost,
             _ => Self::Unknown,
         }
     }
@@ -83,12 +68,9 @@ impl Network {
     /// Returns the network chain ID on the Ethereum side.
     pub fn chain_id(self) -> L1ChainId {
         match self {
-            Self::Mainnet => L1ChainId(1),
-            Self::Ropsten => L1ChainId(3),
-            Self::Rinkeby => L1ChainId(4),
-            Self::Goerli => L1ChainId(5),
-            Self::Localhost => L1ChainId(9),
-            Self::Sepolia => L1ChainId(11155111),
+            Self::Mainnet => L1ChainId(314),
+            Self::Calibration => L1ChainId(314159),
+            Self::Localhost => L1ChainId(31415926),
             Self::Unknown => panic!("Unknown chain ID"),
             Self::Test => panic!("Test chain ID"),
         }

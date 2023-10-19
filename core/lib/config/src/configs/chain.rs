@@ -71,7 +71,7 @@ pub struct StateKeeperConfig {
     pub miniblock_seal_queue_capacity: usize,
 
     /// The max number of gas to spend on an L1 tx before its batch should be sealed by the gas sealer.
-    pub max_single_tx_gas: u32,
+    pub max_single_tx_gas: u64,
 
     pub max_allowed_l2_tx_gas_limit: u32,
 

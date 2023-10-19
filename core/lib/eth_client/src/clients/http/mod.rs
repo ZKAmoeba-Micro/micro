@@ -30,6 +30,7 @@ enum Method {
     EthBalance,
     Logs,
     Block,
+    EstimateGas,
     #[metrics(name = "sign_prepared_tx_for_addr")]
     SignPreparedTx,
     Allowance,

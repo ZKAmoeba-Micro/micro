@@ -134,6 +134,15 @@ pub trait EthInterface: Sync + Send {
         block_id: String,
         component: &'static str,
     ) -> Result<Option<Block<H256>>, Error>;
+
+    async fn estimate_gas(
+        &self,
+        from: Address,
+        to: Address,
+        value: U256,
+        data: Vec<u8>,
+        component: &'static str,
+    ) -> Result<U256, Error>;
 }
 
 /// An extension of `EthInterface` trait, which is used to perform queries that are bound to

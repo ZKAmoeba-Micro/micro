@@ -54,7 +54,7 @@ pub struct SenderConfig {
     /// The mode in which proofs are sent.
     pub proof_sending_mode: ProofSendingMode,
 
-    pub max_aggregated_tx_gas: u32,
+    pub max_aggregated_tx_gas: u64,
     pub max_eth_tx_data_size: usize,
     pub max_aggregated_blocks_to_commit: u32,
     pub max_aggregated_blocks_to_execute: u32,

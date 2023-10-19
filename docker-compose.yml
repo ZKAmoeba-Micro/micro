@@ -1,14 +1,13 @@
 version: '3.2'
 services:
-  geth:
-    image: "matterlabs/geth:latest"
+  lotus:
+    image: "zkamoeba/lotus:latest"
     ports:
-      - "8545:8545"
-      - "8546:8546"
+      - "1234:1234"
     volumes:
       - type: bind
-        source: ./volumes/geth
-        target: /var/lib/geth/data
+        source: ./volumes/lotus
+        target: /var/lib/lotus/data
   postgres:
     image: "postgres:14"
     ports:

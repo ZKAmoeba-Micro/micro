@@ -142,7 +142,7 @@ impl EthSenderDal<'_, '_> {
         raw_tx: Vec<u8>,
         tx_type: AggregatedActionType,
         contract_address: Address,
-        predicted_gas_cost: u32,
+        predicted_gas_cost: u64,
     ) -> EthTx {
         {
             let address = format!("{:#x}", contract_address);

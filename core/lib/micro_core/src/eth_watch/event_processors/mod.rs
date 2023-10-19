@@ -16,5 +16,5 @@ pub trait EventProcessor<W: EthClient + Sync>: Send + std::fmt::Debug {
     ) -> Result<(), Error>;
 
     /// Relevant topic which defines what events to be processed
-    fn relevant_topic(&self) -> H256;
+    fn relevant_topic(&self) -> Vec<H256>;
 }

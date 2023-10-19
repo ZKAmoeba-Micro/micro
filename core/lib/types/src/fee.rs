@@ -44,8 +44,13 @@ impl Fee {
         assert!(block_base_fee_per_gas <= self.max_fee_per_gas);
         assert!(self.max_priority_fee_per_gas <= self.max_fee_per_gas);
 
-        // For now, we charge only for base fee.
-        block_base_fee_per_gas
+        if self.max_fee_per_gas == self.max_priority_fee_per_gas {
+            block_base_fee_per_gas
+        } else {
+            // for EIP1559
+            assert!(block_base_fee_per_gas + self.max_priority_fee_per_gas <= self.max_fee_per_gas);
+            block_base_fee_per_gas + self.max_priority_fee_per_gas
+        }
     }
 }
 

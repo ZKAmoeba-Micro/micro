@@ -22,9 +22,9 @@ impl SealCriterion for GasCriterion {
         tx_data: &SealData,
     ) -> SealResolution {
         let tx_bound =
-            (config.max_single_tx_gas as f64 * config.reject_tx_at_gas_percentage).round() as u32;
+            (config.max_single_tx_gas as f64 * config.reject_tx_at_gas_percentage).round() as u64;
         let block_bound =
-            (config.max_single_tx_gas as f64 * config.close_block_at_gas_percentage).round() as u32;
+            (config.max_single_tx_gas as f64 * config.close_block_at_gas_percentage).round() as u64;
 
         if (tx_data.gas_count + new_block_gas_count()).any_field_greater_than(tx_bound) {
             SealResolution::Unexecutable("Transaction requires too much gas".into())
@@ -96,7 +96,7 @@ mod tests {
 
         // Check criterion workflow
         let reject_tx_bound =
-            (config.max_single_tx_gas as f64 * config.reject_tx_at_gas_percentage).round() as u32;
+            (config.max_single_tx_gas as f64 * config.reject_tx_at_gas_percentage).round() as u64;
         let tx_gas = BlockGasCount {
             commit: reject_tx_bound - empty_block_gas.commit,
             prove: reject_tx_bound - empty_block_gas.prove,
@@ -139,7 +139,7 @@ mod tests {
             execute: reject_tx_bound - empty_block_gas.execute - 1,
         };
         let close_bound =
-            (config.max_single_tx_gas as f64 * config.close_block_at_gas_percentage).round() as u32;
+            (config.max_single_tx_gas as f64 * config.close_block_at_gas_percentage).round() as u64;
         let block_gas = BlockGasCount {
             commit: close_bound + 1,
             prove: close_bound + 1,

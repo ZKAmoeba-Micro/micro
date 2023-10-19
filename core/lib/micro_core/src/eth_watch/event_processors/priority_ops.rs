@@ -2,17 +2,23 @@ use crate::eth_watch::{
     client::{Error, EthClient},
     event_processors::EventProcessor,
 };
+use itertools::Itertools;
 use micro_contracts::micro_contract;
 use micro_dal::StorageProcessor;
-use micro_types::{l1::L1Tx, web3::types::Log, PriorityOpId, H256};
-use std::convert::TryFrom;
+use micro_types::{
+    l1::{L1FactoryDep, L1Tx},
+    web3::types::Log,
+    PriorityOpId, H256,
+};
 use std::time::Instant;
+use std::{collections::HashMap, convert::TryFrom};
 
 /// Responsible for saving new priority L1 transactions to the database.
 #[derive(Debug)]
 pub struct PriorityOpsEventProcessor {
     next_expected_priority_id: PriorityOpId,
     new_priority_request_signature: H256,
+    new_priority_request_factory_deps_signature: H256,
 }
 
 impl PriorityOpsEventProcessor {
@@ -22,6 +28,10 @@ impl PriorityOpsEventProcessor {
             new_priority_request_signature: micro_contract()
                 .event("NewPriorityRequest")
                 .expect("NewPriorityRequest event is missing in abi")
+                .signature(),
+            new_priority_request_factory_deps_signature: micro_contract()
+                .event("NewPriorityRequestFactoryDeps")
+                .expect("NewPriorityRequestFactoryDeps event is missing in abi")
                 .signature(),
         }
     }
@@ -36,13 +46,57 @@ impl<W: EthClient + Sync> EventProcessor<W> for PriorityOpsEventProcessor {
         events: Vec<Log>,
     ) -> Result<(), Error> {
         let mut priority_ops = Vec::new();
-        for event in events
-            .into_iter()
-            .filter(|event| event.topics[0] == self.new_priority_request_signature)
-        {
-            let tx = L1Tx::try_from(event).map_err(|err| Error::LogParse(format!("{}", err)))?;
-            priority_ops.push(tx);
+        let mut splitted_deps: Vec<L1FactoryDep> = Vec::new();
+        for event in events {
+            if event.topics[0] == self.new_priority_request_signature {
+                let tx =
+                    L1Tx::try_from(event).map_err(|err| Error::LogParse(format!("{}", err)))?;
+                priority_ops.push(tx);
+            } else if event.topics[0] == self.new_priority_request_factory_deps_signature {
+                let dep = L1FactoryDep::try_from(event)
+                    .map_err(|err| Error::LogParse(format!("{}", err)))?;
+                splitted_deps.push(dep);
+            }
         }
+
+        let mut deps_result: HashMap<micro_types::PriorityOpId, Vec<Vec<u8>>> = HashMap::new();
+
+        let mapped_deps = splitted_deps.into_iter().into_group_map_by(|d| d.serial_id);
+        for (serial_id, list) in mapped_deps {
+            let mapped_dep = list.into_iter().into_group_map_by(|d| d.dep_index);
+
+            let mut temp_deps: Vec<Vec<u8>> = vec![];
+            temp_deps.resize(mapped_dep.len(), vec![]);
+
+            for (dep_index, list) in mapped_dep {
+                let mut temp_dep = vec![];
+
+                let deps: Vec<L1FactoryDep> = list
+                    .into_iter()
+                    .unique_by(|x| x.splitted_index)
+                    .sorted_by_key(|x| x.splitted_index)
+                    .collect();
+
+                for mut d in deps {
+                    temp_dep.append(&mut d.bytes);
+                }
+                temp_deps[dep_index as usize] = temp_dep;
+            }
+
+            deps_result.insert(serial_id, temp_deps);
+        }
+
+        let priority_ops: Vec<L1Tx> = priority_ops
+            .into_iter()
+            .unique_by(|x| x.serial_id())
+            .update(|x| {
+                x.execute.factory_deps = match deps_result.remove(&x.serial_id()) {
+                    Some(d) => Some(d),
+                    None => Some(vec![]),
+                }
+            })
+            .sorted_by_key(|event| event.serial_id())
+            .collect();
 
         if priority_ops.is_empty() {
             return Ok(());
@@ -104,7 +158,10 @@ impl<W: EthClient + Sync> EventProcessor<W> for PriorityOpsEventProcessor {
         Ok(())
     }
 
-    fn relevant_topic(&self) -> H256 {
-        self.new_priority_request_signature
+    fn relevant_topic(&self) -> Vec<H256> {
+        vec![
+            self.new_priority_request_signature,
+            self.new_priority_request_factory_deps_signature,
+        ]
     }
 }
