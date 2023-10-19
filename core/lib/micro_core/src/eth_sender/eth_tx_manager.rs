@@ -654,7 +654,10 @@ where
                 .await;
 
             for tx in new_eth_tx {
-                let _ = self.send_eth_tx(storage, &tx, 0, current_block).await;
+                let res = self.send_eth_tx(storage, &tx, 0, current_block).await;
+                if let Err(e) = res {
+                    tracing::warn!("send new eth tx failed {}", e);
+                }
             }
         }
     }
@@ -685,9 +688,12 @@ where
             // We don't want to return early in case resend does not succeed -
             // the error is logged anyway, but early returns will prevent
             // sending new operations.
-            let _ = self
+            let res = self
                 .send_eth_tx(storage, &tx, time_in_mempool, l1_block_numbers.latest)
                 .await;
+            if let Err(e) = res {
+                tracing::warn!("send eth tx failed {}", e);
+            }
         }
 
         Ok(l1_block_numbers.latest)
