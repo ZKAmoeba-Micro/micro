@@ -414,8 +414,8 @@ where
                     // previously recorded as confirmed to become pending again and we have to
                     // make sure it's not the case - otherwise eth_sender may not work properly.
                     tracing::warn!(
-                        "Possible block reorgs: finalized nonce increase detected, but no tx receipt found for tx {:?}",
-                        &tx
+                        "Possible block reorgs: finalized nonce increase detected, but no tx receipt found for tx {}",
+                        tx.id
                     );
                 }
             }
