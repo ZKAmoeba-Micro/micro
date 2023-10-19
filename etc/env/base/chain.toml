@@ -21,7 +21,7 @@ block_commit_deadline_ms = 180000
 miniblock_commit_deadline_ms = 1000
 miniblock_seal_queue_capacity = 10
 # Max gas that can used to include single block in aggregated operation
-max_single_tx_gas = 12000000
+max_single_tx_gas = 9_000_000_000
 
 # Configuration option for block to be sealed in case
 # it takes more percentage of the max block capacity than this value.

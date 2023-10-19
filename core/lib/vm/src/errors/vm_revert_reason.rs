@@ -102,7 +102,7 @@ impl VmRevertReason {
 
             return Ok(result);
         }
-
+        let bytes = if bytes[0] == 0x11 { &bytes[1..] } else { bytes };
         let function_selector = &bytes[0..4];
         match function_selector {
             VmRevertReason::GENERAL_ERROR_SELECTOR => Self::parse_general_error(bytes),
