@@ -1,5 +1,5 @@
 {
-  "name": "micro-web3",
+  "name": "@zkamoeba/micro-web3",
   "version": "0.15.4",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
