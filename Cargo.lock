@@ -4228,6 +4228,9 @@ dependencies = [
  "http",
  "micro_config",
  "micro_types",
+ "oss-rust-sdk",
+ "serde",
+ "serde_json",
  "tempdir",
  "tokio",
  "tracing",
@@ -4911,6 +4914,27 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e2355d85b9a3786f481747ced0e0ff2ba35213a1f9bd406ed906554d7af805a1"
 
 [[package]]
+name = "oss-rust-sdk"
+version = "0.10.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "204502c04e45c074593d832d93d24f8fcb6673819bfb3f00d9b40750f56ae17f"
+dependencies = [
+ "async-trait",
+ "base64 0.13.1",
+ "bytes 1.5.0",
+ "chrono",
+ "derive_more",
+ "hmac 0.12.1",
+ "httpdate",
+ "log",
+ "quick-xml",
+ "reqwest",
+ "serde",
+ "sha1",
+ "urlencoding",
+]
+
+[[package]]
 name = "overload"
 version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5500,6 +5524,16 @@ dependencies = [
  "wasi 0.11.0+wasi-snapshot-preview1",
  "web-sys",
  "winapi 0.3.9",
+]
+
+[[package]]
+name = "quick-xml"
+version = "0.28.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0ce5e73202a820a31f8a0ee32ada5e21029c81fd9e3ebf668a40832e4219d9d1"
+dependencies = [
+ "memchr",
+ "serde",
 ]
 
 [[package]]

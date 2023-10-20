@@ -7,6 +7,7 @@ pub enum ObjectStoreMode {
     GCS,
     GCSWithCredentialFile,
     FileBacked,
+    AliOssBacked,
 }
 
 /// Configuration for the object store
@@ -15,7 +16,7 @@ pub struct ObjectStoreConfig {
     pub bucket_base_url: String,
     pub mode: ObjectStoreMode,
     pub file_backed_base_path: String,
-    pub gcs_credential_file_path: String,
+    pub credential_file_path: String,
     pub max_retries: u16,
 }
 
@@ -45,7 +46,7 @@ mod tests {
             bucket_base_url: bucket_base_url.to_string(),
             mode: ObjectStoreMode::FileBacked,
             file_backed_base_path: "artifacts".to_string(),
-            gcs_credential_file_path: "/path/to/credentials.json".to_string(),
+            credential_file_path: "/path/to/credentials.json".to_string(),
             max_retries: 5,
         }
     }
@@ -57,7 +58,7 @@ mod tests {
             OBJECT_STORE_BUCKET_BASE_URL="/base/url"
             OBJECT_STORE_MODE="FileBacked"
             OBJECT_STORE_FILE_BACKED_BASE_PATH="artifacts"
-            OBJECT_STORE_GCS_CREDENTIAL_FILE_PATH="/path/to/credentials.json"
+            OBJECT_STORE_CREDENTIAL_FILE_PATH="/path/to/credentials.json"
             OBJECT_STORE_MAX_RETRIES="5"
         "#;
         lock.set_env(config);
@@ -72,7 +73,7 @@ mod tests {
             PUBLIC_OBJECT_STORE_BUCKET_BASE_URL="/public_base_url"
             PUBLIC_OBJECT_STORE_MODE="FileBacked"
             PUBLIC_OBJECT_STORE_FILE_BACKED_BASE_PATH="artifacts"
-            PUBLIC_OBJECT_STORE_GCS_CREDENTIAL_FILE_PATH="/path/to/credentials.json"
+            PUBLIC_OBJECT_STORE_CREDENTIAL_FILE_PATH="/path/to/credentials.json"
             PUBLIC_OBJECT_STORE_MAX_RETRIES="5"
         "#;
         lock.set_env(config);
@@ -87,7 +88,7 @@ mod tests {
             PROVER_OBJECT_STORE_BUCKET_BASE_URL="/prover_base_url"
             PROVER_OBJECT_STORE_MODE="FileBacked"
             PROVER_OBJECT_STORE_FILE_BACKED_BASE_PATH="artifacts"
-            PROVER_OBJECT_STORE_GCS_CREDENTIAL_FILE_PATH="/path/to/credentials.json"
+            PROVER_OBJECT_STORE_CREDENTIAL_FILE_PATH="/path/to/credentials.json"
             PROVER_OBJECT_STORE_MAX_RETRIES="5"
         "#;
         lock.set_env(config);

@@ -23,6 +23,7 @@
     clippy::doc_markdown
 )]
 
+mod ali_oss;
 mod file;
 mod gcs;
 mod metrics;

@@ -10,7 +10,7 @@ keywords = ["blockchain", "micro"]
 categories = ["cryptography"]
 
 [dependencies]
-vise = { git = "https://github.com/ZKAmoeba-Micro/vise.git", branch = "main"}
+vise = { git = "https://github.com/ZKAmoeba-Micro/vise.git", branch = "main" }
 micro_config = { path = "../config" }
 micro_types = { path = "../types" }
 
@@ -22,6 +22,9 @@ google-cloud-auth = "0.11.0"
 http = "0.2.9"
 tokio = { version = "1.21.2", features = ["full"] }
 tracing = "0.1"
+oss-rust-sdk = "0.10.0"
+serde = "1.0"
+serde_json = "1.0"
 
 [dev-dependencies]
 tempdir = "0.3.7"

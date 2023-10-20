@@ -3,6 +3,7 @@ use async_trait::async_trait;
 
 use std::{error, fmt, sync::Arc};
 
+use crate::ali_oss::AliyunOssStorage;
 use crate::{file::FileBackedObjectStore, gcs::GoogleCloudStorage, mock::MockStore};
 use micro_config::configs::object_store::ObjectStoreMode;
 use micro_config::ObjectStoreConfig;
@@ -203,7 +204,7 @@ impl ObjectStoreFactory {
 
     async fn create_from_config(config: &ObjectStoreConfig) -> Box<dyn ObjectStore> {
         let gcs_credential_file_path = match config.mode {
-            ObjectStoreMode::GCSWithCredentialFile => Some(config.gcs_credential_file_path.clone()),
+            ObjectStoreMode::GCSWithCredentialFile => Some(config.credential_file_path.clone()),
             _ => None,
         };
         match config.mode {
@@ -233,6 +234,14 @@ impl ObjectStoreFactory {
                 tracing::trace!("Initialized FileBacked Object store");
                 let store = FileBackedObjectStore::new(config.file_backed_base_path.clone()).await;
                 Box::new(store)
+            }
+            ObjectStoreMode::AliOssBacked => {
+                tracing::trace!("Initialized AliOssBacked Object store");
+                Box::new(AliyunOssStorage::new(
+                    config.credential_file_path.clone(),
+                    config.bucket_base_url.clone(),
+                    config.max_retries,
+                ))
             }
         }
     }
