@@ -21,7 +21,7 @@ where
         match f().await {
             Ok(result) => return Ok(result),
             Err(err) => {
-                tracing::warn!(%err, "Failed OSS request {retries}/{max_retries}, retrying.");
+                // tracing::warn!(%err, "Failed OSS request {retries}/{max_retries}, retrying.");
                 if retries > max_retries {
                     return Err(err);
                 }
@@ -90,7 +90,11 @@ impl<'a> AliyunOssStorage<'a> {
 
 impl From<oss_rust_sdk::errors::Error> for ObjectStoreError {
     fn from(err: oss_rust_sdk::errors::Error) -> Self {
-        ObjectStoreError::Other(err.into())
+        if err.to_string().contains("404 Not Found") {
+            ObjectStoreError::KeyNotFound(err.into())
+        } else {
+            ObjectStoreError::Other(err.into())
+        }
     }
 }
 
