@@ -18,7 +18,7 @@ micro_prover_fri_utils = { path = "../prover_fri_utils" }
 micro_prover_fri_types = { path = "../prover_fri_types" }
 micro_utils = { path = "../../core/lib/utils" }
 vk_setup_data_generator_server_fri = { path = "../vk_setup_data_generator_server_fri" }
-shivini = { git = "https://github.com/ZKAmoeba-Micro/micro-shivini.git", branch = "main", optional = true, features = [
+shivini = { git = "https://github.com/ZKAmoeba-Micro/micro-shivini.git", branch = "rr-allocations-improvements", optional = true, features = [
     "circuit_definitions",
     "micro",
 ] }

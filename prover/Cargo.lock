@@ -95,9 +95,9 @@ dependencies = [
 
 [[package]]
 name = "aho-corasick"
-version = "1.1.1"
+version = "1.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ea5d730647d4fadd988536d06fecce94b7b4f2a7efdae548f1cf4b63205518ab"
+checksum = "b2969dcb958b36655471fc61f7e416fa76033bdd4bfed0678d8fee1e2d07a1f0"
 dependencies = [
  "memchr",
 ]
@@ -147,9 +147,9 @@ checksum = "a4668cab20f66d8d020e1fbc0ebe47217433c1b6c8f2040faf858554e394ace6"
 [[package]]
 name = "api"
 version = "0.1.0"
-source = "git+https://github.com/ZKAmoeba-Micro/micro-heavy-ops-service.git?branch=v1.3.3#ac6a3af6415dc12c9ae2932fa5ad906939023d82"
+source = "git+https://github.com/ZKAmoeba-Micro/micro-heavy-ops-service.git?branch=v1.3.3#f413c67ed3222a810dd7a0b8b8b92f139770751d"
 dependencies = [
- "bellman_ce 0.3.2 (git+https://github.com/ZKAmoeba-Micro/bellman?branch=dev)",
+ "bellman_ce 0.3.2 (git+https://github.com/ZKAmoeba-Micro/bellman?branch=dev-1)",
  "cfg-if 1.0.0",
  "num_cpus",
  "serde",
@@ -220,20 +220,20 @@ version = "0.3.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "16e62a023e7c117e27523144c5d2459f4397fcc3cab0085af8e2224f643a0193"
 dependencies = [
- "proc-macro2 1.0.67",
+ "proc-macro2 1.0.69",
  "quote 1.0.33",
- "syn 2.0.37",
+ "syn 2.0.38",
 ]
 
 [[package]]
 name = "async-trait"
-version = "0.1.73"
+version = "0.1.74"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bc00ceb34980c03614e35a3a4e218276a0a824e911d07651cd0d858a51e8c0f0"
+checksum = "a66537f1bb974b254c98ed142ff995236e81b9d0fe4db0575f46612cb15eb0f9"
 dependencies = [
- "proc-macro2 1.0.67",
+ "proc-macro2 1.0.69",
  "quote 1.0.33",
- "syn 2.0.37",
+ "syn 2.0.38",
 ]
 
 [[package]]
@@ -313,11 +313,11 @@ checksum = "8c3c1a368f70d6cf7302d78f8f7093da241fb8e8807c05cc9e51a125895a6d5b"
 [[package]]
 name = "bellman_ce"
 version = "0.3.2"
-source = "git+https://github.com/ZKAmoeba-Micro/bellman?branch=dev#5520aa2274afe73d281373c92b007a2ecdebfbea"
+source = "git+https://github.com/ZKAmoeba-Micro/bellman?branch=dev-1#e374842419438510c1605c6f2cc6d0cd5b5f896b"
 dependencies = [
  "arrayvec 0.7.4",
  "bit-vec",
- "blake2s_const 0.6.0 (git+https://github.com/ZKAmoeba-Micro/bellman?branch=dev)",
+ "blake2s_const 0.6.0 (git+https://github.com/ZKAmoeba-Micro/bellman?branch=dev-1)",
  "blake2s_simd",
  "byteorder",
  "cfg-if 1.0.0",
@@ -336,7 +336,7 @@ dependencies = [
 [[package]]
 name = "bellman_ce"
 version = "0.3.2"
-source = "git+https://github.com/ZKAmoeba-Micro/bellman?branch=snark-wrapper#e01e5fa08a97a113e76ec8a69d06fe6cc2c82d17"
+source = "git+https://github.com/ZKAmoeba-Micro/bellman?branch=snark-wrapper#e0445f00f69c8f114c6bd2db6ffa5ee7cbd757af"
 dependencies = [
  "arrayvec 0.7.4",
  "bit-vec",
@@ -390,12 +390,12 @@ dependencies = [
  "lazycell",
  "peeking_take_while",
  "prettyplease",
- "proc-macro2 1.0.67",
+ "proc-macro2 1.0.69",
  "quote 1.0.33",
  "regex",
  "rustc-hash",
  "shlex",
- "syn 2.0.37",
+ "syn 2.0.38",
 ]
 
 [[package]]
@@ -404,7 +404,7 @@ version = "0.68.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "726e4313eb6ec35d2730258ad4e15b547ee75d6afaa1361a922e78e59b7d8078"
 dependencies = [
- "bitflags 2.4.0",
+ "bitflags 2.4.1",
  "cexpr",
  "clang-sys",
  "lazy_static",
@@ -412,12 +412,12 @@ dependencies = [
  "log",
  "peeking_take_while",
  "prettyplease",
- "proc-macro2 1.0.67",
+ "proc-macro2 1.0.69",
  "quote 1.0.33",
  "regex",
  "rustc-hash",
  "shlex",
- "syn 2.0.37",
+ "syn 2.0.38",
  "which",
 ]
 
@@ -447,9 +447,9 @@ checksum = "bef38d45163c2f1dde094a7dfd33ccf595c92905c8f8f4fdc18d06fb1037718a"
 
 [[package]]
 name = "bitflags"
-version = "2.4.0"
+version = "2.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b4682ae6287fcf752ecaabbfcc7b6f9b72aa33933dc23a554d853aea8eea8635"
+checksum = "327762f6e5a765692301e5bb513e0d9fef63be86bbc14528052b1cd3e6f03e07"
 
 [[package]]
 name = "bitvec"
@@ -509,7 +509,7 @@ dependencies = [
 [[package]]
 name = "blake2s_const"
 version = "0.6.0"
-source = "git+https://github.com/ZKAmoeba-Micro/bellman?branch=dev#5520aa2274afe73d281373c92b007a2ecdebfbea"
+source = "git+https://github.com/ZKAmoeba-Micro/bellman?branch=dev-1#e374842419438510c1605c6f2cc6d0cd5b5f896b"
 dependencies = [
  "arrayref",
  "arrayvec 0.5.2",
@@ -519,7 +519,7 @@ dependencies = [
 [[package]]
 name = "blake2s_const"
 version = "0.6.0"
-source = "git+https://github.com/ZKAmoeba-Micro/bellman?branch=snark-wrapper#e01e5fa08a97a113e76ec8a69d06fe6cc2c82d17"
+source = "git+https://github.com/ZKAmoeba-Micro/bellman?branch=snark-wrapper#e0445f00f69c8f114c6bd2db6ffa5ee7cbd757af"
 dependencies = [
  "arrayref",
  "arrayvec 0.5.2",
@@ -575,7 +575,7 @@ checksum = "8d696c370c750c948ada61c69a0ee2cbbb9c50b1019ddb86d9317157a99c2cae"
 [[package]]
 name = "boojum"
 version = "0.1.0"
-source = "git+https://github.com/ZKAmoeba-Micro/micro-boojum?branch=main#2771569baab9a59690d88cee6ba9b295c8a1e4c4"
+source = "git+https://github.com/ZKAmoeba-Micro/micro-boojum?branch=main#9617b0b4afe7186a5d97605724c8f4bdca83bf6c"
 dependencies = [
  "arrayvec 0.7.4",
  "bincode",
@@ -607,7 +607,7 @@ dependencies = [
 [[package]]
 name = "boojum-cuda"
 version = "0.1.0"
-source = "git+https://github.com/ZKAmoeba-Micro/micro-boojum-cuda?branch=main#4326c66de077a159bdbfe9d2575cb248696f0df9"
+source = "git+https://github.com/ZKAmoeba-Micro/micro-boojum-cuda?branch=main#2dbefae00dcfd4eddf75dab5da7ad09ebecca3c6"
 dependencies = [
  "boojum",
  "cmake",
@@ -637,9 +637,9 @@ checksum = "ad152d03a2c813c80bb94fedbf3a3f02b28f793e39e7c214c8a0bcc196343de7"
 
 [[package]]
 name = "byteorder"
-version = "1.4.3"
+version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "14c189c53d098945499cdfa7ecc63567cf3886b3332b312a5b4585d8d3a6a610"
+checksum = "1fd0f2584146f6f2ef48085050886acf353beff7305ebd1ae69500e27c67f64b"
 
 [[package]]
 name = "bytes"
@@ -669,9 +669,9 @@ dependencies = [
 
 [[package]]
 name = "cargo-platform"
-version = "0.1.3"
+version = "0.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2cfa25e60aea747ec7e1124f238816749faa93759c6ff5b31f1ccdda137f4479"
+checksum = "12024c4645c97566567129c204f65d5815a8c9aecf30fcbe682b2fe034996d36"
 dependencies = [
  "serde",
 ]
@@ -780,7 +780,7 @@ dependencies = [
 [[package]]
 name = "circuit_definitions"
 version = "0.1.0"
-source = "git+https://github.com/ZKAmoeba-Micro/micro-zkevm_test_harness.git?branch=v1.4.0#3cd647aa57fc2e1180bab53f7a3b61ec47502a46"
+source = "git+https://github.com/ZKAmoeba-Micro/micro-zkevm_test_harness.git?branch=v1.4.0#e15f15231ee1ad1b2ad28fe55877a65060829f2d"
 dependencies = [
  "crossbeam 0.8.2",
  "derivative",
@@ -795,9 +795,9 @@ dependencies = [
 [[package]]
 name = "circuit_testing"
 version = "0.1.0"
-source = "git+https://github.com/ZKAmoeba-Micro/micro-circuit_testing.git?branch=main#164c0adac85be39ee44bd9456b2b91cdede5af80"
+source = "git+https://github.com/ZKAmoeba-Micro/micro-circuit_testing.git?branch=main-1#8e556d5d5b69a70455e83293449485bbed5224e6"
 dependencies = [
- "bellman_ce 0.3.2 (git+https://github.com/ZKAmoeba-Micro/bellman?branch=dev)",
+ "bellman_ce 0.3.2 (git+https://github.com/ZKAmoeba-Micro/bellman?branch=dev-1)",
 ]
 
 [[package]]
@@ -872,14 +872,14 @@ dependencies = [
 [[package]]
 name = "codegen"
 version = "0.1.0"
-source = "git+https://github.com/ZKAmoeba-Micro/solidity_plonk_verifier.git?branch=dev#82f96b7156551087f1c9bfe4f0ea68845b6debfc"
+source = "git+https://github.com/ZKAmoeba-Micro/solidity_plonk_verifier.git?branch=dev-1#5d7bbe7753d8ef967d64f503692ffeca6b50b9d6"
 dependencies = [
  "ethereum-types 0.14.1",
- "franklin-crypto 0.0.5 (git+https://github.com/ZKAmoeba-Micro/franklin-crypto?branch=dev)",
+ "franklin-crypto 0.0.5 (git+https://github.com/ZKAmoeba-Micro/franklin-crypto?branch=dev-1)",
  "handlebars",
  "hex",
  "paste",
- "rescue_poseidon 0.4.1 (git+https://github.com/ZKAmoeba-Micro/rescue-poseidon)",
+ "rescue_poseidon 0.4.1 (git+https://github.com/ZKAmoeba-Micro/rescue-poseidon?branch=master)",
  "serde",
  "serde_derive",
  "serde_json",
@@ -918,20 +918,20 @@ checksum = "28c122c3980598d243d63d9a704629a2d748d101f278052ff068be5a4423ab6f"
 
 [[package]]
 name = "const_format"
-version = "0.2.31"
+version = "0.2.32"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c990efc7a285731f9a4378d81aff2f0e85a2c8781a05ef0f8baa8dac54d0ff48"
+checksum = "e3a214c7af3d04997541b18d432afaff4c455e79e2029079647e72fc2bd27673"
 dependencies = [
  "const_format_proc_macros",
 ]
 
 [[package]]
 name = "const_format_proc_macros"
-version = "0.2.31"
+version = "0.2.32"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e026b6ce194a874cb9cf32cd5772d1ef9767cc8fcb5765948d74f37a9d8b2bf6"
+checksum = "c7f6ff08fd20f4f299298a28e2dfa8a8ba1036e6cd2460ac1de7b425d76f2500"
 dependencies = [
- "proc-macro2 1.0.67",
+ "proc-macro2 1.0.69",
  "quote 1.0.33",
  "unicode-xid 0.2.4",
 ]
@@ -1243,10 +1243,10 @@ dependencies = [
 [[package]]
 name = "cs_derive"
 version = "0.1.0"
-source = "git+https://github.com/ZKAmoeba-Micro/micro-boojum?branch=main#2771569baab9a59690d88cee6ba9b295c8a1e4c4"
+source = "git+https://github.com/ZKAmoeba-Micro/micro-boojum?branch=main#9617b0b4afe7186a5d97605724c8f4bdca83bf6c"
 dependencies = [
  "proc-macro-error",
- "proc-macro2 1.0.67",
+ "proc-macro2 1.0.69",
  "quote 1.0.33",
  "syn 1.0.109",
 ]
@@ -1254,10 +1254,10 @@ dependencies = [
 [[package]]
 name = "cs_derive"
 version = "0.1.0"
-source = "git+https://github.com/ZKAmoeba-Micro/micro-sync_vm.git?branch=v1.3.3#3a21c8dee43c77604350fdf33c1615e25bf1dacd"
+source = "git+https://github.com/ZKAmoeba-Micro/micro-sync_vm.git?branch=v1.3.3#8039fe08b759aaf83192adb4c9e88b8bb929bf49"
 dependencies = [
  "proc-macro-error",
- "proc-macro2 1.0.67",
+ "proc-macro2 1.0.69",
  "quote 1.0.33",
  "serde",
  "syn 1.0.109",
@@ -1285,9 +1285,9 @@ dependencies = [
 [[package]]
 name = "cudart"
 version = "0.1.0"
-source = "git+https://github.com/ZKAmoeba-Micro/micro-boojum-cuda?branch=main#4326c66de077a159bdbfe9d2575cb248696f0df9"
+source = "git+https://github.com/ZKAmoeba-Micro/micro-boojum-cuda?branch=main#2dbefae00dcfd4eddf75dab5da7ad09ebecca3c6"
 dependencies = [
- "bitflags 2.4.0",
+ "bitflags 2.4.1",
  "criterion",
  "cudart-sys",
 ]
@@ -1295,7 +1295,7 @@ dependencies = [
 [[package]]
 name = "cudart-sys"
 version = "0.1.0"
-source = "git+https://github.com/ZKAmoeba-Micro/micro-boojum-cuda?branch=main#4326c66de077a159bdbfe9d2575cb248696f0df9"
+source = "git+https://github.com/ZKAmoeba-Micro/micro-boojum-cuda?branch=main#2dbefae00dcfd4eddf75dab5da7ad09ebecca3c6"
 dependencies = [
  "bindgen 0.68.1",
  "serde_json",
@@ -1319,7 +1319,7 @@ checksum = "859d65a907b6852c9361e3185c862aae7fafd2887876799fa55f5f99dc40d610"
 dependencies = [
  "fnv",
  "ident_case",
- "proc-macro2 1.0.67",
+ "proc-macro2 1.0.69",
  "quote 1.0.33",
  "strsim 0.10.0",
  "syn 1.0.109",
@@ -1343,10 +1343,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "978747c1d849a7d2ee5e8adc0159961c48fb7e5db2f06af6723b80123bb53856"
 dependencies = [
  "cfg-if 1.0.0",
- "hashbrown 0.14.1",
+ "hashbrown 0.14.2",
  "lock_api",
  "once_cell",
- "parking_lot_core 0.9.8",
+ "parking_lot_core 0.9.9",
 ]
 
 [[package]]
@@ -1382,10 +1382,11 @@ dependencies = [
 
 [[package]]
 name = "deranged"
-version = "0.3.8"
+version = "0.3.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f2696e8a945f658fd14dc3b87242e6b80cd0f36ff04ea560fa39082368847946"
+checksum = "0f32d04922c60427da6f9fef14d042d9edddef64cb9d4ce0d64d0685fbeb1fd3"
 dependencies = [
+ "powerfmt",
  "serde",
 ]
 
@@ -1395,7 +1396,7 @@ version = "2.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fcc3dd5e9e9c0b295d6e1e4d811fb6f157d5ffd784b8d202fc62eac8035a770b"
 dependencies = [
- "proc-macro2 1.0.67",
+ "proc-macro2 1.0.69",
  "quote 1.0.33",
  "syn 1.0.109",
 ]
@@ -1407,7 +1408,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4fb810d30a7c1953f91334de7244731fc3f3c10d7fe163338a35b9f640960321"
 dependencies = [
  "convert_case 0.4.0",
- "proc-macro2 1.0.67",
+ "proc-macro2 1.0.69",
  "quote 1.0.33",
  "rustc_version",
  "syn 1.0.109",
@@ -1567,23 +1568,12 @@ checksum = "5443807d6dff69373d433ab9ef5378ad8df50ca6298caf15de6e52e24aaf54d5"
 
 [[package]]
 name = "errno"
-version = "0.3.4"
+version = "0.3.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "add4f07d43996f76ef320709726a556a9d4f965d9410d8d0271132d2f8293480"
+checksum = "ac3e13f66a2f95e32a39eaa81f6b95d42878ca0e1db0c7543723dfe12557e860"
 dependencies = [
- "errno-dragonfly",
  "libc",
  "windows-sys",
-]
-
-[[package]]
-name = "errno-dragonfly"
-version = "0.1.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "aa68f1b12764fab894d2755d2518754e71b4fd80ecfb822714a1206c2aab39bf"
-dependencies = [
- "cc",
- "libc",
 ]
 
 [[package]]
@@ -1662,7 +1652,7 @@ dependencies = [
  "fixed-hash 0.8.0",
  "impl-rlp",
  "impl-serde 0.4.0",
- "primitive-types 0.12.1",
+ "primitive-types 0.12.2",
  "uint",
 ]
 
@@ -1710,7 +1700,7 @@ dependencies = [
  "num-bigint 0.4.4",
  "num-integer",
  "num-traits",
- "proc-macro2 1.0.67",
+ "proc-macro2 1.0.69",
  "quote 1.0.33",
  "serde",
  "syn 1.0.109",
@@ -1797,10 +1787,10 @@ dependencies = [
 [[package]]
 name = "franklin-crypto"
 version = "0.0.5"
-source = "git+https://github.com/ZKAmoeba-Micro/franklin-crypto?branch=dev#5695d07c7bc604c2c39a27712ffac171d39ee1ed"
+source = "git+https://github.com/ZKAmoeba-Micro/franklin-crypto?branch=dev-1#35a4a3274a98b164566a5b2fa22d14cb5bfdebef"
 dependencies = [
  "arr_macro",
- "bellman_ce 0.3.2 (git+https://github.com/ZKAmoeba-Micro/bellman?branch=dev)",
+ "bellman_ce 0.3.2 (git+https://github.com/ZKAmoeba-Micro/bellman?branch=dev-1)",
  "bit-vec",
  "blake2 0.9.2",
  "blake2-rfc_bellman_edition",
@@ -1827,7 +1817,7 @@ dependencies = [
 [[package]]
 name = "franklin-crypto"
 version = "0.0.5"
-source = "git+https://github.com/ZKAmoeba-Micro/franklin-crypto?branch=snark_wrapper#b1f1677d9ece6a6ddcfbf394dc2db2bd8b792e6c"
+source = "git+https://github.com/ZKAmoeba-Micro/franklin-crypto?branch=snark_wrapper#fc6cae5cc47f0037d86deb4ba6ace4d5aede77a6"
 dependencies = [
  "arr_macro",
  "bellman_ce 0.3.2 (git+https://github.com/ZKAmoeba-Micro/bellman?branch=snark-wrapper)",
@@ -1946,9 +1936,9 @@ version = "0.3.28"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "89ca545a94061b6365f2c7355b4b32bd20df3ff95f02da9329b34ccc3bd6ee72"
 dependencies = [
- "proc-macro2 1.0.67",
+ "proc-macro2 1.0.69",
  "quote 1.0.33",
- "syn 2.0.37",
+ "syn 2.0.38",
 ]
 
 [[package]]
@@ -2180,9 +2170,9 @@ dependencies = [
 
 [[package]]
 name = "hashbrown"
-version = "0.14.1"
+version = "0.14.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7dfda62a12f55daeae5015f81b0baea145391cb4520f86c248fc615d72640d12"
+checksum = "f93e7192158dbcda357bdec5fb5788eebf8bbac027f3f33e719d29135ae84156"
 
 [[package]]
 name = "hashlink"
@@ -2397,16 +2387,16 @@ dependencies = [
 
 [[package]]
 name = "iana-time-zone"
-version = "0.1.57"
+version = "0.1.58"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2fad5b825842d2b38bd206f3e81d6957625fd7f0a361e345c30e01a0ae2dd613"
+checksum = "8326b86b6cff230b97d0d312a6c40a60726df3332e721f72a1b035f451663b20"
 dependencies = [
  "android_system_properties",
  "core-foundation-sys",
  "iana-time-zone-haiku",
  "js-sys",
  "wasm-bindgen",
- "windows",
+ "windows-core",
 ]
 
 [[package]]
@@ -2485,7 +2475,7 @@ version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "11d7a9f6330b71fea57921c9b61c47ee6e84f72d394754eff6163ae67e7395eb"
 dependencies = [
- "proc-macro2 1.0.67",
+ "proc-macro2 1.0.69",
  "quote 1.0.33",
  "syn 1.0.109",
 ]
@@ -2507,7 +2497,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8adf3ddd720272c6ea8bf59463c04e0f93d0bbf7c5439b691bca2987e0270897"
 dependencies = [
  "equivalent",
- "hashbrown 0.14.1",
+ "hashbrown 0.14.2",
 ]
 
 [[package]]
@@ -2568,9 +2558,9 @@ checksum = "af150ab688ff2122fcef229be89cb50dd66af9e01a4ff320cc137eecc9bacc38"
 
 [[package]]
 name = "jobserver"
-version = "0.1.26"
+version = "0.1.27"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "936cfd212a0155903bcbc060e316fb6cc7cbf2e1907329391ebadc1fe0ce77c2"
+checksum = "8c37f63953c4c63420ed5fd3d6d398c719489b9f872b9fa683262f8edd363c7d"
 dependencies = [
  "libc",
 ]
@@ -2651,9 +2641,9 @@ checksum = "830d08ce1d1d941e6b30645f1a0eb5643013d835ce3779a5fc208261dbe10f55"
 
 [[package]]
 name = "libc"
-version = "0.2.148"
+version = "0.2.149"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9cdc71e17332e86d2e1d38c1f99edcb6288ee11b815fb1a4b049eaa2114d369b"
+checksum = "a08173bc88b7955d1b3145aa561539096c421ac8debde8cbc3612ec635fee29b"
 
 [[package]]
 name = "libloading"
@@ -2667,9 +2657,9 @@ dependencies = [
 
 [[package]]
 name = "libm"
-version = "0.2.7"
+version = "0.2.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f7012b1bbb0719e1097c47611d3898568c546d597c2e74d66f6087edd5233ff4"
+checksum = "4ec2a862134d2a7d32d7983ddcdd1c4923530833c9f2ea1a44fc5fa473989058"
 
 [[package]]
 name = "librocksdb-sys"
@@ -2698,29 +2688,29 @@ dependencies = [
 
 [[package]]
 name = "linkme"
-version = "0.3.15"
+version = "0.3.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9f948366ad5bb46b5514ba7a7a80643726eef08b06632592699676748c8bc33b"
+checksum = "91ed2ee9464ff9707af8e9ad834cffa4802f072caad90639c583dd3c62e6e608"
 dependencies = [
  "linkme-impl",
 ]
 
 [[package]]
 name = "linkme-impl"
-version = "0.3.15"
+version = "0.3.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bc28438cad73dcc90ff3466fc329a9252b1b8ba668eb0d5668ba97088cf4eef0"
+checksum = "ba125974b109d512fccbc6c0244e7580143e460895dfd6ea7f8bbb692fd94396"
 dependencies = [
- "proc-macro2 1.0.67",
+ "proc-macro2 1.0.69",
  "quote 1.0.33",
- "syn 2.0.37",
+ "syn 2.0.38",
 ]
 
 [[package]]
 name = "linux-raw-sys"
-version = "0.4.8"
+version = "0.4.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3852614a3bd9ca9804678ba6be5e3b8ce76dfc902cae004e3e0c44051b6e88db"
+checksum = "da2479e8c062e40bf0066ffa0bc823de0a9368974af99c9f6df941d2c231e03f"
 
 [[package]]
 name = "local-ip-address"
@@ -2736,9 +2726,9 @@ dependencies = [
 
 [[package]]
 name = "lock_api"
-version = "0.4.10"
+version = "0.4.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c1cc9717a20b1bb222f333e6a92fd32f7d8a18ddc5a3191a11af45dcbf4dcd16"
+checksum = "3c168f8615b12bc01f9c17e2eb0cc07dcae1940121185446edc3744920e8ef45"
 dependencies = [
  "autocfg 1.1.0",
  "scopeguard",
@@ -2849,9 +2839,9 @@ version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ddece26afd34c31585c74a4db0630c376df271c285d682d1e55012197830b6df"
 dependencies = [
- "proc-macro2 1.0.67",
+ "proc-macro2 1.0.69",
  "quote 1.0.33",
- "syn 2.0.37",
+ "syn 2.0.38",
 ]
 
 [[package]]
@@ -2867,6 +2857,451 @@ dependencies = [
  "num_cpus",
  "quanta",
  "sketches-ddsketch",
+]
+
+[[package]]
+name = "micro_basic_types"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "web3",
+]
+
+[[package]]
+name = "micro_circuit_synthesizer"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "ctrlc",
+ "futures 0.3.28",
+ "local-ip-address",
+ "metrics",
+ "micro_config",
+ "micro_dal",
+ "micro_object_store",
+ "micro_prover_fri_utils",
+ "micro_prover_utils",
+ "micro_queued_job_processor",
+ "micro_types",
+ "micro_utils",
+ "micro_verification_key_generator_and_server",
+ "prometheus_exporter",
+ "prover-service",
+ "structopt",
+ "thiserror",
+ "tokio",
+ "tracing",
+ "vlog",
+ "zkevm_test_harness 1.3.3",
+]
+
+[[package]]
+name = "micro_config"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "bigdecimal",
+ "envy",
+ "hex",
+ "micro_basic_types",
+ "micro_contracts",
+ "micro_utils",
+ "num 0.3.1",
+ "once_cell",
+ "serde",
+ "serde_json",
+ "url",
+]
+
+[[package]]
+name = "micro_contracts"
+version = "0.1.0"
+dependencies = [
+ "envy",
+ "ethabi",
+ "hex",
+ "micro_utils",
+ "once_cell",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "micro_crypto"
+version = "0.1.0"
+dependencies = [
+ "base64 0.13.1",
+ "blake2 0.10.6",
+ "hex",
+ "micro_basic_types",
+ "once_cell",
+ "serde",
+ "sha2 0.9.9",
+ "thiserror",
+]
+
+[[package]]
+name = "micro_dal"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "bigdecimal",
+ "bincode",
+ "hex",
+ "itertools 0.10.5",
+ "micro_config",
+ "micro_contracts",
+ "micro_health_check",
+ "micro_types",
+ "micro_utils",
+ "num 0.3.1",
+ "once_cell",
+ "serde",
+ "serde_json",
+ "sqlx",
+ "strum",
+ "thiserror",
+ "tokio",
+ "tracing",
+ "vise",
+]
+
+[[package]]
+name = "micro_health_check"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "futures 0.3.28",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tracing",
+]
+
+[[package]]
+name = "micro_mini_merkle_tree"
+version = "0.1.0"
+dependencies = [
+ "micro_basic_types",
+ "micro_crypto",
+ "once_cell",
+]
+
+[[package]]
+name = "micro_object_store"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "bincode",
+ "google-cloud-auth",
+ "google-cloud-storage",
+ "http",
+ "micro_config",
+ "micro_types",
+ "oss-rust-sdk",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tracing",
+ "vise",
+]
+
+[[package]]
+name = "micro_proof_fri_compressor"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "bincode",
+ "ctrlc",
+ "futures 0.3.28",
+ "metrics",
+ "micro_config",
+ "micro_dal",
+ "micro_object_store",
+ "micro_prover_fri_types",
+ "micro_prover_utils",
+ "micro_queued_job_processor",
+ "micro_types",
+ "micro_utils",
+ "prometheus_exporter",
+ "structopt",
+ "tokio",
+ "tracing",
+ "vk_setup_data_generator_server_fri",
+ "vlog",
+ "zkevm_test_harness 1.4.0",
+]
+
+[[package]]
+name = "micro_prover_fri"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "circuit_definitions",
+ "ctrlc",
+ "futures 0.3.28",
+ "local-ip-address",
+ "metrics",
+ "micro_config",
+ "micro_dal",
+ "micro_object_store",
+ "micro_prover_fri_types",
+ "micro_prover_fri_utils",
+ "micro_prover_utils",
+ "micro_queued_job_processor",
+ "micro_types",
+ "micro_utils",
+ "prometheus_exporter",
+ "serde",
+ "shivini",
+ "tokio",
+ "tracing",
+ "vk_setup_data_generator_server_fri",
+ "vlog",
+ "zkevm_test_harness 1.4.0",
+]
+
+[[package]]
+name = "micro_prover_fri_gateway"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "ctrlc",
+ "futures 0.3.28",
+ "log",
+ "metrics",
+ "micro_config",
+ "micro_dal",
+ "micro_object_store",
+ "micro_types",
+ "micro_utils",
+ "prometheus_exporter",
+ "reqwest",
+ "serde",
+ "tokio",
+ "tracing",
+ "vlog",
+]
+
+[[package]]
+name = "micro_prover_fri_types"
+version = "0.1.0"
+dependencies = [
+ "circuit_definitions",
+ "micro_object_store",
+ "micro_types",
+ "serde",
+]
+
+[[package]]
+name = "micro_prover_fri_utils"
+version = "0.1.0"
+dependencies = [
+ "metrics",
+ "micro_config",
+ "micro_dal",
+ "micro_object_store",
+ "micro_prover_fri_types",
+ "micro_types",
+ "serde",
+ "tracing",
+]
+
+[[package]]
+name = "micro_prover_utils"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "ctrlc",
+ "futures 0.3.28",
+ "micro_config",
+ "micro_object_store",
+ "micro_types",
+ "micro_utils",
+ "regex",
+ "reqwest",
+ "tokio",
+ "toml_edit 0.14.4",
+ "tracing",
+]
+
+[[package]]
+name = "micro_queued_job_processor"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "micro_utils",
+ "tokio",
+ "tracing",
+]
+
+[[package]]
+name = "micro_state"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "itertools 0.10.5",
+ "metrics",
+ "micro_dal",
+ "micro_storage",
+ "micro_types",
+ "micro_utils",
+ "mini-moka",
+ "tokio",
+ "tracing",
+ "vise",
+]
+
+[[package]]
+name = "micro_storage"
+version = "0.1.0"
+dependencies = [
+ "num_cpus",
+ "once_cell",
+ "rocksdb",
+ "tracing",
+ "vise",
+]
+
+[[package]]
+name = "micro_types"
+version = "0.1.0"
+dependencies = [
+ "blake2 0.10.6",
+ "chrono",
+ "codegen 0.1.0",
+ "ethereum-types 0.12.1",
+ "hex",
+ "micro_basic_types",
+ "micro_config",
+ "micro_contracts",
+ "micro_mini_merkle_tree",
+ "micro_utils",
+ "num 0.3.1",
+ "num_enum",
+ "once_cell",
+ "parity-crypto",
+ "rlp",
+ "serde",
+ "serde_json",
+ "serde_with",
+ "strum",
+ "thiserror",
+ "zk_evm 1.3.2",
+ "zk_evm 1.4.0",
+ "zkevm_test_harness 1.3.3",
+]
+
+[[package]]
+name = "micro_utils"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "bigdecimal",
+ "futures 0.3.28",
+ "hex",
+ "itertools 0.10.5",
+ "metrics",
+ "micro_basic_types",
+ "num 0.3.1",
+ "reqwest",
+ "serde",
+ "thiserror",
+ "tokio",
+ "tracing",
+ "vlog",
+ "zk_evm 1.3.2",
+]
+
+[[package]]
+name = "micro_verification_key_generator_and_server"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "bincode",
+ "circuit_testing",
+ "ff_ce",
+ "hex",
+ "itertools 0.10.5",
+ "micro_prover_utils",
+ "micro_types",
+ "once_cell",
+ "serde_json",
+ "structopt",
+ "tracing",
+ "vlog",
+]
+
+[[package]]
+name = "micro_witness_generator"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "bincode",
+ "circuit_definitions",
+ "ctrlc",
+ "futures 0.3.28",
+ "hex",
+ "metrics",
+ "micro_config",
+ "micro_dal",
+ "micro_object_store",
+ "micro_prover_fri_types",
+ "micro_prover_fri_utils",
+ "micro_prover_utils",
+ "micro_queued_job_processor",
+ "micro_state",
+ "micro_types",
+ "micro_utils",
+ "prometheus_exporter",
+ "rand 0.8.5",
+ "serde",
+ "serde_json",
+ "structopt",
+ "tokio",
+ "tracing",
+ "vk_setup_data_generator_server_fri",
+ "vlog",
+ "vm",
+ "zk_evm 1.4.0",
+ "zkevm_test_harness 1.4.0",
+]
+
+[[package]]
+name = "micro_witness_vector_generator"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "bincode",
+ "ctrlc",
+ "futures 0.3.28",
+ "metrics",
+ "micro_config",
+ "micro_dal",
+ "micro_object_store",
+ "micro_prover_fri_types",
+ "micro_prover_fri_utils",
+ "micro_prover_utils",
+ "micro_queued_job_processor",
+ "micro_types",
+ "micro_utils",
+ "prometheus_exporter",
+ "queues",
+ "serde",
+ "structopt",
+ "tokio",
+ "tracing",
+ "vk_setup_data_generator_server_fri",
+ "vlog",
 ]
 
 [[package]]
@@ -2963,7 +3398,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c168194d373b1e134786274020dae7fc5513d565ea2ebb9bc9ff17ffb69106d4"
 dependencies = [
  "either",
- "proc-macro2 1.0.67",
+ "proc-macro2 1.0.69",
  "quote 1.0.33",
  "serde",
  "syn 1.0.109",
@@ -2975,7 +3410,7 @@ version = "0.27.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2eb04e9c688eff1c89d72b407f168cf79bb9e867a9d3323ed6c01519eb9cc053"
 dependencies = [
- "bitflags 2.4.0",
+ "bitflags 2.4.1",
  "cfg-if 1.0.0",
  "libc",
 ]
@@ -3111,7 +3546,7 @@ version = "0.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "876a53fff98e03a936a674b29568b0e605f06b29372c2489ff4de23f1949743d"
 dependencies = [
- "proc-macro2 1.0.67",
+ "proc-macro2 1.0.69",
  "quote 1.0.33",
  "syn 1.0.109",
 ]
@@ -3174,9 +3609,9 @@ dependencies = [
 
 [[package]]
 name = "num-traits"
-version = "0.2.16"
+version = "0.2.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f30b0abd723be7e2ffca1272140fac1a2f084c77ec3e123c192b66af1ee9e6c2"
+checksum = "39e3200413f237f41ab11ad6d161bc7239c84dcb631773ccd7de3dfe4b5c267c"
 dependencies = [
  "autocfg 1.1.0",
  "libm",
@@ -3208,9 +3643,9 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "96667db765a921f7b295ffee8b60472b686a51d4f21c2ee4ffdb94c7013b65a6"
 dependencies = [
  "proc-macro-crate",
- "proc-macro2 1.0.67",
+ "proc-macro2 1.0.69",
  "quote 1.0.33",
- "syn 2.0.37",
+ "syn 2.0.38",
 ]
 
 [[package]]
@@ -3246,7 +3681,7 @@ version = "0.10.57"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bac25ee399abb46215765b1cb35bc0212377e58a061560d8b29b024fd0430e7c"
 dependencies = [
- "bitflags 2.4.0",
+ "bitflags 2.4.1",
  "cfg-if 1.0.0",
  "foreign-types",
  "libc",
@@ -3261,9 +3696,9 @@ version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a948666b637a0f465e8564c73e89d4dde00d72d4d473cc972f390fc3dcee7d9c"
 dependencies = [
- "proc-macro2 1.0.67",
+ "proc-macro2 1.0.69",
  "quote 1.0.33",
- "syn 2.0.37",
+ "syn 2.0.38",
 ]
 
 [[package]]
@@ -3293,6 +3728,27 @@ dependencies = [
  "log",
  "serde",
  "winapi",
+]
+
+[[package]]
+name = "oss-rust-sdk"
+version = "0.10.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "204502c04e45c074593d832d93d24f8fcb6673819bfb3f00d9b40750f56ae17f"
+dependencies = [
+ "async-trait",
+ "base64 0.13.1",
+ "bytes",
+ "chrono",
+ "derive_more",
+ "hmac 0.12.1",
+ "httpdate",
+ "log",
+ "quick-xml",
+ "reqwest",
+ "serde",
+ "sha1",
+ "urlencoding",
 ]
 
 [[package]]
@@ -3327,7 +3783,7 @@ dependencies = [
 [[package]]
 name = "pairing_ce"
 version = "0.28.5"
-source = "git+https://github.com/ZKAmoeba-Micro/pairing.git#d06c2a112913b0abfb75996cc29a6b6075717e99"
+source = "git+https://github.com/ZKAmoeba-Micro/pairing.git#e046abc7f1df8bd1257cc5133760b67c56a7ebbb"
 dependencies = [
  "byteorder",
  "cfg-if 1.0.0",
@@ -3395,7 +3851,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1557010476e0595c9b568d16dcfb81b93cdeb157612726f5170d31aa707bed27"
 dependencies = [
  "proc-macro-crate",
- "proc-macro2 1.0.67",
+ "proc-macro2 1.0.69",
  "quote 1.0.33",
  "syn 1.0.109",
 ]
@@ -3407,7 +3863,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "312270ee71e1cd70289dacf597cab7b207aa107d2f28191c2ae45b2ece18a260"
 dependencies = [
  "proc-macro-crate",
- "proc-macro2 1.0.67",
+ "proc-macro2 1.0.69",
  "quote 1.0.33",
  "syn 1.0.109",
 ]
@@ -3430,7 +3886,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3742b2c103b9f06bc9fff0a37ff4912935851bee6d36f3c02bcc755bcfec228f"
 dependencies = [
  "lock_api",
- "parking_lot_core 0.9.8",
+ "parking_lot_core 0.9.9",
 ]
 
 [[package]]
@@ -3449,13 +3905,13 @@ dependencies = [
 
 [[package]]
 name = "parking_lot_core"
-version = "0.9.8"
+version = "0.9.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "93f00c865fe7cabf650081affecd3871070f26767e7b2070a3ffae14c654b447"
+checksum = "4c42a9226546d68acdd9c0a280d17ce19bfe27a46bf68784e4066115788d008e"
 dependencies = [
  "cfg-if 1.0.0",
  "libc",
- "redox_syscall 0.3.5",
+ "redox_syscall 0.4.1",
  "smallvec",
  "windows-targets",
 ]
@@ -3557,9 +4013,9 @@ checksum = "bc9fc1b9e7057baba189b5c626e2d6f40681ae5b6eb064dc7c7834101ec8123a"
 dependencies = [
  "pest",
  "pest_meta",
- "proc-macro2 1.0.67",
+ "proc-macro2 1.0.69",
  "quote 1.0.33",
- "syn 2.0.37",
+ "syn 2.0.38",
 ]
 
 [[package]]
@@ -3588,9 +4044,9 @@ version = "1.1.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4359fd9c9171ec6e8c62926d6faaf553a8dc3f64e1507e76da7911b4f6a04405"
 dependencies = [
- "proc-macro2 1.0.67",
+ "proc-macro2 1.0.69",
  "quote 1.0.33",
- "syn 2.0.37",
+ "syn 2.0.38",
 ]
 
 [[package]]
@@ -3678,6 +4134,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "31114a898e107c51bb1609ffaf55a0e011cf6a4d7f1170d0015a165082c0338b"
 
 [[package]]
+name = "powerfmt"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "439ee305def115ba05938db6eb1644ff94165c5ab5e9420d1c1bcedbba909391"
+
+[[package]]
 name = "ppv-lite86"
 version = "0.2.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3689,8 +4151,8 @@ version = "0.2.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ae005bd773ab59b4725093fd7df83fd7892f7d8eafb48dbd7de6e024e4215f9d"
 dependencies = [
- "proc-macro2 1.0.67",
- "syn 2.0.37",
+ "proc-macro2 1.0.69",
+ "syn 2.0.38",
 ]
 
 [[package]]
@@ -3708,9 +4170,9 @@ dependencies = [
 
 [[package]]
 name = "primitive-types"
-version = "0.12.1"
+version = "0.12.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9f3486ccba82358b11a77516035647c34ba167dfa53312630de83b12bd4f3d66"
+checksum = "0b34d9fd68ae0b74a41b21c03c2f62847aa0ffea044eee893b4c140b37e244e2"
 dependencies = [
  "fixed-hash 0.8.0",
  "impl-codec 0.6.0",
@@ -3736,7 +4198,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "da25490ff9892aab3fcf7c36f08cfb902dd3e71ca0f9f9517bea02a73a5ce38c"
 dependencies = [
  "proc-macro-error-attr",
- "proc-macro2 1.0.67",
+ "proc-macro2 1.0.69",
  "quote 1.0.33",
  "syn 1.0.109",
  "version_check",
@@ -3748,7 +4210,7 @@ version = "1.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a1be40180e52ecc98ad80b184934baf3d0d29f979574e439af5a55274b35f869"
 dependencies = [
- "proc-macro2 1.0.67",
+ "proc-macro2 1.0.69",
  "quote 1.0.33",
  "version_check",
 ]
@@ -3770,9 +4232,9 @@ dependencies = [
 
 [[package]]
 name = "proc-macro2"
-version = "1.0.67"
+version = "1.0.69"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3d433d9f1a3e8c1263d9456598b16fec66f4acc9a74dacffd35c7bb09b3a1328"
+checksum = "134c189feb4956b20f6f547d2cf727d4c0fe06722b20a0eec87ed445a97f92da"
 dependencies = [
  "unicode-ident",
 ]
@@ -3795,9 +4257,9 @@ version = "0.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "440f724eba9f6996b75d63681b0a92b06947f1457076d503a4d2e2c8f56442b8"
 dependencies = [
- "proc-macro2 1.0.67",
+ "proc-macro2 1.0.69",
  "quote 1.0.33",
- "syn 2.0.37",
+ "syn 2.0.38",
 ]
 
 [[package]]
@@ -3819,7 +4281,7 @@ checksum = "7c003ac8c77cb07bb74f5f198bce836a689bcd5a42574612bf14d17bfd08c20e"
 dependencies = [
  "bit-set",
  "bit-vec",
- "bitflags 2.4.0",
+ "bitflags 2.4.1",
  "lazy_static",
  "num-traits",
  "rand 0.8.5",
@@ -3834,7 +4296,7 @@ dependencies = [
 [[package]]
 name = "prover-service"
 version = "0.1.0"
-source = "git+https://github.com/ZKAmoeba-Micro/micro-heavy-ops-service.git?branch=v1.3.3#ac6a3af6415dc12c9ae2932fa5ad906939023d82"
+source = "git+https://github.com/ZKAmoeba-Micro/micro-heavy-ops-service.git?branch=v1.3.3#f413c67ed3222a810dd7a0b8b8b92f139770751d"
 dependencies = [
  "api",
  "bincode",
@@ -3887,6 +4349,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a1d01941d82fa2ab50be1e79e6714289dd7cde78eba4c074bc5a4374f650dfe0"
 
 [[package]]
+name = "quick-xml"
+version = "0.28.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0ce5e73202a820a31f8a0ee32ada5e21029c81fd9e3ebf668a40832e4219d9d1"
+dependencies = [
+ "memchr",
+ "serde",
+]
+
+[[package]]
 name = "quote"
 version = "0.6.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3901,7 +4373,7 @@ version = "1.0.33"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5267fca4496028628a95160fc423a33e8b2e6af8a5302579e322e4b520293cae"
 dependencies = [
- "proc-macro2 1.0.67",
+ "proc-macro2 1.0.69",
 ]
 
 [[package]]
@@ -4170,6 +4642,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "redox_syscall"
+version = "0.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4722d768eff46b75989dd134e5c353f0d6296e5aaa3132e776cbdb56be7731aa"
+dependencies = [
+ "bitflags 1.3.2",
+]
+
+[[package]]
 name = "redox_users"
 version = "0.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4182,14 +4663,14 @@ dependencies = [
 
 [[package]]
 name = "regex"
-version = "1.9.6"
+version = "1.10.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ebee201405406dbf528b8b672104ae6d6d63e6d118cb10e4d51abbc7b58044ff"
+checksum = "380b951a9c5e80ddfd6136919eef32310721aa4aacd4889a8d39124b026ab343"
 dependencies = [
  "aho-corasick",
  "memchr",
- "regex-automata 0.3.9",
- "regex-syntax 0.7.5",
+ "regex-automata 0.4.3",
+ "regex-syntax 0.8.2",
 ]
 
 [[package]]
@@ -4203,13 +4684,13 @@ dependencies = [
 
 [[package]]
 name = "regex-automata"
-version = "0.3.9"
+version = "0.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "59b23e92ee4318893fa3fe3e6fb365258efbfe6ac6ab30f090cdcbb7aa37efa9"
+checksum = "5f804c7828047e88b2d32e2d7fe5a105da8ee3264f01902f796c8e067dc2483f"
 dependencies = [
  "aho-corasick",
  "memchr",
- "regex-syntax 0.7.5",
+ "regex-syntax 0.8.2",
 ]
 
 [[package]]
@@ -4223,6 +4704,12 @@ name = "regex-syntax"
 version = "0.7.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dbb5fb1acd8a1a18b3dd5be62d25485eb770e05afb408a9627d14d451bae12da"
+
+[[package]]
+name = "regex-syntax"
+version = "0.8.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c08c74e62047bb2de4ff487b251e4a92e24f48745648451635cec7d591162d9f"
 
 [[package]]
 name = "reqwest"
@@ -4273,16 +4760,13 @@ dependencies = [
 [[package]]
 name = "rescue_poseidon"
 version = "0.4.1"
-source = "git+https://github.com/ZKAmoeba-Micro/rescue-poseidon.git?branch=poseidon2#09b96e7e82dadac151d8d681f017cb6a16961801"
+source = "git+https://github.com/ZKAmoeba-Micro/rescue-poseidon?branch=master#dbefbc0d40115998e4504addb698866b86b225a8"
 dependencies = [
  "addchain",
  "arrayvec 0.7.4",
  "blake2 0.10.6",
- "boojum",
  "byteorder",
- "derivative",
- "franklin-crypto 0.0.5 (git+https://github.com/ZKAmoeba-Micro/franklin-crypto?branch=snark_wrapper)",
- "log",
+ "franklin-crypto 0.0.5 (git+https://github.com/ZKAmoeba-Micro/franklin-crypto?branch=dev-1)",
  "num-bigint 0.3.3",
  "num-integer",
  "num-iter",
@@ -4296,13 +4780,16 @@ dependencies = [
 [[package]]
 name = "rescue_poseidon"
 version = "0.4.1"
-source = "git+https://github.com/ZKAmoeba-Micro/rescue-poseidon#d059b5042df5ed80e151f05751410b524a54d16c"
+source = "git+https://github.com/ZKAmoeba-Micro/rescue-poseidon.git?branch=poseidon2#6082521423c9456f7d532197edbbb84d368abbe5"
 dependencies = [
  "addchain",
  "arrayvec 0.7.4",
  "blake2 0.10.6",
+ "boojum",
  "byteorder",
- "franklin-crypto 0.0.5 (git+https://github.com/ZKAmoeba-Micro/franklin-crypto?branch=dev)",
+ "derivative",
+ "franklin-crypto 0.0.5 (git+https://github.com/ZKAmoeba-Micro/franklin-crypto?branch=snark_wrapper)",
+ "log",
  "num-bigint 0.3.3",
  "num-integer",
  "num-iter",
@@ -4419,11 +4906,11 @@ dependencies = [
 
 [[package]]
 name = "rustix"
-version = "0.38.17"
+version = "0.38.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f25469e9ae0f3d0047ca8b93fc56843f38e6774f0914a107ff8b41be8be8e0b7"
+checksum = "67ce50cb2e16c2903e30d1cbccfd8387a74b9d4c938b6a4c5ec6cc7556f7a8a0"
 dependencies = [
- "bitflags 2.4.0",
+ "bitflags 2.4.1",
  "errno",
  "libc",
  "linux-raw-sys",
@@ -4620,9 +5107,9 @@ dependencies = [
 
 [[package]]
 name = "semver"
-version = "1.0.19"
+version = "1.0.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ad977052201c6de01a8ef2aa3378c4bd23217a056337d1d6da40468d267a4fb0"
+checksum = "836fa6a3e1e547f9a2c4040802ec865b5d85f4014efe00555d7090a3dcaa1090"
 dependencies = [
  "serde",
 ]
@@ -4737,22 +5224,22 @@ dependencies = [
 
 [[package]]
 name = "serde"
-version = "1.0.188"
+version = "1.0.189"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cf9e0fcba69a370eed61bcf2b728575f726b50b55cba78064753d708ddc7549e"
+checksum = "8e422a44e74ad4001bdc8eede9a4570ab52f71190e9c076d14369f38b9200537"
 dependencies = [
  "serde_derive",
 ]
 
 [[package]]
 name = "serde_derive"
-version = "1.0.188"
+version = "1.0.189"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4eca7ac642d82aa35b60049a6eccb4be6be75e599bd2e9adb5f875a737654af2"
+checksum = "1e48d1f918009ce3145511378cf68d613e3b3d9137d67272562080d68a2b32d5"
 dependencies = [
- "proc-macro2 1.0.67",
+ "proc-macro2 1.0.69",
  "quote 1.0.33",
- "syn 2.0.37",
+ "syn 2.0.38",
 ]
 
 [[package]]
@@ -4796,7 +5283,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e182d6ec6f05393cc0e5ed1bf81ad6db3a8feedf8ee515ecdd369809bcce8082"
 dependencies = [
  "darling",
- "proc-macro2 1.0.67",
+ "proc-macro2 1.0.69",
  "quote 1.0.33",
  "syn 1.0.109",
 ]
@@ -4881,7 +5368,7 @@ dependencies = [
 [[package]]
 name = "shivini"
 version = "0.1.0"
-source = "git+https://github.com/ZKAmoeba-Micro/micro-shivini.git?branch=main#2c73a10ff0310e7f99a0d9a8cea043e697eaa5e4"
+source = "git+https://github.com/ZKAmoeba-Micro/micro-shivini.git?branch=rr-allocations-improvements#2c65b11044b9d1153bb8ef373c807cb7c971f3f4"
 dependencies = [
  "bincode",
  "blake2 0.10.6",
@@ -4976,7 +5463,7 @@ dependencies = [
 [[package]]
 name = "snark_wrapper"
 version = "0.1.0"
-source = "git+https://github.com/ZKAmoeba-Micro/snark-wrapper.git?branch=main#450ea6c9f3ede11e149b86ad3a072e673f9846e7"
+source = "git+https://github.com/ZKAmoeba-Micro/snark-wrapper.git?branch=main#f57a88f9a4baba01252a8352b7816001cdf8a47d"
 dependencies = [
  "boojum",
  "derivative",
@@ -5122,7 +5609,7 @@ dependencies = [
  "heck 0.4.1",
  "hex",
  "once_cell",
- "proc-macro2 1.0.67",
+ "proc-macro2 1.0.69",
  "quote 1.0.33",
  "serde",
  "serde_json",
@@ -5199,7 +5686,7 @@ checksum = "dcb5ae327f9cc13b68763b5749770cb9e048a99bd9dfdfa58d0cf05d5f64afe0"
 dependencies = [
  "heck 0.3.3",
  "proc-macro-error",
- "proc-macro2 1.0.67",
+ "proc-macro2 1.0.69",
  "quote 1.0.33",
  "syn 1.0.109",
 ]
@@ -5220,7 +5707,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1e385be0d24f186b4ce2f9982191e7101bb737312ad61c1f2f984f34bcf85d59"
 dependencies = [
  "heck 0.4.1",
- "proc-macro2 1.0.67",
+ "proc-macro2 1.0.69",
  "quote 1.0.33",
  "rustversion",
  "syn 1.0.109",
@@ -5249,18 +5736,18 @@ version = "1.0.109"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "72b64191b275b66ffe2469e8af2c1cfe3bafa67b529ead792a6d0160888b4237"
 dependencies = [
- "proc-macro2 1.0.67",
+ "proc-macro2 1.0.69",
  "quote 1.0.33",
  "unicode-ident",
 ]
 
 [[package]]
 name = "syn"
-version = "2.0.37"
+version = "2.0.38"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7303ef2c05cd654186cb250d29049a24840ca25d2747c25c0381c8d9e2f582e8"
+checksum = "e96b79aaa137db8f61e26363a0c9b47d8b4ec75da28b7d1d614c2303e232408b"
 dependencies = [
- "proc-macro2 1.0.67",
+ "proc-macro2 1.0.69",
  "quote 1.0.33",
  "unicode-ident",
 ]
@@ -5268,12 +5755,12 @@ dependencies = [
 [[package]]
 name = "sync_vm"
 version = "1.3.3"
-source = "git+https://github.com/ZKAmoeba-Micro/micro-sync_vm.git?branch=v1.3.3#3a21c8dee43c77604350fdf33c1615e25bf1dacd"
+source = "git+https://github.com/ZKAmoeba-Micro/micro-sync_vm.git?branch=v1.3.3#8039fe08b759aaf83192adb4c9e88b8bb929bf49"
 dependencies = [
  "arrayvec 0.7.4",
  "cs_derive 0.1.0 (git+https://github.com/ZKAmoeba-Micro/micro-sync_vm.git?branch=v1.3.3)",
  "derivative",
- "franklin-crypto 0.0.5 (git+https://github.com/ZKAmoeba-Micro/franklin-crypto?branch=dev)",
+ "franklin-crypto 0.0.5 (git+https://github.com/ZKAmoeba-Micro/franklin-crypto?branch=dev-1)",
  "hex",
  "itertools 0.10.5",
  "num-bigint 0.4.4",
@@ -5282,12 +5769,12 @@ dependencies = [
  "num-traits",
  "once_cell",
  "rand 0.4.6",
- "rescue_poseidon 0.4.1 (git+https://github.com/ZKAmoeba-Micro/rescue-poseidon)",
+ "rescue_poseidon 0.4.1 (git+https://github.com/ZKAmoeba-Micro/rescue-poseidon?branch=master)",
  "serde",
  "sha2 0.10.6",
  "sha3 0.10.6",
  "smallvec",
- "zk_evm 1.3.3",
+ "zk_evm 1.3.2",
  "zkevm_opcode_defs",
 ]
 
@@ -5348,13 +5835,13 @@ dependencies = [
 
 [[package]]
 name = "test-log"
-version = "0.2.12"
+version = "0.2.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d9601d162c1d77e62c1ea0bc8116cd1caf143ce3af947536c3c9052a1677fe0c"
+checksum = "f66edd6b6cd810743c0c71e1d085e92b01ce6a72782032e3f794c8284fe4bcdd"
 dependencies = [
- "proc-macro2 1.0.67",
+ "proc-macro2 1.0.69",
  "quote 1.0.33",
- "syn 1.0.109",
+ "syn 2.0.38",
 ]
 
 [[package]]
@@ -5368,22 +5855,22 @@ dependencies = [
 
 [[package]]
 name = "thiserror"
-version = "1.0.49"
+version = "1.0.50"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1177e8c6d7ede7afde3585fd2513e611227efd6481bd78d2e82ba1ce16557ed4"
+checksum = "f9a7210f5c9a7156bb50aa36aed4c95afb51df0df00713949448cf9e97d382d2"
 dependencies = [
  "thiserror-impl",
 ]
 
 [[package]]
 name = "thiserror-impl"
-version = "1.0.49"
+version = "1.0.50"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "10712f02019e9288794769fba95cd6847df9874d49d871d062172f9dd41bc4cc"
+checksum = "266b2e40bc00e5a6c09c3584011e08b06f123c00362c92b975ba9843aaaa14b8"
 dependencies = [
- "proc-macro2 1.0.67",
+ "proc-macro2 1.0.69",
  "quote 1.0.33",
- "syn 2.0.37",
+ "syn 2.0.38",
 ]
 
 [[package]]
@@ -5398,12 +5885,13 @@ dependencies = [
 
 [[package]]
 name = "time"
-version = "0.3.29"
+version = "0.3.30"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "426f806f4089c493dcac0d24c29c01e2c38baf8e30f1b716ee37e83d200b18fe"
+checksum = "c4a34ab300f2dee6e562c10a046fc05e358b29f9bf92277f30c3c8d82275f6f5"
 dependencies = [
  "deranged",
  "itoa",
+ "powerfmt",
  "serde",
  "time-core",
  "time-macros",
@@ -5469,9 +5957,9 @@ checksum = "1f3ccbac311fea05f86f61904b462b55fb3df8837a366dfc601a0161d0532f20"
 
 [[package]]
 name = "tokio"
-version = "1.32.0"
+version = "1.33.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "17ed6077ed6cd6c74735e21f37eb16dc3935f96878b1fe961074089cc80893f9"
+checksum = "4f38200e3ef7995e5ef13baec2f432a6da0aa9ac495b2c0e8f3b7eec2c92d653"
 dependencies = [
  "backtrace",
  "bytes",
@@ -5492,9 +5980,9 @@ version = "2.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "630bdcf245f78637c13ec01ffae6187cca34625e8c63150d424b59e55af2675e"
 dependencies = [
- "proc-macro2 1.0.67",
+ "proc-macro2 1.0.69",
  "quote 1.0.33",
- "syn 2.0.37",
+ "syn 2.0.38",
 ]
 
 [[package]]
@@ -5578,11 +6066,10 @@ checksum = "b6bc1c9ce2b5135ac7f93c72918fc37feb872bdc6a5533a8b85eb4b86bfdae52"
 
 [[package]]
 name = "tracing"
-version = "0.1.37"
+version = "0.1.40"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8ce8c33a8d48bd45d624a6e523445fd21ec13d3653cd51f681abf67418f54eb8"
+checksum = "c3523ab5a71916ccf420eebdf5521fcef02141234bbc0b8a49f2fdc4544364ef"
 dependencies = [
- "cfg-if 1.0.0",
  "pin-project-lite",
  "tracing-attributes",
  "tracing-core",
@@ -5590,20 +6077,20 @@ dependencies = [
 
 [[package]]
 name = "tracing-attributes"
-version = "0.1.26"
+version = "0.1.27"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5f4f31f56159e98206da9efd823404b79b6ef3143b4a7ab76e67b1751b25a4ab"
+checksum = "34704c8d6ebcbc939824180af020566b01a7c01f80641264eba0999f6c2b6be7"
 dependencies = [
- "proc-macro2 1.0.67",
+ "proc-macro2 1.0.69",
  "quote 1.0.33",
- "syn 2.0.37",
+ "syn 2.0.38",
 ]
 
 [[package]]
 name = "tracing-core"
-version = "0.1.31"
+version = "0.1.32"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0955b8137a1df6f1a2e9a37d8a6656291ff0297c1a97c24e0d8425fe2312f79a"
+checksum = "c06d3da6113f116aaee68e4d601191614c9053067f9ab7f6edbcb161237daa54"
 dependencies = [
  "once_cell",
  "valuable",
@@ -5812,9 +6299,9 @@ checksum = "daf8dba3b7eb870caf1ddeed7bc9d2a049f3cfdfae7cb521b087cc33ae4c49da"
 
 [[package]]
 name = "uuid"
-version = "1.4.1"
+version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "79daa5ed5740825c40b389c5e50312b9c86df53fccd33f281df655642b43869d"
+checksum = "88ad59a7560b41a70d191093a945f0b87bc1deeda46fb237479708a1d6b6cdfc"
 dependencies = [
  "serde",
 ]
@@ -5846,7 +6333,7 @@ checksum = "49874b5167b65d7193b8aba1567f5c7d93d001cafc34600cee003eda787e483f"
 [[package]]
 name = "vise"
 version = "0.1.0"
-source = "git+https://github.com/ZKAmoeba-Micro/vise.git?rev=9d097ab747b037b6e62504df1db5b975425b6bdd#9d097ab747b037b6e62504df1db5b975425b6bdd"
+source = "git+https://github.com/ZKAmoeba-Micro/vise.git?branch=main#913ac0541117ac80806367b2185910e852aa652c"
 dependencies = [
  "elsa",
  "linkme",
@@ -5858,7 +6345,7 @@ dependencies = [
 [[package]]
 name = "vise-exporter"
 version = "0.1.0"
-source = "git+https://github.com/ZKAmoeba-Micro/vise.git?rev=9d097ab747b037b6e62504df1db5b975425b6bdd#9d097ab747b037b6e62504df1db5b975425b6bdd"
+source = "git+https://github.com/ZKAmoeba-Micro/vise.git?branch=main#913ac0541117ac80806367b2185910e852aa652c"
 dependencies = [
  "hyper",
  "metrics-exporter-prometheus",
@@ -5871,11 +6358,11 @@ dependencies = [
 [[package]]
 name = "vise-macros"
 version = "0.1.0"
-source = "git+https://github.com/ZKAmoeba-Micro/vise.git?rev=9d097ab747b037b6e62504df1db5b975425b6bdd#9d097ab747b037b6e62504df1db5b975425b6bdd"
+source = "git+https://github.com/ZKAmoeba-Micro/vise.git?branch=main#913ac0541117ac80806367b2185910e852aa652c"
 dependencies = [
- "proc-macro2 1.0.67",
+ "proc-macro2 1.0.69",
  "quote 1.0.33",
- "syn 2.0.37",
+ "syn 2.0.38",
 ]
 
 [[package]]
@@ -5886,6 +6373,10 @@ dependencies = [
  "bincode",
  "circuit_definitions",
  "itertools 0.10.5",
+ "micro_config",
+ "micro_prover_fri_types",
+ "micro_prover_utils",
+ "micro_types",
  "once_cell",
  "proptest",
  "serde",
@@ -5896,10 +6387,6 @@ dependencies = [
  "tracing",
  "vlog",
  "zkevm_test_harness 1.4.0",
- "micro_config",
- "micro_prover_fri_types",
- "micro_prover_utils",
- "micro_types",
 ]
 
 [[package]]
@@ -5920,16 +6407,16 @@ dependencies = [
  "anyhow",
  "hex",
  "itertools 0.10.5",
- "once_cell",
- "thiserror",
- "tracing",
- "vise",
- "zk_evm 1.3.3",
  "micro_config",
  "micro_contracts",
  "micro_state",
  "micro_types",
  "micro_utils",
+ "once_cell",
+ "thiserror",
+ "tracing",
+ "vise",
+ "zk_evm 1.4.0",
 ]
 
 [[package]]
@@ -5991,9 +6478,9 @@ dependencies = [
  "bumpalo",
  "log",
  "once_cell",
- "proc-macro2 1.0.67",
+ "proc-macro2 1.0.69",
  "quote 1.0.33",
- "syn 2.0.37",
+ "syn 2.0.38",
  "wasm-bindgen-shared",
 ]
 
@@ -6025,9 +6512,9 @@ version = "0.2.87"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "54681b18a46765f095758388f2d0cf16eb8d4169b639ab575a8f5693af210c7b"
 dependencies = [
- "proc-macro2 1.0.67",
+ "proc-macro2 1.0.69",
  "quote 1.0.33",
- "syn 2.0.37",
+ "syn 2.0.38",
  "wasm-bindgen-backend",
  "wasm-bindgen-shared",
 ]
@@ -6152,10 +6639,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "712e227841d057c1ee1cd2fb22fa7e5a5461ae8e48fa2ca79ec42cfc1931183f"
 
 [[package]]
-name = "windows"
-version = "0.48.0"
+name = "windows-core"
+version = "0.51.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e686886bc078bc1b0b600cac0147aadb815089b6e4da64016cbd754b6342700f"
+checksum = "f1f8cf84f35d2db49a46868f947758c7a1138116f7fac3bc844f43ade1292e64"
 dependencies = [
  "windows-targets",
 ]
@@ -6228,9 +6715,9 @@ checksum = "ed94fce61571a4006852b7389a063ab983c02eb1bb37b47f8272ce92d06d9538"
 
 [[package]]
 name = "winnow"
-version = "0.5.15"
+version = "0.5.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7c2e3184b9c4e92ad5167ca73039d0c42476302ab603e2fec4487511f38ccefc"
+checksum = "a3b801d0e0a6726477cc207f60162da452f3a95adb368399bef20a946e06f65c"
 dependencies = [
  "memchr",
 ]
@@ -6268,8 +6755,8 @@ checksum = "2a0956f1ba7c7909bfb66c2e9e4124ab6f6482560f6628b5aaeba39207c9aad9"
 
 [[package]]
 name = "zk_evm"
-version = "1.3.3"
-source = "git+https://github.com/ZKAmoeba-Micro/micro-zk_evm.git?branch=v1.3.3#fe8215a7047d24430ad470cf15a19bedb4d6ba0b"
+version = "1.3.2"
+source = "git+https://github.com/ZKAmoeba-Micro/micro-zk_evm.git?branch=v1.3.3#a911524cf5ffc3cc259708ef309609c0aad6b6b2"
 dependencies = [
  "anyhow",
  "lazy_static",
@@ -6284,7 +6771,7 @@ dependencies = [
 [[package]]
 name = "zk_evm"
 version = "1.4.0"
-source = "git+https://github.com/ZKAmoeba-Micro/micro-zk_evm.git?branch=v1.4.0#e33a5ded1b53e35d261fdb46e6d16f2c900b217f"
+source = "git+https://github.com/ZKAmoeba-Micro/micro-zk_evm.git?branch=v1.4.0#d150e55672deee2f6f0cb646154e7bdc46f5691a"
 dependencies = [
  "anyhow",
  "lazy_static",
@@ -6299,7 +6786,7 @@ dependencies = [
 [[package]]
 name = "zk_evm_abstractions"
 version = "0.1.0"
-source = "git+https://github.com/ZKAmoeba-Micro/micro-zk_evm_abstractions.git#7502a661d7d38906d849dcd3e7a15e5848af6581"
+source = "git+https://github.com/ZKAmoeba-Micro/micro-zk_evm_abstractions.git#df585c45d73cce9f8bcc3ae46569fe943b1aae05"
 dependencies = [
  "anyhow",
  "serde",
@@ -6310,7 +6797,7 @@ dependencies = [
 [[package]]
 name = "zkevm-assembly"
 version = "1.3.2"
-source = "git+https://github.com/ZKAmoeba-Micro/micro-zkEVM-assembly.git?branch=v1.3.2#3c61d450cbe6548068be8f313ed02f1bd229a865"
+source = "git+https://github.com/ZKAmoeba-Micro/micro-zkEVM-assembly.git?branch=v1.3.2#0961553d60e234809ebc41530967169b1e908c71"
 dependencies = [
  "env_logger 0.9.3",
  "hex",
@@ -6329,7 +6816,7 @@ dependencies = [
 [[package]]
 name = "zkevm_circuits"
 version = "1.4.0"
-source = "git+https://github.com/ZKAmoeba-Micro/micro-zkevm_circuits.git?branch=main#4fba537ccecc238e2da9c80844dc8c185e42466f"
+source = "git+https://github.com/ZKAmoeba-Micro/micro-zkevm_circuits.git?branch=main#bafebba9844c6c673e0016e320aafdbd43205f6b"
 dependencies = [
  "arrayvec 0.7.4",
  "bincode",
@@ -6349,9 +6836,9 @@ dependencies = [
 [[package]]
 name = "zkevm_opcode_defs"
 version = "1.3.2"
-source = "git+https://github.com/ZKAmoeba-Micro/micro-zkevm_opcode_defs.git?branch=v1.3.2#c7ab62f4c60b27dfc690c3ab3efb5fff1ded1a25"
+source = "git+https://github.com/ZKAmoeba-Micro/micro-zkevm_opcode_defs.git?branch=v1.3.2#2276b1146ec4b3d36c0574df03a7cdbed9d53cdf"
 dependencies = [
- "bitflags 2.4.0",
+ "bitflags 2.4.1",
  "blake2 0.10.6",
  "ethereum-types 0.14.1",
  "k256",
@@ -6363,7 +6850,7 @@ dependencies = [
 [[package]]
 name = "zkevm_test_harness"
 version = "1.3.3"
-source = "git+https://github.com/ZKAmoeba-Micro/micro-zkevm_test_harness.git?branch=v1.3.3#d26aa4133f2b5e114c0bf084b8c3f1eca9aa9929"
+source = "git+https://github.com/ZKAmoeba-Micro/micro-zkevm_test_harness.git?branch=v1.3.3#c40daa967bd24579207ada1ab84a82372b8ce63b"
 dependencies = [
  "bincode",
  "circuit_testing",
@@ -6383,14 +6870,14 @@ dependencies = [
  "sync_vm",
  "test-log",
  "tracing",
- "zk_evm 1.3.3",
+ "zk_evm 1.3.2",
  "zkevm-assembly",
 ]
 
 [[package]]
 name = "zkevm_test_harness"
 version = "1.4.0"
-source = "git+https://github.com/ZKAmoeba-Micro/micro-zkevm_test_harness.git?branch=v1.4.0#3cd647aa57fc2e1180bab53f7a3b61ec47502a46"
+source = "git+https://github.com/ZKAmoeba-Micro/micro-zkevm_test_harness.git?branch=v1.4.0#e15f15231ee1ad1b2ad28fe55877a65060829f2d"
 dependencies = [
  "bincode",
  "circuit_definitions",
@@ -6409,444 +6896,4 @@ dependencies = [
  "test-log",
  "tracing",
  "zkevm-assembly",
-]
-
-[[package]]
-name = "micro_basic_types"
-version = "0.1.0"
-dependencies = [
- "serde",
- "serde_json",
- "web3",
-]
-
-[[package]]
-name = "micro_circuit_synthesizer"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "ctrlc",
- "futures 0.3.28",
- "local-ip-address",
- "metrics",
- "prometheus_exporter",
- "prover-service",
- "structopt",
- "thiserror",
- "tokio",
- "tracing",
- "vlog",
- "zkevm_test_harness 1.3.3",
- "micro_config",
- "micro_dal",
- "micro_object_store",
- "micro_prover_fri_utils",
- "micro_prover_utils",
- "micro_queued_job_processor",
- "micro_types",
- "micro_utils",
- "micro_verification_key_generator_and_server",
-]
-
-[[package]]
-name = "micro_config"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "bigdecimal",
- "envy",
- "hex",
- "num 0.3.1",
- "once_cell",
- "serde",
- "serde_json",
- "url",
- "micro_basic_types",
- "micro_contracts",
- "micro_utils",
-]
-
-[[package]]
-name = "micro_contracts"
-version = "0.1.0"
-dependencies = [
- "envy",
- "ethabi",
- "hex",
- "once_cell",
- "serde",
- "serde_json",
- "micro_utils",
-]
-
-[[package]]
-name = "micro_crypto"
-version = "0.1.0"
-dependencies = [
- "base64 0.13.1",
- "blake2 0.10.6",
- "hex",
- "once_cell",
- "serde",
- "sha2 0.9.9",
- "thiserror",
- "micro_basic_types",
-]
-
-[[package]]
-name = "micro_dal"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "bigdecimal",
- "bincode",
- "hex",
- "itertools 0.10.5",
- "num 0.3.1",
- "once_cell",
- "serde",
- "serde_json",
- "sqlx",
- "strum",
- "thiserror",
- "tokio",
- "tracing",
- "vise",
- "micro_config",
- "micro_contracts",
- "micro_health_check",
- "micro_types",
- "micro_utils",
-]
-
-[[package]]
-name = "micro_health_check"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "futures 0.3.28",
- "serde",
- "serde_json",
- "tokio",
- "tracing",
-]
-
-[[package]]
-name = "micro_mini_merkle_tree"
-version = "0.1.0"
-dependencies = [
- "once_cell",
- "micro_basic_types",
- "micro_crypto",
-]
-
-[[package]]
-name = "micro_object_store"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "async-trait",
- "bincode",
- "google-cloud-auth",
- "google-cloud-storage",
- "http",
- "tokio",
- "tracing",
- "vise",
- "micro_config",
- "micro_types",
-]
-
-[[package]]
-name = "micro_proof_fri_compressor"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "async-trait",
- "bincode",
- "ctrlc",
- "futures 0.3.28",
- "metrics",
- "prometheus_exporter",
- "structopt",
- "tokio",
- "tracing",
- "vk_setup_data_generator_server_fri",
- "vlog",
- "zkevm_test_harness 1.4.0",
- "micro_config",
- "micro_dal",
- "micro_object_store",
- "micro_prover_fri_types",
- "micro_prover_utils",
- "micro_queued_job_processor",
- "micro_types",
- "micro_utils",
-]
-
-[[package]]
-name = "micro_prover_fri"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "async-trait",
- "circuit_definitions",
- "ctrlc",
- "futures 0.3.28",
- "local-ip-address",
- "metrics",
- "prometheus_exporter",
- "serde",
- "shivini",
- "tokio",
- "tracing",
- "vk_setup_data_generator_server_fri",
- "vlog",
- "zkevm_test_harness 1.4.0",
- "micro_config",
- "micro_dal",
- "micro_object_store",
- "micro_prover_fri_types",
- "micro_prover_fri_utils",
- "micro_prover_utils",
- "micro_queued_job_processor",
- "micro_types",
- "micro_utils",
-]
-
-[[package]]
-name = "micro_prover_fri_gateway"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "async-trait",
- "ctrlc",
- "futures 0.3.28",
- "log",
- "metrics",
- "prometheus_exporter",
- "reqwest",
- "serde",
- "tokio",
- "tracing",
- "vlog",
- "micro_config",
- "micro_dal",
- "micro_object_store",
- "micro_types",
- "micro_utils",
-]
-
-[[package]]
-name = "micro_prover_fri_types"
-version = "0.1.0"
-dependencies = [
- "circuit_definitions",
- "serde",
- "micro_object_store",
- "micro_types",
-]
-
-[[package]]
-name = "micro_prover_fri_utils"
-version = "0.1.0"
-dependencies = [
- "metrics",
- "serde",
- "tracing",
- "micro_config",
- "micro_dal",
- "micro_object_store",
- "micro_prover_fri_types",
- "micro_types",
-]
-
-[[package]]
-name = "micro_prover_utils"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "async-trait",
- "ctrlc",
- "futures 0.3.28",
- "regex",
- "reqwest",
- "tokio",
- "toml_edit 0.14.4",
- "tracing",
- "micro_config",
- "micro_object_store",
- "micro_types",
- "micro_utils",
-]
-
-[[package]]
-name = "micro_queued_job_processor"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "async-trait",
- "tokio",
- "tracing",
- "micro_utils",
-]
-
-[[package]]
-name = "micro_state"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "itertools 0.10.5",
- "mini-moka",
- "tokio",
- "tracing",
- "vise",
- "micro_dal",
- "micro_storage",
- "micro_types",
- "micro_utils",
-]
-
-[[package]]
-name = "micro_storage"
-version = "0.1.0"
-dependencies = [
- "num_cpus",
- "once_cell",
- "rocksdb",
- "tracing",
- "vise",
-]
-
-[[package]]
-name = "micro_types"
-version = "0.1.0"
-dependencies = [
- "blake2 0.10.6",
- "chrono",
- "codegen 0.1.0",
- "ethereum-types 0.12.1",
- "hex",
- "num 0.3.1",
- "num_enum",
- "once_cell",
- "parity-crypto",
- "rlp",
- "serde",
- "serde_json",
- "serde_with",
- "strum",
- "thiserror",
- "zk_evm 1.3.3",
- "zkevm_test_harness 1.3.3",
- "micro_basic_types",
- "micro_config",
- "micro_contracts",
- "micro_mini_merkle_tree",
- "micro_utils",
-]
-
-[[package]]
-name = "micro_utils"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "bigdecimal",
- "futures 0.3.28",
- "hex",
- "itertools 0.10.5",
- "metrics",
- "num 0.3.1",
- "reqwest",
- "serde",
- "thiserror",
- "tokio",
- "tracing",
- "vlog",
- "zk_evm 1.3.3",
- "micro_basic_types",
-]
-
-[[package]]
-name = "micro_verification_key_generator_and_server"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "bincode",
- "circuit_testing",
- "ff_ce",
- "hex",
- "itertools 0.10.5",
- "once_cell",
- "serde_json",
- "structopt",
- "tracing",
- "vlog",
- "micro_prover_utils",
- "micro_types",
-]
-
-[[package]]
-name = "micro_witness_generator"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "async-trait",
- "bincode",
- "circuit_definitions",
- "ctrlc",
- "futures 0.3.28",
- "hex",
- "metrics",
- "prometheus_exporter",
- "rand 0.8.5",
- "serde",
- "serde_json",
- "structopt",
- "tokio",
- "tracing",
- "vk_setup_data_generator_server_fri",
- "vlog",
- "vm",
- "zk_evm 1.4.0",
- "zkevm_test_harness 1.4.0",
- "micro_config",
- "micro_dal",
- "micro_object_store",
- "micro_prover_fri_types",
- "micro_prover_fri_utils",
- "micro_prover_utils",
- "micro_queued_job_processor",
- "micro_state",
- "micro_types",
- "micro_utils",
-]
-
-[[package]]
-name = "micro_witness_vector_generator"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "async-trait",
- "bincode",
- "ctrlc",
- "futures 0.3.28",
- "metrics",
- "prometheus_exporter",
- "queues",
- "serde",
- "structopt",
- "tokio",
- "tracing",
- "vk_setup_data_generator_server_fri",
- "vlog",
- "micro_config",
- "micro_dal",
- "micro_object_store",
- "micro_prover_fri_types",
- "micro_prover_fri_utils",
- "micro_prover_utils",
- "micro_queued_job_processor",
- "micro_types",
- "micro_utils",
 ]

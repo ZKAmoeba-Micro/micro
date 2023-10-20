@@ -30,7 +30,7 @@ zkevm_test_harness = { git = "https://github.com/ZKAmoeba-Micro/micro-zkevm_test
 circuit_definitions = { git = "https://github.com/ZKAmoeba-Micro/micro-zkevm_test_harness.git", branch = "v1.4.0", features = [
     "log_tracing",
 ] }
-shivini = { git = "https://github.com/ZKAmoeba-Micro/micro-shivini.git", branch = "main", optional = true }
+shivini = { git = "https://github.com/ZKAmoeba-Micro/micro-shivini.git", branch = "rr-allocations-improvements", optional = true }
 micro_config = { path = "../../core/lib/config" }
 
 anyhow = "1.0"

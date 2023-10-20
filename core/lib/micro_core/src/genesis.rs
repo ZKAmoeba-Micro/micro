@@ -323,8 +323,8 @@ pub(crate) async fn add_eth_token(storage: &mut StorageProcessor<'_>) {
         l1_address: ETHEREUM_ADDRESS,
         l2_address: ETHEREUM_ADDRESS,
         metadata: TokenMetadata {
-            name: "Ether".to_string(),
-            symbol: "ETH".to_string(),
+            name: "File Coin".to_string(),
+            symbol: "FIL".to_string(),
             decimals: 18,
         },
     };
