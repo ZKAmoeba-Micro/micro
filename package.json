@@ -24,7 +24,7 @@
   },
   "scripts": {
     "build:micro-sdk-web3": "yarn web3 build",
-    "web3": "yarn workspace micro-web3",
+    "web3": "yarn workspace @zkamoeba/micro-web3",
     "local-prep": "yarn workspace local-setup-preparation",
     "l1-contracts": "yarn workspace l1-micro-contracts",
     "l2-contracts": "yarn workspace l2-micro-contracts",
