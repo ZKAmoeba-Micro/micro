@@ -19,7 +19,7 @@ use micro_types::web3::{
     types::{BlockId, BlockNumber},
     Web3,
 };
-use micro_types::{L1BatchNumber, PackedEthSignature, H160, H256, U256};
+use micro_types::{L1BatchNumber, PackedEthSignature, H160, H256, U256, U64};
 
 use micro_eth_signer::{EthereumSigner, PrivateKeySigner, TransactionParameters};
 
@@ -132,7 +132,7 @@ impl BlockReverter {
                 .get_number_of_last_l1_batch_executed_on_eth()
                 .await
                 .unwrap()
-                .expect("failed to get last executed L1 batch");
+                .unwrap_or_default();
             assert!(
                 last_l1_batch_to_keep >= last_executed_l1_batch,
                 "Attempt to revert already executed L1 batches"
@@ -320,9 +320,10 @@ impl BlockReverter {
             data,
             chain_id,
             nonce: nonce.into(),
+            transaction_type: Some(U64::from(2)),
             max_priority_fee_per_gas: priority_fee_per_gas,
             max_fee_per_gas: base_fee + priority_fee_per_gas,
-            gas: 5_000_000.into(),
+            gas: 50_000_000.into(),
             ..Default::default()
         };
 
@@ -335,6 +336,7 @@ impl BlockReverter {
 
         loop {
             if let Some(receipt) = web3.eth().transaction_receipt(hash).await.unwrap() {
+                tracing::info!("receipt {:?}", receipt);
                 assert_eq!(receipt.status, Some(1.into()), "revert transaction failed");
                 tracing::info!("revert transaction has completed");
                 return;
