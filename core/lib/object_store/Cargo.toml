@@ -25,6 +25,7 @@ tracing = "0.1"
 oss-rust-sdk = "0.10.0"
 serde = "1.0"
 serde_json = "1.0"
+reqwest = "0.11.22"
 
 [dev-dependencies]
 tempdir = "0.3.7"

@@ -8,6 +8,7 @@ pub enum ObjectStoreMode {
     GCSWithCredentialFile,
     FileBacked,
     AliOssBacked,
+    HttpBacked,
 }
 
 /// Configuration for the object store

@@ -4,6 +4,7 @@ use async_trait::async_trait;
 use std::{error, fmt, sync::Arc};
 
 use crate::ali_oss::AliyunOssStorage;
+use crate::http::HttpBackedObjectStore;
 use crate::{file::FileBackedObjectStore, gcs::GoogleCloudStorage, mock::MockStore};
 use micro_config::configs::object_store::ObjectStoreMode;
 use micro_config::ObjectStoreConfig;
@@ -237,11 +238,18 @@ impl ObjectStoreFactory {
             }
             ObjectStoreMode::AliOssBacked => {
                 tracing::trace!("Initialized AliOssBacked Object store");
-                Box::new(AliyunOssStorage::new(
+                let store = AliyunOssStorage::new(
                     config.credential_file_path.clone(),
                     config.bucket_base_url.clone(),
                     config.max_retries,
-                ))
+                );
+                Box::new(store)
+            }
+            ObjectStoreMode::HttpBacked => {
+                tracing::trace!("Initialized Http Object store");
+                let store =
+                    HttpBackedObjectStore::new(config.bucket_base_url.clone(), config.max_retries);
+                Box::new(store)
             }
         }
     }

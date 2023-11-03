@@ -26,6 +26,7 @@
 mod ali_oss;
 mod file;
 mod gcs;
+mod http;
 mod metrics;
 mod mock;
 mod objects;

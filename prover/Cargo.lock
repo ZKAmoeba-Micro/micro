@@ -3001,6 +3001,7 @@ dependencies = [
  "micro_config",
  "micro_types",
  "oss-rust-sdk",
+ "reqwest",
  "serde",
  "serde_json",
  "tokio",
