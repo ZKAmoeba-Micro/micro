@@ -104,7 +104,8 @@ export async function deployL2(args: any[] = [], includePaymaster?: boolean, inc
         'CONTRACTS_L2_TESTNET_PAYMASTER_ADDR',
         'CONTRACTS_L2_WETH_TOKEN_IMPL_ADDR',
         'CONTRACTS_L2_WETH_TOKEN_PROXY_ADDR',
-        'CONTRACTS_L2_DEFAULT_UPGRADE_ADDR'
+        'CONTRACTS_L2_DEFAULT_UPGRADE_ADDR',
+        'CONTRACTS_L2_GETTERS_ADDR'
     ];
     updateContractsEnv(l2DeployLog, l2DeploymentEnvVars);
 
