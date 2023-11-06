@@ -10,3 +10,4 @@ CREATE TABLE assignments (
 
 
 CREATE UNIQUE INDEX assignments_un_address_l1batch ON assignments (verification_address, l1_batch_number);
+CREATE INDEX assignments_idx_status ON assignments (status);
