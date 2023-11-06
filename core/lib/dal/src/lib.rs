@@ -46,6 +46,7 @@ use crate::witness_generator_dal::WitnessGeneratorDal;
 #[macro_use]
 mod macro_utils;
 pub mod accounts_dal;
+pub mod assignments_dal;
 pub mod blocks_dal;
 pub mod blocks_web3_dal;
 pub mod connection;
@@ -80,7 +81,6 @@ pub mod tokens_web3_dal;
 pub mod transactions_dal;
 pub mod transactions_web3_dal;
 pub mod witness_generator_dal;
-pub mod assignments_dal;
 
 #[cfg(test)]
 mod tests;
