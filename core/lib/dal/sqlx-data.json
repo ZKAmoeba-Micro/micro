@@ -1256,6 +1256,20 @@
     },
     "query": "SELECT l1_address FROM tokens WHERE market_volume > $1"
   },
+  "162d4fd73b6939a45a53245a75202e8d6da05387633d9ce1867e0694bd04a886": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Text",
+          "Bytea",
+          "Int8"
+        ]
+      }
+    },
+    "query": "UPDATE assignments SET status=$1, return_time_at = now(),updated_at=now() WHERE verification_address=$2 and l1_batch_number = $3"
+  },
   "17a42a97e87a675bd465103ebedc63d6d091e5bb093c7905de70aed3dc71d823": {
     "describe": {
       "columns": [],
@@ -6044,6 +6058,18 @@
     },
     "query": "\n                    SELECT l1_batch_number, basic_circuits_blob_url, basic_circuits_inputs_blob_url FROM leaf_aggregation_witness_jobs\n                    WHERE status='successful' AND is_blob_cleaned=FALSE\n                    AND basic_circuits_blob_url is NOT NULL\n                    AND basic_circuits_inputs_blob_url is NOT NULL\n                    AND updated_at < NOW() - INTERVAL '30 days'\n                    LIMIT $1;\n                "
   },
+  "7321fb3d806f85f911ae371eaed693d757d0200d89b8200568b67ac0342dd7f5": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      }
+    },
+    "query": "UPDATE proof_generation_details SET status='ready_to_be_proven', updated_at = now() WHERE l1_batch_number = $1"
+  },
   "741b13b0a4769a30186c650a4a1b24855806a27ccd8d5a50594741842dde44ec": {
     "describe": {
       "columns": [
@@ -6332,26 +6358,6 @@
       }
     },
     "query": "SELECT number, l1_tx_count, l2_tx_count, timestamp, is_finished, fee_account_address, l2_to_l1_logs, l2_to_l1_messages, bloom, priority_ops_onchain_data, used_contract_hashes, base_fee_per_gas, l1_gas_price, l2_fair_gas_price, bootloader_code_hash, default_aa_code_hash, protocol_version, system_logs, compressed_state_diffs, events_state_queue_commitment, bootloader_initial_memory_commitment FROM l1_batches WHERE eth_commit_tx_id = $1 OR eth_prove_tx_id = $1 OR eth_execute_tx_id = $1"
-  },
-  "b0533ba23f8cc2fe66b1f4d58d4133d2914e9da15c619fca4e913224c8f4c059": {
-    "describe": {
-      "columns": [
-        {
-          "name": "count!",
-          "ordinal": 0,
-          "type_info": "Int8"
-        }
-      ],
-      "nullable": [
-        null
-      ],
-      "parameters": {
-        "Left": [
-          "Int4"
-        ]
-      }
-    },
-    "query": "SELECT COUNT(*) as \"count!\" FROM l1_batches WHERE eth_commit_tx_id = $1 OR eth_prove_tx_id = $1 OR eth_execute_tx_id = $1"
   },
   "79420f7676acb3f17aeb538271cdb4067a342fd554adcf7bd0550b6682b4c82b": {
     "describe": {
@@ -7371,6 +7377,18 @@
       }
     },
     "query": "\n                UPDATE node_aggregation_witness_jobs_fri\n                SET status='queued'\n                WHERE (l1_batch_number, circuit_id, depth) IN\n                      (SELECT prover_jobs_fri.l1_batch_number, prover_jobs_fri.circuit_id, prover_jobs_fri.depth\n                       FROM prover_jobs_fri\n                                JOIN node_aggregation_witness_jobs_fri nawj ON\n                                prover_jobs_fri.l1_batch_number = nawj.l1_batch_number\n                                AND prover_jobs_fri.circuit_id = nawj.circuit_id\n                                AND prover_jobs_fri.depth = nawj.depth\n                       WHERE nawj.status = 'waiting_for_proofs'\n                         AND prover_jobs_fri.status = 'successful'\n                         AND prover_jobs_fri.aggregation_round = 2\n                       GROUP BY prover_jobs_fri.l1_batch_number, prover_jobs_fri.circuit_id, prover_jobs_fri.depth, nawj.number_of_dependent_jobs\n                       HAVING COUNT(*) = nawj.number_of_dependent_jobs)\n                RETURNING l1_batch_number, circuit_id, depth;\n            "
+  },
+  "8eba3e68de1ce77bec8c570360e0f67182f2b7c302440eb990fea7a3c508f8fd": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      }
+    },
+    "query": "UPDATE proof_generation_details SET status='picked_by_prover', updated_at = now(),prover_taken_at = now() WHERE  l1_batch_number = $1"
   },
   "8f75c5aa615080fc02b60baccae9c49a81e282a54864ea3eb874ebe10a23eafe": {
     "describe": {
@@ -9267,6 +9285,26 @@
     },
     "query": "SELECT l1_block_number FROM transactions\n                WHERE priority_op_id IS NOT NULL\n                ORDER BY priority_op_id DESC\n                LIMIT 1"
   },
+  "b0533ba23f8cc2fe66b1f4d58d4133d2914e9da15c619fca4e913224c8f4c059": {
+    "describe": {
+      "columns": [
+        {
+          "name": "count!",
+          "ordinal": 0,
+          "type_info": "Int8"
+        }
+      ],
+      "nullable": [
+        null
+      ],
+      "parameters": {
+        "Left": [
+          "Int4"
+        ]
+      }
+    },
+    "query": "SELECT COUNT(*) as \"count!\" FROM l1_batches WHERE eth_commit_tx_id = $1 OR eth_prove_tx_id = $1 OR eth_execute_tx_id = $1"
+  },
   "b1478907214ad20dddd4f3846fba4b0ddf1fff63ddb3b95c8999635e77c8b863": {
     "describe": {
       "columns": [
@@ -10382,6 +10420,19 @@
       }
     },
     "query": "SELECT hashed_key, l1_batch_number, index FROM initial_writes WHERE hashed_key = ANY($1::bytea[])"
+  },
+  "d254aacaec50aad958ff872ea898e6c4a6c7a6b09dd3d4f1f7a61077b3832899": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Bytea",
+          "Int8"
+        ]
+      }
+    },
+    "query": "INSERT INTO assignments (verification_address,l1_batch_number, status, created_at, updated_at) VALUES ($1,$2, 'ready_to_be_proven', now(), now()) ON CONFLICT (verification_address,l1_batch_number) DO NOTHING"
   },
   "d6709f3ce8f08f988e10a0e0fb5c06db9488834a85066babaf3d56cf212b4ea0": {
     "describe": {
@@ -11572,6 +11623,18 @@
       }
     },
     "query": "SELECT address, key, value FROM storage_logs WHERE miniblock_number BETWEEN (SELECT MIN(number) FROM miniblocks WHERE l1_batch_number = $1) AND (SELECT MAX(number) FROM miniblocks WHERE l1_batch_number = $1) ORDER BY miniblock_number, operation_number"
+  },
+  "f6254d7c9d92900818e4836195ca73f86a59ec569576ae62dc64584f459f92ca": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      }
+    },
+    "query": "UPDATE proof_generation_details SET status='generated', updated_at = now() WHERE  l1_batch_number = $1"
   },
   "f78960549e6201527454d060d5b483db032f4df80b4269a624f0309ed9a6a38e": {
     "describe": {

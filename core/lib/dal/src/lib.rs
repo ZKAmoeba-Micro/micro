@@ -80,6 +80,7 @@ pub mod tokens_web3_dal;
 pub mod transactions_dal;
 pub mod transactions_web3_dal;
 pub mod witness_generator_dal;
+pub mod assignments_dal;
 
 #[cfg(test)]
 mod tests;
