@@ -5,9 +5,3 @@ DROP TABLE IF EXISTS assignments;
 DROP INDEX IF EXISTS assignment_user_summary_pkey;
 DROP TABLE IF EXISTS assignment_user_summary;
 
-
-DROP INDEX IF EXISTS assignment_rewards_pkey;
-DROP TABLE IF EXISTS assignment_rewards;
-
-DROP INDEX IF EXISTS assignment_penalties_detail_pkey;
-DROP TABLE IF EXISTS assignment_penalties_detail;
