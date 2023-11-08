@@ -5,6 +5,7 @@ use micro_basic_types::L1BatchNumber;
 use crate::aggregated_operations::L1BatchProofForL1;
 use crate::proofs::PrepareBasicCircuitsJob;
 use crate::protocol_version::{FriProtocolVersionId, L1VerifierConfig};
+use crate::PackedEthSignature;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ProofGenerationData {
@@ -15,7 +16,10 @@ pub struct ProofGenerationData {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct ProofGenerationDataRequest {}
+pub struct ProofGenerationDataRequest {
+    pub timestamp: i64,
+    pub signature: PackedEthSignature,
+}
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum ProofGenerationDataResponse {

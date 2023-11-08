@@ -1,4 +1,5 @@
 use codegen::serialize_proof;
+use micro_basic_types::{Address, H256};
 
 use std::{fmt, ops, str::FromStr};
 
@@ -10,6 +11,7 @@ use zkevm_test_harness::bellman::plonk::better_better_cs::proof::Proof;
 use zkevm_test_harness::witness::oracle::VmWitnessOracle;
 
 use crate::commitment::L1BatchWithMetadata;
+use crate::PackedEthSignature;
 
 fn l1_batch_range_from_batches(
     batches: &[L1BatchWithMetadata],
@@ -58,6 +60,7 @@ pub struct L1BatchCreateProofOperation {
 pub struct L1BatchProofForL1 {
     pub aggregation_result_coords: [[u8; 32]; 4],
     pub scheduler_proof: Proof<Bn256, MicroCircuit<Bn256, VmWitnessOracle<Bn256>>>,
+    pub signature: PackedEthSignature,
 }
 
 impl fmt::Debug for L1BatchProofForL1 {
@@ -66,6 +69,33 @@ impl fmt::Debug for L1BatchProofForL1 {
             .debug_struct("L1BatchProofForL1")
             .field("aggregation_result_coords", &self.aggregation_result_coords)
             .finish_non_exhaustive()
+    }
+}
+
+impl L1BatchProofForL1 {
+    pub fn sign(&mut self, private_key: &H256) {
+        self.signature = PackedEthSignature::sign(private_key, &self.encode())
+            .expect("sign l1 batch proof failed");
+    }
+
+    pub fn signature_recover_signer(&self) -> Result<Address, parity_crypto::publickey::Error> {
+        if self.signature == PackedEthSignature::default() {
+            return Ok(Address::default());
+        }
+        let signed_bytes = PackedEthSignature::message_to_signed_bytes(&self.encode());
+        self.signature.signature_recover_signer(&signed_bytes)
+    }
+
+    pub fn proof_input(&self) -> Token {
+        let (_inputs, proof) = serialize_proof(&self.scheduler_proof);
+        Token::Tuple(vec![
+            Token::Array(vec![]),
+            Token::Array(proof.into_iter().map(Token::Uint).collect()),
+        ])
+    }
+
+    fn encode(&self) -> Vec<u8> {
+        crate::ethabi::encode(&vec![self.proof_input()])
     }
 }
 
@@ -92,24 +122,19 @@ impl L1BatchProofOperation {
             assert_eq!(self.proofs.len(), 1);
             assert_eq!(self.l1_batches.len(), 1);
 
-            let L1BatchProofForL1 {
-                aggregation_result_coords: _,
-                scheduler_proof,
-            } = self.proofs.first().unwrap();
+            let l1_batch_proof_for_l1 = self.proofs.first().unwrap();
 
-            let (_inputs, proof) = serialize_proof(scheduler_proof);
+            let proof_input = l1_batch_proof_for_l1.proof_input();
 
-            let proof_input = Token::Tuple(vec![
-                Token::Array(vec![]),
-                Token::Array(proof.into_iter().map(Token::Uint).collect()),
-            ]);
+            let prover = Token::Address(l1_batch_proof_for_l1.signature_recover_signer().unwrap());
 
-            vec![prev_l1_batch, batches_arg, proof_input]
+            vec![prev_l1_batch, batches_arg, proof_input, prover]
         } else {
             vec![
                 prev_l1_batch,
                 batches_arg,
                 Token::Tuple(vec![Token::Array(vec![]), Token::Array(vec![])]),
+                Token::Address(Address::default()),
             ]
         }
     }
@@ -210,5 +235,39 @@ impl AggregatedOperation {
             Self::PublishProofOnchain(_) => "proof",
             Self::Execute(_) => "execute",
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use micro_basic_types::{ethabi::Token, H256, U256};
+
+    use crate::PackedEthSignature;
+
+    #[test]
+    fn test_encode_sign() {
+        let private_key = H256::from([5; 32]);
+
+        let proof_input = Token::Tuple(vec![
+            Token::Array(
+                vec![U256::from(1), U256::from(2), U256::from(3)]
+                    .into_iter()
+                    .map(Token::Uint)
+                    .collect(),
+            ),
+            Token::Array(
+                vec![U256::from(4), U256::from(5), U256::from(6)]
+                    .into_iter()
+                    .map(Token::Uint)
+                    .collect(),
+            ),
+        ]);
+
+        let encoded = crate::ethabi::encode(&vec![proof_input]);
+
+        let res = PackedEthSignature::sign(&private_key, &encoded).unwrap();
+        let signature = hex::encode(res.serialize_packed());
+
+        assert_eq!(signature, "a4be061bd5b6251c3dd6873b5181b58112c61c8abda9edb20e8ea195474af4c0043d2c1e9541973b758d809d7c67764a9559de4979f50a902f7a53490d4c5f1f1c");
     }
 }

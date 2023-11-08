@@ -1,4 +1,5 @@
 use super::envy_load;
+use micro_basic_types::H256;
 use serde::Deserialize;
 use std::time::Duration;
 
@@ -14,6 +15,13 @@ pub struct FriProverGatewayConfig {
 }
 
 impl FriProverGatewayConfig {
+    // Don't load private key, if it's not required.
+    pub fn prover_private_key(&self) -> Option<H256> {
+        std::env::var("FRI_PROVER_GATEWAY_PROVER_PRIVATE_KEY")
+            .ok()
+            .map(|pk| pk.parse().unwrap())
+    }
+
     pub fn from_env() -> anyhow::Result<Self> {
         envy_load("fri_prover_gateway", "FRI_PROVER_GATEWAY_")
     }

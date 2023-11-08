@@ -16,7 +16,7 @@ use micro_types::{
     zkevm_test_harness::{
         abstract_micro_circuit::concrete_circuits::MicroProof, bellman::bn256::Bn256,
     },
-    L1BatchNumber, ProtocolVersionId,
+    L1BatchNumber, PackedEthSignature, ProtocolVersionId,
 };
 
 use crate::{
@@ -300,6 +300,7 @@ impl ProverDal<'_, '_> {
                     L1BatchProofForL1 {
                         aggregation_result_coords: deserialized_aggregation_result_coords,
                         scheduler_proof: MicroProof::into_proof(deserialized_proof),
+                        signature: PackedEthSignature::default(),
                     }
                 })
                 .collect()

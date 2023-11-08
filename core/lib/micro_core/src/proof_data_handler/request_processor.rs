@@ -6,6 +6,7 @@ use micro_config::configs::{
 };
 use micro_types::commitment::serialize_commitments;
 use micro_types::web3::signing::keccak256;
+use micro_types::PackedEthSignature;
 use micro_utils::u256_to_h256;
 use std::convert::TryFrom;
 use std::sync::Arc;
@@ -34,6 +35,7 @@ pub(crate) enum RequestProcessorError {
     NoPendingBatches,
     ObjectStore(ObjectStoreError),
     Sqlx(SqlxError),
+    SignatureError,
 }
 
 impl IntoResponse for RequestProcessorError {
@@ -62,6 +64,9 @@ impl IntoResponse for RequestProcessorError {
                     ),
                 }
             }
+            RequestProcessorError::SignatureError => {
+                (StatusCode::BAD_REQUEST, "Invalid signature".to_owned())
+            }
         };
         (status_code, message).into_response()
     }
@@ -87,6 +92,19 @@ impl RequestProcessor {
         request: Json<ProofGenerationDataRequest>,
     ) -> Result<Json<ProofGenerationDataResponse>, RequestProcessorError> {
         tracing::info!("Received request for proof generation data: {:?}", request);
+
+        // recover prover address
+        let prover_addr = request
+            .signature
+            .signature_recover_signer(&PackedEthSignature::message_to_signed_bytes(
+                &request.timestamp.to_be_bytes(),
+            ))
+            .map_err(|_| RequestProcessorError::SignatureError)?;
+        if prover_addr.is_zero() {
+            return Err(RequestProcessorError::SignatureError);
+        }
+
+        // TODO get proof job by prover address
 
         let l1_batch_number = self
             .pool
@@ -137,6 +155,16 @@ impl RequestProcessor {
         let l1_batch_number = L1BatchNumber(l1_batch_number);
         match payload {
             SubmitProofRequest::Proof(proof) => {
+                // recover prover address
+                let prover_addr = proof
+                    .signature_recover_signer()
+                    .map_err(|_| RequestProcessorError::SignatureError)?;
+                if prover_addr.is_zero() {
+                    return Err(RequestProcessorError::SignatureError);
+                }
+
+                // TODO check prover address is equal to job in database
+
                 let blob_url = self
                     .blob_store
                     .put(l1_batch_number, &*proof)

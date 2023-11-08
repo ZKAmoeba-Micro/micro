@@ -14,3 +14,6 @@ operator_commit_eth_addr = "0x26937d59db4463254c930D5f31353F14AA89a0F7"
 [misc]
 # Private key for the fee seller account
 fee_account_private_key = "0x848181ca4df71f9fe087f3ce10a503bb8d700775dfe8e948a07d40889a3e4200"
+
+[fri_prover_gateway]
+prover_private_key = "0x848181ca4df71f9fe087f3ce10a503bb8d700775dfe8e948a07d40889a3e4200"

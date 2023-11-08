@@ -1,6 +1,7 @@
 use async_trait::async_trait;
-use micro_dal::fri_proof_compressor_dal::ProofCompressionJobStatus;
 
+use micro_dal::fri_proof_compressor_dal::ProofCompressionJobStatus;
+use micro_types::aggregated_operations::L1BatchProofForL1;
 use micro_types::prover_server_api::{SubmitProofRequest, SubmitProofResponse};
 use micro_types::L1BatchNumber;
 
@@ -10,19 +11,23 @@ impl PeriodicApiStruct {
     async fn next_submit_proof_request(&self) -> Option<(L1BatchNumber, SubmitProofRequest)> {
         let (l1_batch_number, status) = self
             .pool
-            .access_storage().await.unwrap()
+            .access_storage()
+            .await
+            .unwrap()
             .fri_proof_compressor_dal()
             .get_least_proven_block_number_not_sent_to_server()
             .await?;
 
         let request = match status {
             ProofCompressionJobStatus::Successful => {
-                let proof = self
+                let mut l1_batch_proof: L1BatchProofForL1 = self
                     .blob_store
                     .get(l1_batch_number)
                     .await
                     .expect("Failed to get compressed snark proof from blob store");
-                SubmitProofRequest::Proof(Box::new(proof))
+
+                l1_batch_proof.sign(&self.config.prover_private_key().unwrap());
+                SubmitProofRequest::Proof(Box::new(l1_batch_proof))
             }
             ProofCompressionJobStatus::Skipped => SubmitProofRequest::SkippedProofGeneration,
             _ => panic!(
@@ -36,7 +41,9 @@ impl PeriodicApiStruct {
 
     async fn save_successful_sent_proof(&self, l1_batch_number: L1BatchNumber) {
         self.pool
-            .access_storage().await.unwrap()
+            .access_storage()
+            .await
+            .unwrap()
             .fri_proof_compressor_dal()
             .mark_proof_sent_to_server(l1_batch_number)
             .await;

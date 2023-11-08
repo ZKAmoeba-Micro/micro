@@ -52,6 +52,7 @@ async fn main() -> anyhow::Result<()> {
         api_url: format!("{}{SUBMIT_PROOF_PATH}", config.api_url),
         poll_duration: config.api_poll_duration(),
         client: Client::new(),
+        config: config.clone(),
     };
     let proof_gen_data_fetcher = PeriodicApiStruct {
         blob_store: store_factory.create_store().await,
@@ -59,6 +60,7 @@ async fn main() -> anyhow::Result<()> {
         api_url: format!("{}{PROOF_GENERATION_DATA_PATH}", config.api_url),
         poll_duration: config.api_poll_duration(),
         client: Client::new(),
+        config: config.clone(),
     };
 
     let (stop_sender, stop_receiver) = watch::channel(false);

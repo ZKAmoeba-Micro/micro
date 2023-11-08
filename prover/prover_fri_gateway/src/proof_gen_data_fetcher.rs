@@ -1,7 +1,11 @@
 use async_trait::async_trait;
 
-use micro_types::prover_server_api::{
-    ProofGenerationData, ProofGenerationDataRequest, ProofGenerationDataResponse,
+use chrono::Utc;
+use micro_types::{
+    prover_server_api::{
+        ProofGenerationData, ProofGenerationDataRequest, ProofGenerationDataResponse,
+    },
+    PackedEthSignature,
 };
 
 use crate::api_data_fetcher::{PeriodicApi, PeriodicApiStruct};
@@ -36,7 +40,19 @@ impl PeriodicApi<ProofGenerationDataRequest> for PeriodicApiStruct {
     const SERVICE_NAME: &'static str = "ProofGenDataFetcher";
 
     async fn get_next_request(&self) -> Option<(Self::JobId, ProofGenerationDataRequest)> {
-        Some(((), ProofGenerationDataRequest {}))
+        let timestamp = Utc::now().timestamp();
+        let signature = PackedEthSignature::sign(
+            &self.config.prover_private_key().unwrap(),
+            &timestamp.to_be_bytes(),
+        )
+        .unwrap();
+        Some((
+            (),
+            ProofGenerationDataRequest {
+                timestamp,
+                signature,
+            },
+        ))
     }
 
     async fn send_request(

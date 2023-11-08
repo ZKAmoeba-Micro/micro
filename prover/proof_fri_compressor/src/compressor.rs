@@ -3,7 +3,6 @@ use async_trait::async_trait;
 use std::time::Instant;
 use tokio::task::JoinHandle;
 
-use zkevm_test_harness::proof_wrapper_utils::wrap_proof;
 use micro_dal::ConnectionPool;
 use micro_object_store::ObjectStore;
 use micro_prover_fri_types::circuit_definitions::boojum::field::goldilocks::GoldilocksField;
@@ -21,8 +20,9 @@ use micro_types::zkevm_test_harness::abstract_micro_circuit::concrete_circuits::
 use micro_types::zkevm_test_harness::bellman::bn256::Bn256;
 use micro_types::zkevm_test_harness::bellman::plonk::better_better_cs::proof::Proof;
 use micro_types::zkevm_test_harness::witness::oracle::VmWitnessOracle;
-use micro_types::L1BatchNumber;
+use micro_types::{L1BatchNumber, PackedEthSignature};
 use micro_vk_setup_data_server_fri::{get_recursive_layer_vk_for_circuit_type, get_snark_vk};
+use zkevm_test_harness::proof_wrapper_utils::wrap_proof;
 
 pub struct ProofCompressor {
     blob_store: Box<dyn ObjectStore>,
@@ -61,8 +61,9 @@ impl ProofCompressor {
         // TODO: is that true here?
         let serialized = bincode::serialize(&inner)
             .expect("Failed to serialize proof with MicroSnarkWrapperCircuit");
-        let proof: Proof<Bn256, MicroCircuit<Bn256, VmWitnessOracle<Bn256>>> = bincode::deserialize(&serialized)
-            .expect("Failed to deserialize proof with MicroCircuit");
+        let proof: Proof<Bn256, MicroCircuit<Bn256, VmWitnessOracle<Bn256>>> =
+            bincode::deserialize(&serialized)
+                .expect("Failed to deserialize proof with MicroCircuit");
         if verify_wrapper_proof {
             let existing_vk = get_snark_vk().context("get_snark_vk()")?;
             let vk = MicroVerificationKey::from_verification_key_and_numeric_type(0, existing_vk);
@@ -134,7 +135,9 @@ impl JobProcessor for ProofCompressor {
 
     async fn save_failure(&self, job_id: Self::JobId, _started_at: Instant, error: String) {
         self.pool
-            .access_storage().await.unwrap()
+            .access_storage()
+            .await
+            .unwrap()
             .fri_proof_compressor_dal()
             .mark_proof_compression_job_failed(&error, job_id)
             .await;
@@ -177,6 +180,7 @@ impl JobProcessor for ProofCompressor {
         let l1_batch_proof = L1BatchProofForL1 {
             aggregation_result_coords,
             scheduler_proof: artifacts,
+            signature: PackedEthSignature::default(),
         };
         let blob_save_started_at = Instant::now();
         let blob_url = self
@@ -189,7 +193,9 @@ impl JobProcessor for ProofCompressor {
             blob_save_started_at.elapsed(),
         );
         self.pool
-            .access_storage().await.unwrap()
+            .access_storage()
+            .await
+            .unwrap()
             .fri_proof_compressor_dal()
             .mark_proof_compression_job_successful(job_id, started_at.elapsed(), &blob_url)
             .await;
