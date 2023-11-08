@@ -19,12 +19,12 @@ CREATE TABLE assignment_user_summary (
     status text NOT NULL,
     participations_num bigint NOT NULL,
     completion_num bigint NOT NULL,
+    completion_prove_cumulative_time bigint NOT NULL DEFAULT 0,
     timeout_num bigint NOT NULL,
-    score numeric(10, 2) NOT NULL,
+    score integer NOT NULL,
     created_at timestamp without time zone NOT NULL,
     update_at timestamp without time zone NOT NULL,
-    deposit_amount numeric(38, 18) NOT NULL,
-    total_prove_time bigint NOT NULL DEFAULT 0
+    deposit_amount numeric(80, 0) NOT NULL
   );
 
 ALTER TABLE assignment_user_summary ADD CONSTRAINT assignment_user_summary_pkey PRIMARY KEY (verification_address);
