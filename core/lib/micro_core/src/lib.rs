@@ -502,13 +502,10 @@ pub async fn initialize_components(
     if components.contains(&Component::StateKeeper) {
         let started_at = Instant::now();
         tracing::info!("initializing State Keeper");
-        let api_config = ApiConfig::from_env().context("ApiConfig::from_env()")?;
         let bounded_gas_adjuster = gas_adjuster
             .get_or_init_bounded()
             .await
             .context("gas_adjuster.get_or_init_bounded()")?;
-        let storage_caches = build_storage_caches(&replica_connection_pool, &mut task_futures)
-            .context("build_Storage_caches()")?;
         add_state_keeper_to_task_futures(
             &mut task_futures,
             &contracts_config,
@@ -518,9 +515,6 @@ pub async fn initialize_components(
             &MempoolConfig::from_env().context("MempoolConfig::from_env()")?,
             bounded_gas_adjuster,
             stop_receiver.clone(),
-            &api_config.web3_json_rpc,
-            replica_connection_pool.clone(),
-            storage_caches,
         )
         .await
         .context("add_state_keeper_to_task_futures()")?;
@@ -693,9 +687,6 @@ async fn add_state_keeper_to_task_futures<E: L1GasPriceProvider + Send + Sync + 
     mempool_config: &MempoolConfig,
     gas_adjuster: Arc<E>,
     stop_receiver: watch::Receiver<bool>,
-    web3_json_config: &Web3JsonRpcConfig,
-    replica_connection_pool: ConnectionPool,
-    storage_caches: PostgresStorageCaches,
 ) -> anyhow::Result<()> {
     let fair_l2_gas_price = state_keeper_config.fair_l2_gas_price;
     let pool_builder = ConnectionPool::singleton(DbVariant::Master);
@@ -734,9 +725,6 @@ async fn add_state_keeper_to_task_futures<E: L1GasPriceProvider + Send + Sync + 
         gas_adjuster.clone(),
         miniblock_sealer_handle,
         stop_receiver.clone(),
-        web3_json_config,
-        replica_connection_pool,
-        storage_caches,
     )
     .await;
     task_futures.push(tokio::spawn(state_keeper.run()));

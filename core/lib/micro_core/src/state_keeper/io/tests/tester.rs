@@ -82,10 +82,8 @@ impl Tester {
             virtual_blocks_per_miniblock: 1,
             ..StateKeeperConfig::default()
         };
-        let web3_json_rpc_config = Web3JsonRpcConfig::from_env().unwrap();
         let l2_erc20_bridge_addr = Address::repeat_byte(0x5a); // Isn't relevant.
 
-        let storage_caches = PostgresStorageCaches::new(1, 1);
         let io = MempoolIO::new(
             mempool.clone(),
             miniblock_sealer_handle,
@@ -96,9 +94,6 @@ impl Tester {
             l2_erc20_bridge_addr,
             BLOCK_GAS_LIMIT,
             L2ChainId::from(270),
-            &web3_json_rpc_config,
-            pool.clone(),
-            storage_caches,
         )
         .await;
 

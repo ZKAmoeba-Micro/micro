@@ -1,13 +1,9 @@
-use micro_state::PostgresStorageCaches;
 use tokio::sync::watch;
 
 use std::sync::Arc;
 
 use micro_config::{
-    configs::{
-        api::Web3JsonRpcConfig,
-        chain::{MempoolConfig, NetworkConfig, StateKeeperConfig},
-    },
+    configs::chain::{MempoolConfig, NetworkConfig, StateKeeperConfig},
     constants::MAX_TXS_IN_BLOCK,
     ContractsConfig, DBConfig,
 };
@@ -46,9 +42,6 @@ pub(crate) async fn create_state_keeper<G>(
     l1_gas_price_provider: Arc<G>,
     miniblock_sealer_handle: MiniblockSealerHandle,
     stop_receiver: watch::Receiver<bool>,
-    web3_json_config: &Web3JsonRpcConfig,
-    replica_connection_pool: ConnectionPool,
-    storage_caches: PostgresStorageCaches,
 ) -> MicroStateKeeper
 where
     G: L1GasPriceProvider + 'static + Send + Sync,
@@ -79,9 +72,6 @@ where
         contracts_config.l2_erc20_bridge_addr,
         state_keeper_config.validation_computational_gas_limit,
         network_config.micro_network_id,
-        web3_json_config,
-        replica_connection_pool,
-        storage_caches,
     )
     .await;
 
