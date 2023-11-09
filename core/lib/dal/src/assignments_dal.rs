@@ -71,7 +71,7 @@ impl AssignmentsDal<'_, '_> {
 
             ProverResultStatus::Failed.to_string()
         };
-        sqlx::query!("UPDATE assignments SET status=$1, return_time_at = now(),updated_at=now() WHERE verification_address=$2 and l1_batch_number = $3",
+        sqlx::query!("UPDATE assignments SET status=$1,updated_at=now() WHERE verification_address=$2 and l1_batch_number = $3",
             result_status,
             verification_address.as_bytes(),
             block_number.0 as i64,

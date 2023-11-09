@@ -1268,7 +1268,7 @@
         ]
       }
     },
-    "query": "UPDATE assignments SET status=$1, return_time_at = now(),updated_at=now() WHERE verification_address=$2 and l1_batch_number = $3"
+    "query": "UPDATE assignments SET status=$1,updated_at=now() WHERE verification_address=$2 and l1_batch_number = $3"
   },
   "17a42a97e87a675bd465103ebedc63d6d091e5bb093c7905de70aed3dc71d823": {
     "describe": {
