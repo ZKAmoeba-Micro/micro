@@ -17,14 +17,10 @@ CREATE INDEX assignments_idx_status ON assignments (status);
 CREATE TABLE assignment_user_summary (
     verification_address bytea NOT NULL,
     status text NOT NULL,
-    participations_num bigint NOT NULL,
-    completion_num bigint NOT NULL,
-    completion_prove_cumulative_time bigint NOT NULL DEFAULT 0,
-    timeout_num bigint NOT NULL,
-    score integer NOT NULL,
+    base_score integer NOT NULL,
+    last_batch_number bigint NOT NULL,
     created_at timestamp without time zone NOT NULL,
-    update_at timestamp without time zone NOT NULL,
-    deposit_amount numeric(80, 0) NOT NULL
+    update_at timestamp without time zone NOT NULL
   );
 
 ALTER TABLE assignment_user_summary ADD CONSTRAINT assignment_user_summary_pkey PRIMARY KEY (verification_address);

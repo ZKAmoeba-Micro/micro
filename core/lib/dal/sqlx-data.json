@@ -4334,6 +4334,21 @@
     },
     "query": "DELETE FROM l2_to_l1_logs WHERE miniblock_number > $1"
   },
+  "4c6aa48abfd55e029ea07aebd09cd64f11ddd2a27893f22f0eb38fb7e2b0fc94": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Bytea",
+          "Text",
+          "Int4",
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n            INSERT INTO assignment_user_summary (verification_address,status,base_score,last_batch_number,created_at,update_at)\n            VALUES ($1, $2, $3, $4, now(), now())\n            ON CONFLICT(verification_address)\n            DO UPDATE SET update_at=now()\n            "
+  },
   "4c83881635e957872a435737392bfed829de58780887c9a0fa7921ea648296fb": {
     "describe": {
       "columns": [

@@ -46,6 +46,7 @@ use crate::witness_generator_dal::WitnessGeneratorDal;
 #[macro_use]
 mod macro_utils;
 pub mod accounts_dal;
+pub mod assignment_user_summary_dal;
 pub mod assignments_dal;
 pub mod blocks_dal;
 pub mod blocks_web3_dal;
