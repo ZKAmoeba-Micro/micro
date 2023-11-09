@@ -1,4 +1,5 @@
 use codegen::serialize_proof;
+use micro_basic_types::ethabi::Uint;
 use micro_basic_types::{Address, H256};
 
 use std::{fmt, ops, str::FromStr};
@@ -61,6 +62,7 @@ pub struct L1BatchProofForL1 {
     pub aggregation_result_coords: [[u8; 32]; 4],
     pub scheduler_proof: Proof<Bn256, MicroCircuit<Bn256, VmWitnessOracle<Bn256>>>,
     pub signature: PackedEthSignature,
+    pub time_taken: u64,
 }
 
 impl fmt::Debug for L1BatchProofForL1 {
@@ -125,16 +127,21 @@ impl L1BatchProofOperation {
             let l1_batch_proof_for_l1 = self.proofs.first().unwrap();
 
             let proof_input = l1_batch_proof_for_l1.proof_input();
+            let prover_info = Token::Tuple(vec![
+                Token::Address(l1_batch_proof_for_l1.signature_recover_signer().unwrap()),
+                Token::Uint(Uint::from(l1_batch_proof_for_l1.time_taken)),
+            ]);
 
-            let prover = Token::Address(l1_batch_proof_for_l1.signature_recover_signer().unwrap());
-
-            vec![prev_l1_batch, batches_arg, proof_input, prover]
+            vec![prev_l1_batch, batches_arg, proof_input, prover_info]
         } else {
             vec![
                 prev_l1_batch,
                 batches_arg,
                 Token::Tuple(vec![Token::Array(vec![]), Token::Array(vec![])]),
-                Token::Address(Address::default()),
+                Token::Tuple(vec![
+                    Token::Address(Address::default()),
+                    Token::Uint(Uint::from(0)),
+                ]),
             ]
         }
     }

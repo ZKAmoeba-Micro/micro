@@ -181,6 +181,7 @@ impl JobProcessor for ProofCompressor {
             aggregation_result_coords,
             scheduler_proof: artifacts,
             signature: PackedEthSignature::default(),
+            time_taken: 0,
         };
         let blob_save_started_at = Instant::now();
         let blob_url = self

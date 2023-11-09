@@ -165,6 +165,8 @@ impl RequestProcessor {
 
                 // TODO check prover address is equal to job in database
 
+                // TODO read job start time from database and calculate time_taken
+
                 let blob_url = self
                     .blob_store
                     .put(l1_batch_number, &*proof)

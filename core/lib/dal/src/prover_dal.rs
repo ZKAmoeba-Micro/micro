@@ -301,6 +301,7 @@ impl ProverDal<'_, '_> {
                         aggregation_result_coords: deserialized_aggregation_result_coords,
                         scheduler_proof: MicroProof::into_proof(deserialized_proof),
                         signature: PackedEthSignature::default(),
+                        time_taken: 0,
                     }
                 })
                 .collect()
