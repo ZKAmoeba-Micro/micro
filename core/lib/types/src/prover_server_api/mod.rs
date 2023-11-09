@@ -31,7 +31,7 @@ pub enum ProofGenerationDataResponse {
 pub enum SubmitProofRequest {
     Proof(Box<L1BatchProofForL1>),
     // The proof generation was skipped due to sampling
-    SkippedProofGeneration,
+    SkippedProofGeneration(PackedEthSignature),
 }
 
 #[derive(Debug, Serialize, Deserialize)]

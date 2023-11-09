@@ -4,6 +4,7 @@ use micro_dal::fri_proof_compressor_dal::ProofCompressionJobStatus;
 use micro_types::aggregated_operations::L1BatchProofForL1;
 use micro_types::prover_server_api::{SubmitProofRequest, SubmitProofResponse};
 use micro_types::L1BatchNumber;
+use micro_types::PackedEthSignature;
 
 use crate::api_data_fetcher::{PeriodicApi, PeriodicApiStruct};
 
@@ -26,10 +27,17 @@ impl PeriodicApiStruct {
                     .await
                     .expect("Failed to get compressed snark proof from blob store");
 
-                l1_batch_proof.sign(&self.config.prover_private_key().unwrap());
+                l1_batch_proof.sign(l1_batch_number, &self.config.prover_private_key().unwrap());
                 SubmitProofRequest::Proof(Box::new(l1_batch_proof))
             }
-            ProofCompressionJobStatus::Skipped => SubmitProofRequest::SkippedProofGeneration,
+            ProofCompressionJobStatus::Skipped => {
+                let sign = PackedEthSignature::sign(
+                    &self.config.prover_private_key().unwrap(),
+                    &l1_batch_number.0.to_be_bytes(),
+                )
+                .unwrap();
+                SubmitProofRequest::SkippedProofGeneration(sign)
+            }
             _ => panic!(
                 "Trying to send proof that are not successful status: {:?}",
                 status

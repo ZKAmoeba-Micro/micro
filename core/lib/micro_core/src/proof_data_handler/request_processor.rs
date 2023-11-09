@@ -1,9 +1,11 @@
 use axum::extract::Path;
 use axum::response::Response;
 use axum::{http::StatusCode, response::IntoResponse, Json};
+use chrono::Utc;
 use micro_config::configs::{
     proof_data_handler::ProtocolVersionLoadingMode, ProofDataHandlerConfig,
 };
+use micro_dal::assignments_dal::ProverResultStatus;
 use micro_types::commitment::serialize_commitments;
 use micro_types::web3::signing::keccak256;
 use micro_types::PackedEthSignature;
@@ -36,6 +38,7 @@ pub(crate) enum RequestProcessorError {
     ObjectStore(ObjectStoreError),
     Sqlx(SqlxError),
     SignatureError,
+    ProveTimeout,
 }
 
 impl IntoResponse for RequestProcessorError {
@@ -66,6 +69,9 @@ impl IntoResponse for RequestProcessorError {
             }
             RequestProcessorError::SignatureError => {
                 (StatusCode::BAD_REQUEST, "Invalid signature".to_owned())
+            }
+            RequestProcessorError::ProveTimeout => {
+                (StatusCode::BAD_REQUEST, "prove timeout".to_owned())
             }
         };
         (status_code, message).into_response()
@@ -104,15 +110,14 @@ impl RequestProcessor {
             return Err(RequestProcessorError::SignatureError);
         }
 
-        // TODO get proof job by prover address
-
+        // get proof job by prover address
         let l1_batch_number = self
             .pool
             .access_storage()
             .await
             .unwrap()
-            .proof_generation_dal()
-            .get_next_block_to_be_proven(self.config.proof_generation_timeout())
+            .assignments_dal()
+            .get_next_block_to_be_proven(prover_addr)
             .await
             .ok_or(RequestProcessorError::NoPendingBatches)?;
 
@@ -157,15 +162,29 @@ impl RequestProcessor {
             SubmitProofRequest::Proof(proof) => {
                 // recover prover address
                 let prover_addr = proof
-                    .signature_recover_signer()
+                    .signature_recover_signer(l1_batch_number)
                     .map_err(|_| RequestProcessorError::SignatureError)?;
                 if prover_addr.is_zero() {
                     return Err(RequestProcessorError::SignatureError);
                 }
 
-                // TODO check prover address is equal to job in database
+                let mut storage = self.pool.access_storage().await.unwrap();
 
-                // TODO read job start time from database and calculate time_taken
+                // check job status and timeout
+                let job = storage
+                    .assignments_dal()
+                    .get_job_details(prover_addr, l1_batch_number)
+                    .await
+                    .map_err(RequestProcessorError::Sqlx)?;
+
+                if let Some((ProverResultStatus::ReadyToBeProven, created_at)) = job {
+                    let now = Utc::now().timestamp_millis();
+                    if now - created_at > self.config.proof_generation_timeout_in_secs as i64 {
+                        return Err(RequestProcessorError::ProveTimeout);
+                    }
+                } else {
+                    return Err(RequestProcessorError::NoPendingBatches);
+                }
 
                 let blob_url = self
                     .blob_store
@@ -181,8 +200,6 @@ impl RequestProcessor {
                     H256::from_slice(&proof.aggregation_result_coords[2]);
                 let events_queue_state_from_prover =
                     H256::from_slice(&proof.aggregation_result_coords[3]);
-
-                let mut storage = self.pool.access_storage().await.unwrap();
 
                 let header = storage
                     .blocks_dal()
@@ -217,20 +234,31 @@ impl RequestProcessor {
                     tracing::error!("Auxilary output doesn't match, server values: {server_values} prover values: {prover_values}");
                 }
                 storage
-                    .proof_generation_dal()
+                    .assignments_dal()
                     .save_proof_artifacts_metadata(l1_batch_number, &blob_url)
                     .await
                     .map_err(RequestProcessorError::Sqlx)?;
             }
-            SubmitProofRequest::SkippedProofGeneration => {
-                self.pool
-                    .access_storage()
-                    .await
-                    .unwrap()
-                    .proof_generation_dal()
-                    .mark_proof_generation_job_as_skipped(l1_batch_number)
-                    .await
-                    .map_err(RequestProcessorError::Sqlx)?;
+            SubmitProofRequest::SkippedProofGeneration(signature) => {
+                let signed_bytes =
+                    PackedEthSignature::message_to_signed_bytes(&l1_batch_number.0.to_be_bytes());
+                let prover_addr = signature
+                    .signature_recover_signer(&signed_bytes)
+                    .map_err(|_| RequestProcessorError::SignatureError)?;
+                if prover_addr.is_zero() {
+                    return Err(RequestProcessorError::SignatureError);
+                }
+
+                // do nothing, wait for timeout
+
+                // self.pool
+                //     .access_storage()
+                //     .await
+                //     .unwrap()
+                //     .proof_generation_dal()
+                //     .mark_proof_generation_job_as_skipped(l1_batch_number)
+                //     .await
+                //     .map_err(RequestProcessorError::Sqlx)?;
             }
         }
 

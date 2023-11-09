@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use crate::{SqlxError, StorageProcessor};
 use micro_types::{Address, L1BatchNumber};
 use strum::{Display, EnumString};
@@ -80,6 +82,100 @@ impl AssignmentsDal<'_, '_> {
         .await?;
 
         transaction.commit().await.unwrap();
+        Ok(())
+    }
+
+    pub async fn get_next_block_to_be_proven(&mut self, prover: Address) -> Option<L1BatchNumber> {
+        let mut transaction = self.storage.start_transaction().await.unwrap();
+
+        let result: Option<L1BatchNumber> = sqlx::query!(
+            "UPDATE assignments \
+             SET status = 'picked_by_prover', updated_at = now() \
+             WHERE l1_batch_number = ( \
+                 SELECT l1_batch_number \
+                 FROM assignments \
+                 WHERE status = 'ready_to_be_proven' \
+                 AND verification_address = $1 \
+                 ORDER BY l1_batch_number ASC \
+                 LIMIT 1 \
+                 FOR UPDATE \
+                 SKIP LOCKED \
+             ) \
+             RETURNING assignments.l1_batch_number",
+            prover.as_bytes(),
+        )
+        .fetch_optional(transaction.conn())
+        .await
+        .unwrap()
+        .map(|row| L1BatchNumber(row.l1_batch_number as u32));
+
+        if let Some(l1_batch_number) = &result {
+            sqlx::query!(
+                "UPDATE proof_generation_details \
+                 SET status = 'picked_by_prover', updated_at = now(), prover_taken_at = now() \
+                 WHERE l1_batch_number = $1",
+                l1_batch_number.0 as i32,
+            )
+            .execute(transaction.conn())
+            .await
+            .unwrap();
+        }
+
+        transaction.commit().await.unwrap();
+
+        result
+    }
+
+    pub async fn get_job_details(
+        &mut self,
+        prover: Address,
+        l1_batch_number: L1BatchNumber,
+    ) -> Result<Option<(ProverResultStatus, i64)>, SqlxError> {
+        let status_and_created_at = sqlx::query!(
+            "SELECT status, created_at FROM assignments WHERE verification_address = $1 AND l1_batch_number = $2 LIMIT 1",
+            prover.as_bytes(),
+            l1_batch_number.0 as i32
+        )
+        .fetch_optional(self.storage.conn())
+        .await?
+        .map(|row| (ProverResultStatus::from_str(&row.status).unwrap(), row.created_at.timestamp_millis()));
+
+        Ok(status_and_created_at)
+    }
+
+    pub async fn save_proof_artifacts_metadata(
+        &mut self,
+        block_number: L1BatchNumber,
+        proof_blob_url: &str,
+    ) -> Result<(), SqlxError> {
+        let mut transaction = self.storage.start_transaction().await.unwrap();
+
+        sqlx::query!("UPDATE assignments SET status = 'generated', updated_at = now() WHERE l1_batch_number = $1 AND status = 'picked_by_prover'",
+            block_number.0 as i64,
+        )
+        .execute(transaction.conn())
+        .await?
+        .rows_affected()
+        .eq(&1)
+        .then_some(())
+        .ok_or(sqlx::Error::RowNotFound)?;
+
+        sqlx::query!(
+            "UPDATE proof_generation_details \
+             SET status='generated', proof_blob_url = $1, updated_at = now() \
+             WHERE l1_batch_number = $2",
+            proof_blob_url,
+            block_number.0 as i64,
+        )
+        .execute(transaction.conn())
+        .await?
+        .rows_affected()
+        .eq(&1)
+        .then_some(())
+        .ok_or(sqlx::Error::RowNotFound)?;
+
+        transaction.commit().await.unwrap();
+
         Ok(())
     }
 }

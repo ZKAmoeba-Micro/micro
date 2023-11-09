@@ -1014,6 +1014,18 @@
     },
     "query": "SELECT timestamp FROM miniblocks WHERE number = $1"
   },
+  "0fc89085ba0efe0e352b5937489203b397700e2d1bc83c513b540a6da2ff5bca": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      }
+    },
+    "query": "UPDATE proof_generation_details SET status = 'picked_by_prover', updated_at = now(), prover_taken_at = now() WHERE l1_batch_number = $1"
+  },
   "0fd885074c624bea478ec0a24a499cf1278773cdba92550439da5d3b70cbf38c": {
     "describe": {
       "columns": [
@@ -1732,6 +1744,18 @@
       }
     },
     "query": "SELECT eth_txs.id FROM eth_txs_history JOIN eth_txs\n                ON eth_txs.confirmed_eth_tx_history_id = eth_txs_history.id\n                WHERE eth_txs_history.tx_hash = $1"
+  },
+  "1f901dbfd1f16e37ca4ee1f176e29e8c736e2c79ff4c7993f0dd194170b83c4d": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      }
+    },
+    "query": "UPDATE assignments SET status = 'generated', updated_at = now() WHERE l1_batch_number = $1 AND status = 'picked_by_prover'"
   },
   "1faf6552c221c75b7232b55210c0c37be76a57ec9dc94584b6ccb562e8b182f2": {
     "describe": {
@@ -3349,6 +3373,33 @@
       }
     },
     "query": "\n                    SELECT l1_batch_number, leaf_layer_subqueues_blob_url, aggregation_outputs_blob_url FROM node_aggregation_witness_jobs\n                    WHERE status='successful' AND is_blob_cleaned=FALSE\n                    AND leaf_layer_subqueues_blob_url is NOT NULL\n                    AND aggregation_outputs_blob_url is NOT NULL\n                    AND updated_at < NOW() - INTERVAL '30 days'\n                    LIMIT $1;\n                "
+  },
+  "3761d87c781f78cd47f80c40b6c9d9f81f8194087b284d003e5f5a51a50d6a55": {
+    "describe": {
+      "columns": [
+        {
+          "name": "status",
+          "ordinal": 0,
+          "type_info": "Text"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 1,
+          "type_info": "Timestamp"
+        }
+      ],
+      "nullable": [
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Bytea",
+          "Int8"
+        ]
+      }
+    },
+    "query": "SELECT status, created_at FROM assignments WHERE verification_address = $1 AND l1_batch_number = $2 LIMIT 1"
   },
   "37e4a0eea7b72bd3b75c26e003f3fa62039d9b614f0f2fa3d61e8c5e95f002fd": {
     "describe": {
@@ -8209,6 +8260,26 @@
       }
     },
     "query": "\n                SELECT\n                    (SELECT l1_batch_number\n                    FROM prover_jobs\n                    WHERE status NOT IN ('successful', 'skipped')\n                    ORDER BY l1_batch_number\n                    LIMIT 1) as \"successful_limit!\",\n                    \n                    (SELECT l1_batch_number\n                    FROM prover_jobs\n                    WHERE status <> 'queued'\n                    ORDER BY l1_batch_number DESC\n                    LIMIT 1) as \"queued_limit!\",\n\n                    (SELECT MAX(l1_batch_number) as \"max!\" FROM prover_jobs) as \"max_block!\"\n                "
+  },
+  "9c0d710df7acc07fb14db2cbe7b413d8dd481ff46f051ec3665cf8f06d030443": {
+    "describe": {
+      "columns": [
+        {
+          "name": "l1_batch_number",
+          "ordinal": 0,
+          "type_info": "Int8"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Bytea"
+        ]
+      }
+    },
+    "query": "UPDATE assignments SET status = 'picked_by_prover', updated_at = now() WHERE l1_batch_number = ( SELECT l1_batch_number FROM assignments WHERE status = 'ready_to_be_proven' AND verification_address = $1 ORDER BY l1_batch_number ASC LIMIT 1 FOR UPDATE SKIP LOCKED ) RETURNING assignments.l1_batch_number"
   },
   "9d28c1be3bda0c4fb37567d4a56730e801f48fbb2abad42ea894ebd8ee40412d": {
     "describe": {

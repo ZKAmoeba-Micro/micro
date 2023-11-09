@@ -75,16 +75,20 @@ impl fmt::Debug for L1BatchProofForL1 {
 }
 
 impl L1BatchProofForL1 {
-    pub fn sign(&mut self, private_key: &H256) {
-        self.signature = PackedEthSignature::sign(private_key, &self.encode())
+    pub fn sign(&mut self, l1_batch_number: L1BatchNumber, private_key: &H256) {
+        self.signature = PackedEthSignature::sign(private_key, &self.encode(l1_batch_number))
             .expect("sign l1 batch proof failed");
     }
 
-    pub fn signature_recover_signer(&self) -> Result<Address, parity_crypto::publickey::Error> {
+    pub fn signature_recover_signer(
+        &self,
+        l1_batch_number: L1BatchNumber,
+    ) -> Result<Address, parity_crypto::publickey::Error> {
         if self.signature == PackedEthSignature::default() {
             return Ok(Address::default());
         }
-        let signed_bytes = PackedEthSignature::message_to_signed_bytes(&self.encode());
+        let signed_bytes =
+            PackedEthSignature::message_to_signed_bytes(&self.encode(l1_batch_number));
         self.signature.signature_recover_signer(&signed_bytes)
     }
 
@@ -96,8 +100,11 @@ impl L1BatchProofForL1 {
         ])
     }
 
-    fn encode(&self) -> Vec<u8> {
-        crate::ethabi::encode(&vec![self.proof_input()])
+    fn encode(&self, l1_batch_number: L1BatchNumber) -> Vec<u8> {
+        crate::ethabi::encode(&vec![
+            self.proof_input(),
+            Token::Uint(l1_batch_number.0.into()),
+        ])
     }
 }
 
@@ -124,11 +131,17 @@ impl L1BatchProofOperation {
             assert_eq!(self.proofs.len(), 1);
             assert_eq!(self.l1_batches.len(), 1);
 
+            let l1_batch_number = self.l1_batches.first().unwrap().header.number;
+
             let l1_batch_proof_for_l1 = self.proofs.first().unwrap();
 
             let proof_input = l1_batch_proof_for_l1.proof_input();
             let prover_info = Token::Tuple(vec![
-                Token::Address(l1_batch_proof_for_l1.signature_recover_signer().unwrap()),
+                Token::Address(
+                    l1_batch_proof_for_l1
+                        .signature_recover_signer(l1_batch_number)
+                        .unwrap(),
+                ),
                 Token::Uint(Uint::from(l1_batch_proof_for_l1.time_taken)),
             ]);
 
