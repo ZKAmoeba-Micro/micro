@@ -1050,6 +1050,38 @@
     },
     "query": "\n                SELECT COUNT(*) as \"count!\", status as \"status!\"\n                FROM prover_jobs\n                GROUP BY status\n                "
   },
+  "0fdeed7256e8c4fa8f39ed956de36382d3cdb4d2c0856ea3f3b8ca922245fb3f": {
+    "describe": {
+      "columns": [
+        {
+          "name": "verification_address",
+          "ordinal": 0,
+          "type_info": "Bytea"
+        },
+        {
+          "name": "base_score",
+          "ordinal": 1,
+          "type_info": "Int4"
+        },
+        {
+          "name": "last_batch_number",
+          "ordinal": 2,
+          "type_info": "Int8"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      }
+    },
+    "query": "select verification_address,base_score,last_batch_number from assignment_user_summary where status=$1"
+  },
   "100ede607d40d8d07000fcdc40705c806e8229323e0e6dfb7507691838963ccf": {
     "describe": {
       "columns": [
@@ -1267,20 +1299,6 @@
       }
     },
     "query": "SELECT l1_address FROM tokens WHERE market_volume > $1"
-  },
-  "162d4fd73b6939a45a53245a75202e8d6da05387633d9ce1867e0694bd04a886": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Text",
-          "Bytea",
-          "Int8"
-        ]
-      }
-    },
-    "query": "UPDATE assignments SET status=$1,updated_at=now() WHERE verification_address=$2 and l1_batch_number = $3"
   },
   "17a42a97e87a675bd465103ebedc63d6d091e5bb093c7905de70aed3dc71d823": {
     "describe": {
@@ -5194,6 +5212,20 @@
     },
     "query": "SELECT MAX(number) as \"number\" FROM l1_batches WHERE hash IS NOT NULL"
   },
+  "5c115139ff42d46cf05c058a04ff10d8bcdedd9313f14991ea289747345451bb": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Text",
+          "Bytea",
+          "Int8"
+        ]
+      }
+    },
+    "query": "UPDATE assignments SET status=$1,updated_at=now() WHERE verification_address=$2 and l1_batch_number = $3"
+  },
   "5df806b33f84893d4ddfacf3b289b0e173e85ad9204cbb7ad314e68a94cdc41e": {
     "describe": {
       "columns": [],
@@ -6057,6 +6089,19 @@
       }
     },
     "query": "INSERT INTO miniblocks ( number, timestamp, hash, l1_tx_count, l2_tx_count, base_fee_per_gas, l1_gas_price, l2_fair_gas_price, gas_per_pubdata_limit, bootloader_code_hash, default_aa_code_hash, protocol_version, virtual_blocks, created_at, updated_at ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, now(), now())"
+  },
+  "6e8c9408206dc9b2277a5d3e265556ad91f45f7efdc86b75329a761d7fb3bd8d": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8",
+          "Bytea"
+        ]
+      }
+    },
+    "query": "UPDATE assignment_user_summary SET last_batch_number=$1, update_at = now() WHERE  verification_address = $2"
   },
   "6ffd22b0590341c38ce3957dccdb5a4edf47fb558bc64e4df08897a0c72dbf23": {
     "describe": {

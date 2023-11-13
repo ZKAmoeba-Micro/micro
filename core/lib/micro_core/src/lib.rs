@@ -89,6 +89,7 @@ use crate::{
 };
 
 pub mod api_server;
+pub mod assignments;
 pub mod block_reverter;
 pub mod consistency_checker;
 pub mod data_fetchers;

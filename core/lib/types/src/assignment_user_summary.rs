@@ -3,10 +3,14 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, strum::Display, strum::EnumString, strum::AsRefStr)]
 pub enum UserStatus {
-    #[strum(serialize = "enable")]
-    Enable,
-    #[strum(serialize = "disable")]
-    Disable,
+    #[strum(serialize = "undeposit")]
+    UnDeposit,
+    #[strum(serialize = "normal")]
+    Normal,
+    #[strum(serialize = "frozon")]
+    Frozon,
+    #[strum(serialize = "applying")]
+    Applying,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

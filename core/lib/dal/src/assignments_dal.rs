@@ -42,6 +42,13 @@ impl AssignmentsDal<'_, '_> {
         .execute(transaction.conn())
         .await?;
 
+        sqlx::query!("UPDATE assignment_user_summary SET last_batch_number=$1, update_at = now() WHERE  verification_address = $2",
+        block_number.0 as i64,
+        verification_address.as_bytes(),
+        )
+        .execute(transaction.conn())
+        .await?;
+
         transaction.commit().await.unwrap();
         Ok(())
     }

@@ -18,6 +18,7 @@ CREATE TABLE assignment_user_summary (
     status text NOT NULL,
     base_score integer NOT NULL,
     last_batch_number bigint NOT NULL,
+    miniblock_number bigint default 0 NOT NULL,
     created_at timestamp without time zone NOT NULL,
     update_at timestamp without time zone NOT NULL
   );

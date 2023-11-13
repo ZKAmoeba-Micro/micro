@@ -1,6 +1,8 @@
 use crate::{SqlxError, StorageProcessor};
-use micro_types::assignment_user_summary::{AssignmentUserSummaryInfo, UserStatus};
-
+use micro_types::{
+    assignment_user_summary::{AssignmentUserSummaryInfo, UserStatus},
+    Address, L1BatchNumber,
+};
 #[derive(Debug)]
 pub struct AssignmentUserSummaryDal<'a, 'c> {
     pub(crate) storage: &'a mut StorageProcessor<'c>,
@@ -32,5 +34,26 @@ impl AssignmentUserSummaryDal<'_, '_> {
         .execute(self.storage.conn())
         .await?;
         Ok(())
+    }
+
+    pub async fn select_normal_user_list(
+        &mut self,
+        status: UserStatus,
+    ) -> Vec<AssignmentUserSummaryInfo> {
+        let result = sqlx::query!("select verification_address,base_score,last_batch_number from assignment_user_summary where status=$1",
+            status.to_string()
+        )
+        .fetch_all(self.storage.conn())
+        .await
+        .unwrap();
+
+        result
+            .into_iter()
+            .map(|row| AssignmentUserSummaryInfo {
+                verification_address: Address::from_slice(&row.verification_address),
+                base_score: row.base_score as u16,
+                last_batch_number: L1BatchNumber::from(row.last_batch_number as u32),
+            })
+            .collect()
     }
 }
