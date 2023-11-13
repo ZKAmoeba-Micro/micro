@@ -118,7 +118,7 @@ impl AssignmentsDal<'_, '_> {
                 "UPDATE proof_generation_details \
                  SET status = 'picked_by_prover', updated_at = now(), prover_taken_at = now() \
                  WHERE l1_batch_number = $1",
-                l1_batch_number.0 as i32,
+                l1_batch_number.0 as i64,
             )
             .execute(transaction.conn())
             .await
@@ -138,7 +138,7 @@ impl AssignmentsDal<'_, '_> {
         let status_and_created_at = sqlx::query!(
             "SELECT status, created_at FROM assignments WHERE verification_address = $1 AND l1_batch_number = $2 LIMIT 1",
             prover.as_bytes(),
-            l1_batch_number.0 as i32
+            l1_batch_number.0 as i64
         )
         .fetch_optional(self.storage.conn())
         .await?
@@ -154,7 +154,7 @@ impl AssignmentsDal<'_, '_> {
     ) -> Result<(), SqlxError> {
         let mut transaction = self.storage.start_transaction().await.unwrap();
 
-        sqlx::query!("UPDATE assignments SET status = 'generated', updated_at = now() WHERE l1_batch_number = $1 AND status = 'picked_by_prover'",
+        sqlx::query!("UPDATE assignments SET status = 'successful', updated_at = now() WHERE l1_batch_number = $1 AND status = 'picked_by_prover'",
             block_number.0 as i64,
         )
         .execute(transaction.conn())

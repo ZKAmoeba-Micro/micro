@@ -1312,6 +1312,18 @@
     },
     "query": "DELETE FROM storage_logs WHERE miniblock_number > $1"
   },
+  "17be08091cca475b0880844dde12df708a233814644b44c1ed4603d2b80c5332": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      }
+    },
+    "query": "UPDATE assignments SET status = 'successful', updated_at = now() WHERE l1_batch_number = $1 AND status = 'picked_by_prover'"
+  },
   "1948ab14bafbb3ba0098563f22d958c9383877788980fe51bd217987898b1c92": {
     "describe": {
       "columns": [
@@ -1762,18 +1774,6 @@
       }
     },
     "query": "SELECT eth_txs.id FROM eth_txs_history JOIN eth_txs\n                ON eth_txs.confirmed_eth_tx_history_id = eth_txs_history.id\n                WHERE eth_txs_history.tx_hash = $1"
-  },
-  "1f901dbfd1f16e37ca4ee1f176e29e8c736e2c79ff4c7993f0dd194170b83c4d": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      }
-    },
-    "query": "UPDATE assignments SET status = 'generated', updated_at = now() WHERE l1_batch_number = $1 AND status = 'picked_by_prover'"
   },
   "1faf6552c221c75b7232b55210c0c37be76a57ec9dc94584b6ccb562e8b182f2": {
     "describe": {
