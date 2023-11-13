@@ -11,8 +11,12 @@ pub struct AssignmentsDal<'a, 'c> {
 
 #[derive(Debug, EnumString, Display)]
 pub enum ProverResultStatus {
-    #[strum(serialize = "ready_to_be_proven")]
-    ReadyToBeProven,
+    #[strum(serialize = "assigned_not_certified")]
+    AssignedNotCertified,
+    #[strum(serialize = "be_punished")]
+    BePunished,
+    #[strum(serialize = "picked_by_prover")]
+    PickedByProver,
     #[strum(serialize = "successful")]
     Successful,
     #[strum(serialize = "failed")]
@@ -29,13 +33,7 @@ impl AssignmentsDal<'_, '_> {
 
         tracing::info!("insert_assignments verification_address:{verification_address},block_number:{block_number}");
 
-        sqlx::query!("UPDATE proof_generation_details SET status='picked_by_prover', updated_at = now(),prover_taken_at = now() WHERE  l1_batch_number = $1",
-             block_number.0 as i64,
-        )
-        .execute(transaction.conn())
-        .await?;
-
-        sqlx::query!("INSERT INTO assignments (verification_address,l1_batch_number, status, created_at, updated_at) VALUES ($1,$2, 'ready_to_be_proven', now(), now()) ON CONFLICT (verification_address,l1_batch_number) DO NOTHING",
+        sqlx::query!("INSERT INTO assignments (verification_address,l1_batch_number, status, created_at, updated_at) VALUES ($1,$2, 'assigned_not_certified', now(), now()) ON CONFLICT (verification_address,l1_batch_number) DO NOTHING",
              verification_address.as_bytes(),
              block_number.0 as i64,
         )
@@ -53,42 +51,41 @@ impl AssignmentsDal<'_, '_> {
         Ok(())
     }
 
-    pub async fn update_assigments_return_status_and_time(
+    pub async fn update_assigments_status_for_time(
         &mut self,
         verification_address: Address,
         block_number: L1BatchNumber,
-        is_result: bool,
     ) -> Result<(), SqlxError> {
-        tracing::info!("update_assigments_return_status_and_time verification_address:{verification_address},block_number:{block_number},is_result:{is_result}");
+        tracing::info!("update_assigments_status_for_time verification_address:{verification_address},block_number:{block_number}");
 
         let mut transaction = self.storage.start_transaction().await.unwrap();
-
-        let result_status = if is_result {
-            sqlx::query!("UPDATE proof_generation_details SET status='generated', updated_at = now() WHERE  l1_batch_number = $1",
-                 block_number.0 as i64,
-            )
-            .execute(transaction.conn())
-            .await?;
-
-            ProverResultStatus::Successful.to_string()
-        } else {
-            sqlx::query!("UPDATE proof_generation_details SET status='ready_to_be_proven', updated_at = now() WHERE l1_batch_number = $1",
-                 block_number.0 as i64,
-            )
-            .execute(transaction.conn())
-            .await?;
-
-            ProverResultStatus::Failed.to_string()
-        };
-        sqlx::query!("UPDATE assignments SET status=$1,updated_at=now() WHERE verification_address=$2 and l1_batch_number = $3",
-            result_status,
+        sqlx::query!("UPDATE proof_generation_details SET status='ready_to_be_proven', updated_at = now() WHERE l1_batch_number = $1",
+                block_number.0 as i64,
+        )
+        .execute(transaction.conn())
+        .await?;
+        sqlx::query!("UPDATE assignments SET status='be_punished',updated_at=now() WHERE status='assigned_not_certified' and verification_address=$1 and l1_batch_number = $2",
             verification_address.as_bytes(),
             block_number.0 as i64,
         )
         .execute(transaction.conn())
         .await?;
-
         transaction.commit().await.unwrap();
+        Ok(())
+    }
+
+    pub async fn update_assigments_status_by_punished(
+        &mut self,
+        verification_address: Address,
+        block_number: L1BatchNumber,
+    ) -> Result<(), SqlxError> {
+        tracing::info!("update_assigments_status verification_address:{verification_address},block_number:{block_number}");
+        sqlx::query!("UPDATE assignments SET status='failed',updated_at=now() WHERE status='be_punished' and verification_address=$1 and l1_batch_number = $2",
+            verification_address.as_bytes(),
+            block_number.0 as i64,
+        )
+        .execute(self.storage.conn())
+        .await?;
         Ok(())
     }
 
@@ -101,7 +98,7 @@ impl AssignmentsDal<'_, '_> {
              WHERE l1_batch_number = ( \
                  SELECT l1_batch_number \
                  FROM assignments \
-                 WHERE status = 'ready_to_be_proven' \
+                 WHERE status = 'assigned_not_certified' \
                  AND verification_address = $1 \
                  ORDER BY l1_batch_number ASC \
                  LIMIT 1 \

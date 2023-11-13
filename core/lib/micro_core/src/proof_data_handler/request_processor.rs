@@ -177,7 +177,7 @@ impl RequestProcessor {
                     .await
                     .map_err(RequestProcessorError::Sqlx)?;
 
-                if let Some((ProverResultStatus::ReadyToBeProven, created_at)) = job {
+                if let Some((ProverResultStatus::AssignedNotCertified, created_at)) = job {
                     let now = Utc::now().timestamp_millis();
                     if now - created_at > self.config.proof_generation_timeout_in_secs as i64 {
                         return Err(RequestProcessorError::ProveTimeout);
