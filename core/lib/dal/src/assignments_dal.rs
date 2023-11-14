@@ -3,6 +3,9 @@ use std::str::FromStr;
 use crate::{SqlxError, StorageProcessor};
 use micro_types::{Address, L1BatchNumber};
 use strum::{Display, EnumString};
+use std::{time::Duration};
+
+use crate::{time_utils::{duration_to_naive_time, pg_interval_from_duration}};
 
 #[derive(Debug)]
 pub struct AssignmentsDal<'a, 'c> {
@@ -53,24 +56,43 @@ impl AssignmentsDal<'_, '_> {
 
     pub async fn update_assigments_status_for_time(
         &mut self,
-        verification_address: Address,
-        block_number: L1BatchNumber,
+        processing_timeout: Duration,
     ) -> Result<(), SqlxError> {
-        tracing::info!("update_assigments_status_for_time verification_address:{verification_address},block_number:{block_number}");
+        // let time_str: &str = if !m_time.is_empty() { m_time } else { "'60 M'" };
 
-        let mut transaction = self.storage.start_transaction().await.unwrap();
-        sqlx::query!("UPDATE proof_generation_details SET status='ready_to_be_proven', updated_at = now() WHERE l1_batch_number = $1",
-                block_number.0 as i64,
-        )
-        .execute(transaction.conn())
-        .await?;
-        sqlx::query!("UPDATE assignments SET status='be_punished',updated_at=now() WHERE status='assigned_not_certified' and verification_address=$1 and l1_batch_number = $2",
-            verification_address.as_bytes(),
-            block_number.0 as i64,
-        )
-        .execute(transaction.conn())
-        .await?;
-        transaction.commit().await.unwrap();
+        let processing_timeout = pg_interval_from_duration(processing_timeout);
+        let count = sqlx::query!("select count(1) as num from assignments where now()>created_at + $1::interval and status='assigned_not_certified'",&processing_timeout)
+        .fetch_one(self.storage.conn())
+        .await?
+        .num;
+        if count !=  Some(0) {
+            let mut transaction = self.storage.start_transaction().await.unwrap();
+           
+            sqlx::query!(
+                "update assignments \
+            set status ='be_punished', updated_at = now() \
+            where (verification_address,l1_batch_number) \
+            in (select verification_address,l1_batch_number \
+                from assignments \
+                where now()>created_at + $1::interval and status='assigned_not_certified' \
+            )",
+            &processing_timeout,
+            )
+            .execute(transaction.conn())
+            .await?;
+
+            sqlx::query!(
+                "UPDATE proof_generation_details \
+            SET status='ready_to_be_proven', updated_at = now() \
+            WHERE status='picked_by_prover' \
+            and l1_batch_number in (select  l1_batch_number \
+            from assignments \
+            where  status='be_punished')"
+            )
+            .execute(transaction.conn())
+            .await?;
+            transaction.commit().await.unwrap();
+        }
         Ok(())
     }
 
@@ -80,6 +102,7 @@ impl AssignmentsDal<'_, '_> {
         block_number: L1BatchNumber,
     ) -> Result<(), SqlxError> {
         tracing::info!("update_assigments_status verification_address:{verification_address},block_number:{block_number}");
+
         sqlx::query!("UPDATE assignments SET status='failed',updated_at=now() WHERE status='be_punished' and verification_address=$1 and l1_batch_number = $2",
             verification_address.as_bytes(),
             block_number.0 as i64,

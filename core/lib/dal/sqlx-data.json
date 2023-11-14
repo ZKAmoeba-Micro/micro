@@ -244,6 +244,18 @@
     },
     "query": "\n                WITH events_select AS (\n                    SELECT\n                        address, topic1, topic2, topic3, topic4, value,\n                        miniblock_number, tx_hash, tx_index_in_block,\n                        event_index_in_block, event_index_in_tx\n                    FROM events\n                    WHERE miniblock_number > $1\n                    ORDER BY miniblock_number ASC, event_index_in_block ASC\n                )\n                SELECT miniblocks.hash as \"block_hash?\",\n                    address as \"address!\", topic1 as \"topic1!\", topic2 as \"topic2!\", topic3 as \"topic3!\", topic4 as \"topic4!\", value as \"value!\",\n                    miniblock_number as \"miniblock_number!\", miniblocks.l1_batch_number as \"l1_batch_number?\", tx_hash as \"tx_hash!\",\n                    tx_index_in_block as \"tx_index_in_block!\", event_index_in_block as \"event_index_in_block!\", event_index_in_tx as \"event_index_in_tx!\"\n                FROM events_select\n                INNER JOIN miniblocks ON events_select.miniblock_number = miniblocks.number\n                ORDER BY miniblock_number ASC, event_index_in_block ASC\n                "
   },
+  "053cda3ee1baf71c98cf1c5b6360e6290b26f48bc7ac1d7c7d55144f50cf78d5": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Interval"
+        ]
+      }
+    },
+    "query": "update assignments set status ='be_punished', updated_at = now() where (verification_address,l1_batch_number) in (select verification_address,l1_batch_number from assignments where now()>created_at + $1::interval and status='assigned_not_certified' )"
+  },
   "0608677396b09cda3f09d22dd42318028de7c2b9fff6ac176383a06f8f3ae761": {
     "describe": {
       "columns": [
@@ -805,6 +817,16 @@
       }
     },
     "query": "UPDATE eth_txs\n                    SET confirmed_eth_tx_history_id = $1\n                    WHERE id = $2"
+  },
+  "08f6d90c8e95de15e496098b99f17d43b0c1f2ea49d0929b02c5b1f2ccba034e": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": []
+      }
+    },
+    "query": "UPDATE proof_generation_details SET status='ready_to_be_proven', updated_at = now() WHERE status='picked_by_prover' and l1_batch_number in (select  l1_batch_number from assignments where  status='be_punished')"
   },
   "0c212f47b9a0e719f947a419be8284837b1b01aa23994ba6401b420790b802b8": {
     "describe": {
@@ -4896,6 +4918,26 @@
     },
     "query": "UPDATE miniblocks SET protocol_version = $1 WHERE l1_batch_number IS NULL"
   },
+  "56f28942cbc70c61f489e377160da5012e5f79861ed40d8134092758c0e7f045": {
+    "describe": {
+      "columns": [
+        {
+          "name": "num",
+          "ordinal": 0,
+          "type_info": "Int8"
+        }
+      ],
+      "nullable": [
+        null
+      ],
+      "parameters": {
+        "Left": [
+          "Interval"
+        ]
+      }
+    },
+    "query": "select count(1) as num from assignments where now()>created_at + $1::interval and status='assigned_not_certified'"
+  },
   "57742ed088179b89b50920a2ab1a103b745598ee0ba05d1793fc54e63b477319": {
     "describe": {
       "columns": [],
@@ -6167,18 +6209,6 @@
       }
     },
     "query": "\n                    SELECT l1_batch_number, basic_circuits_blob_url, basic_circuits_inputs_blob_url FROM leaf_aggregation_witness_jobs\n                    WHERE status='successful' AND is_blob_cleaned=FALSE\n                    AND basic_circuits_blob_url is NOT NULL\n                    AND basic_circuits_inputs_blob_url is NOT NULL\n                    AND updated_at < NOW() - INTERVAL '30 days'\n                    LIMIT $1;\n                "
-  },
-  "7321fb3d806f85f911ae371eaed693d757d0200d89b8200568b67ac0342dd7f5": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      }
-    },
-    "query": "UPDATE proof_generation_details SET status='ready_to_be_proven', updated_at = now() WHERE l1_batch_number = $1"
   },
   "741b13b0a4769a30186c650a4a1b24855806a27ccd8d5a50594741842dde44ec": {
     "describe": {
@@ -9861,19 +9891,6 @@
       }
     },
     "query": "UPDATE proof_generation_details SET status = 'picked_by_prover', updated_at = now(), prover_taken_at = now() WHERE l1_batch_number = ( SELECT l1_batch_number FROM proof_generation_details WHERE status = 'ready_to_be_proven' OR (status = 'picked_by_prover' AND prover_taken_at < now() - $1::interval) ORDER BY l1_batch_number ASC LIMIT 1 FOR UPDATE SKIP LOCKED ) RETURNING proof_generation_details.l1_batch_number"
-  },
-  "ba2b293b81abca2d44b0f9ee2f61f3d029ad8d6816aee6bec854c09f04ba4189": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Bytea",
-          "Int8"
-        ]
-      }
-    },
-    "query": "UPDATE assignments SET status='be_punished',updated_at=now() WHERE status='assigned_not_certified' and verification_address=$1 and l1_batch_number = $2"
   },
   "bc4433cdfa499830fe6a6a95759c9fbe343ac25b371c7fa980bfd1b0afc86629": {
     "describe": {
