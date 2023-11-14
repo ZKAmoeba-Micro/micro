@@ -47,7 +47,6 @@ use micro_types::{
 };
 use micro_verification_key_server::get_cached_commitments;
 
-use crate::api_server::healthcheck::HealthCheckHandle;
 use crate::api_server::tx_sender::TxSenderConfig;
 use crate::api_server::tx_sender::{TxSender, TxSenderBuilder};
 use crate::api_server::web3::{state::InternalApiConfig, Namespace};
@@ -76,6 +75,7 @@ use crate::witness_generator::{
     basic_circuits::BasicWitnessGenerator, leaf_aggregation::LeafAggregationWitnessGenerator,
     node_aggregation::NodeAggregationWitnessGenerator, scheduler::SchedulerWitnessGenerator,
 };
+use crate::{api_server::healthcheck::HealthCheckHandle, l2_sender::L2Sender};
 use crate::{
     api_server::{
         contract_verification,
@@ -100,6 +100,7 @@ pub mod gas_tracker;
 pub mod genesis;
 pub mod house_keeper;
 pub mod l1_gas_price;
+pub mod l2_sender;
 pub mod metadata_calculator;
 pub mod proof_data_handler;
 pub mod reorg_detector;
@@ -239,6 +240,9 @@ pub enum Component {
     Housekeeper,
     // Component for exposing API's to prover for providing proof generation data and accepting proofs.
     ProofDataHandler,
+
+    // l2 sender
+    L2Sender,
 }
 
 #[derive(Debug)]
@@ -307,6 +311,7 @@ impl FromStr for Components {
             "eth_tx_aggregator" => Ok(Components(vec![Component::EthTxAggregator])),
             "eth_tx_manager" => Ok(Components(vec![Component::EthTxManager])),
             "proof_data_handler" => Ok(Components(vec![Component::ProofDataHandler])),
+            "l2_sender" => Ok(Components(vec![Component::L2Sender])),
             other => Err(format!("{} is not a valid component name", other)),
         }
     }
@@ -391,6 +396,12 @@ pub async fn initialize_components(
         tokio::spawn(circuit_breaker_checker.run(cb_sender, stop_receiver.clone())),
     ];
 
+    // Lazily initialize storage caches only when they are needed (e.g., skip their initialization
+    // if we only run the explorer APIs). This is required because the cache update task will
+    // terminate immediately if storage caches are dropped, which will lead to the (unexpected)
+    // program termination.
+    let mut storage_caches = None;
+
     if components.contains(&Component::WsApi)
         || components.contains(&Component::HttpApi)
         || components.contains(&Component::ContractVerificationApi)
@@ -410,12 +421,6 @@ pub async fn initialize_components(
             &api_config.web3_json_rpc,
             &contracts_config,
         );
-
-        // Lazily initialize storage caches only when they are needed (e.g., skip their initialization
-        // if we only run the explorer APIs). This is required because the cache update task will
-        // terminate immediately if storage caches are dropped, which will lead to the (unexpected)
-        // program termination.
-        let mut storage_caches = None;
 
         if components.contains(&Component::HttpApi) {
             storage_caches = Some(
@@ -451,7 +456,7 @@ pub async fn initialize_components(
         }
 
         if components.contains(&Component::WsApi) {
-            let storage_caches = match storage_caches {
+            let storage_caches = match storage_caches.clone() {
                 Some(storage_caches) => storage_caches,
                 None => build_storage_caches(&replica_connection_pool, &mut task_futures)
                     .context("build_Storage_caches()")?,
@@ -625,6 +630,20 @@ pub async fn initialize_components(
         ));
         tracing::info!("initialized data fetchers in {:?}", started_at.elapsed());
         metrics::gauge!("server.init.latency", started_at.elapsed(), "stage" => "data_fetchers");
+    }
+
+    let mut caller: Option<l2_sender::caller::Caller> = None;
+    if components.contains(&Component::L2Sender) {
+        let storage_caches = match storage_caches {
+            Some(storage_caches) => storage_caches,
+            None => build_storage_caches(&replica_connection_pool, &mut task_futures)
+                .context("build_Storage_caches()")?,
+        };
+
+        let eth_sender = ETHSenderConfig::from_env().context("ETHSenderConfig::from_env()")?;
+
+        let l2_sender = L2Sender::new(eth_sender.sender);
+        caller = Some(l2_sender.get_caller());
     }
 
     add_trees_to_task_futures(
