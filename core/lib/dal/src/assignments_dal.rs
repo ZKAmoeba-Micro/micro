@@ -2,10 +2,10 @@ use std::str::FromStr;
 
 use crate::{SqlxError, StorageProcessor};
 use micro_types::{Address, L1BatchNumber};
+use std::time::Duration;
 use strum::{Display, EnumString};
-use std::{time::Duration};
 
-use crate::{time_utils::{duration_to_naive_time, pg_interval_from_duration}};
+use crate::time_utils::{duration_to_naive_time, pg_interval_from_duration};
 
 #[derive(Debug)]
 pub struct AssignmentsDal<'a, 'c> {
@@ -65,9 +65,9 @@ impl AssignmentsDal<'_, '_> {
         .fetch_one(self.storage.conn())
         .await?
         .num;
-        if count !=  Some(0) {
+        if count != Some(0) {
             let mut transaction = self.storage.start_transaction().await.unwrap();
-           
+
             sqlx::query!(
                 "update assignments \
             set status ='be_punished', updated_at = now() \
@@ -76,7 +76,7 @@ impl AssignmentsDal<'_, '_> {
                 from assignments \
                 where now()>created_at + $1::interval and status='assigned_not_certified' \
             )",
-            &processing_timeout,
+                &processing_timeout,
             )
             .execute(transaction.conn())
             .await?;

@@ -8,7 +8,7 @@ use micro_types::{
     assignment_user_summary::{AssignmentUserSummaryInfo, UserStatus},
     Address, L1BatchNumber,
 };
-use std::{time::Duration};
+use std::time::Duration;
 #[derive(Debug)]
 pub struct AssignmentsManager {
     pool: ConnectionPool,
@@ -17,7 +17,7 @@ pub struct AssignmentsManager {
 }
 
 impl AssignmentsManager {
-    pub fn new(processing_timeout: Duration,retry_interval_ms: u64, pool: ConnectionPool) -> Self {
+    pub fn new(processing_timeout: Duration, retry_interval_ms: u64, pool: ConnectionPool) -> Self {
         Self {
             retry_interval_ms,
             processing_timeout,
@@ -55,7 +55,10 @@ impl AssignmentsManager {
 
     pub async fn time_out_check(&mut self) {
         let mut connection = self.pool.access_storage().await.unwrap();
-        connection.assignments_dal().update_assigments_status_for_time(self.processing_timeout).await;
+        connection
+            .assignments_dal()
+            .update_assigments_status_for_time(self.processing_timeout)
+            .await;
     }
 
     pub fn monitor_change_event() {}
