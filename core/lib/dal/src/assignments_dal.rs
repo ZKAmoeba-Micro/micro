@@ -1,11 +1,11 @@
 use std::str::FromStr;
 
 use crate::{SqlxError, StorageProcessor};
-use micro_types::{Address, L1BatchNumber};
+use micro_types::{Address, L1BatchNumber, H256};
 use std::time::Duration;
 use strum::{Display, EnumString};
 
-use crate::time_utils::{duration_to_naive_time, pg_interval_from_duration};
+use crate::time_utils::pg_interval_from_duration;
 
 #[derive(Debug)]
 pub struct AssignmentsDal<'a, 'c> {
@@ -100,16 +100,40 @@ impl AssignmentsDal<'_, '_> {
         &mut self,
         verification_address: Address,
         block_number: L1BatchNumber,
+        tx_hash: H256,
     ) -> Result<(), SqlxError> {
-        tracing::info!("update_assigments_status verification_address:{verification_address},block_number:{block_number}");
+        tracing::info!("update_assigments_status verification_address:{verification_address},block_number:{block_number},tx_hash:{tx_hash}");
 
-        sqlx::query!("UPDATE assignments SET status='failed',updated_at=now() WHERE status='be_punished' and verification_address=$1 and l1_batch_number = $2",
+        sqlx::query!("UPDATE assignments SET status='failed',tx_hash=$1,updated_at=now() WHERE status='be_punished' and verification_address=$2 and l1_batch_number = $3 and tx_hash is null",
+            tx_hash.as_bytes(),
             verification_address.as_bytes(),
             block_number.0 as i64,
         )
         .execute(self.storage.conn())
         .await?;
         Ok(())
+    }
+
+    pub async fn get_punished_address_list(&mut self) -> Vec<(Address, L1BatchNumber)> {
+        let result = sqlx::query!(
+        "SELECT verification_address,l1_batch_number \
+        FROM ( \
+            SELECT verification_address,l1_batch_number,status,tx_hash,COUNT(*) OVER (PARTITION BY verification_address) AS total_count \
+            FROM assignments \
+            WHERE status IN ('failed', 'be_punished') ) AS subquery WHERE total_count > 1 AND status = 'be_punished' and tx_hash is null")
+        .fetch_all(self.storage.conn())
+        .await
+        .unwrap();
+
+        result
+            .into_iter()
+            .map(|row| {
+                (
+                    Address::from_slice(&row.verification_address),
+                    L1BatchNumber(row.l1_batch_number as u32),
+                )
+            })
+            .collect()
     }
 
     pub async fn get_next_block_to_be_proven(&mut self, prover: Address) -> Option<L1BatchNumber> {

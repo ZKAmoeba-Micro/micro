@@ -4952,6 +4952,20 @@
     },
     "query": "UPDATE l1_batches SET eth_commit_tx_id = $1, updated_at = now() WHERE number BETWEEN $2 AND $3"
   },
+  "57a779346ed471ff463c61c16bda4a7249830f22c7976b062830ebfcd5a5f880": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Bytea",
+          "Bytea",
+          "Int8"
+        ]
+      }
+    },
+    "query": "UPDATE assignments SET status='failed',tx_hash=$1,updated_at=now() WHERE status='be_punished' and verification_address=$2 and l1_batch_number = $3 and tx_hash is null"
+  },
   "57b4e8fb728f1e90dc5ed80c1493471f8e9eff828c99eadc531b28a068ade83e": {
     "describe": {
       "columns": [
@@ -7631,19 +7645,6 @@
       }
     },
     "query": "\n                SELECT value\n                FROM storage_logs\n                WHERE storage_logs.hashed_key = $1 AND storage_logs.miniblock_number <= $2\n                ORDER BY storage_logs.miniblock_number DESC, storage_logs.operation_number DESC\n                LIMIT 1\n                "
-  },
-  "94bcb488ef9603b25f7cb0479afe9633d00b60574aaaa2eb26a6394dbe9bf72e": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Bytea",
-          "Int8"
-        ]
-      }
-    },
-    "query": "UPDATE assignments SET status='failed',updated_at=now() WHERE status='be_punished' and verification_address=$1 and l1_batch_number = $2"
   },
   "957ceda740ffb36740acf1e3fbacf76a2ea7422dd9d76a38d745113359e4b7a6": {
     "describe": {
@@ -11073,6 +11074,30 @@
       }
     },
     "query": "UPDATE proof_generation_details SET status='generated', proof_blob_url = $1, updated_at = now() WHERE l1_batch_number = $2"
+  },
+  "e832cb91a19bd4303471010b81379e89c7fadecfaaae533d0a44f4146bf227fc": {
+    "describe": {
+      "columns": [
+        {
+          "name": "verification_address",
+          "ordinal": 0,
+          "type_info": "Bytea"
+        },
+        {
+          "name": "l1_batch_number",
+          "ordinal": 1,
+          "type_info": "Int8"
+        }
+      ],
+      "nullable": [
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": []
+      }
+    },
+    "query": "SELECT verification_address,l1_batch_number FROM ( SELECT verification_address,l1_batch_number,status,tx_hash,COUNT(*) OVER (PARTITION BY verification_address) AS total_count FROM assignments WHERE status IN ('failed', 'be_punished') ) AS subquery WHERE total_count > 1 AND status = 'be_punished' and tx_hash is null"
   },
   "e900682a160af90d532da47a1222fc1d7c9962ee8996dbd9b9bb63f13820cf2b": {
     "describe": {
