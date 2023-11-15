@@ -108,14 +108,14 @@ impl<G: L1GasPriceProvider> L2Sender<G> {
     pub async fn run(mut self, mut stop_receiver: watch::Receiver<bool>) -> anyhow::Result<()> {
         loop {
             if *stop_receiver.borrow_and_update() {
-                tracing::info!("Stop signal received, metadata_calculator is shutting down");
+                tracing::info!("Stop signal received, l2_sender is shutting down");
                 self.vm_barrier.close();
                 break;
             }
 
             tokio::select! {
                 _ = stop_receiver.changed() => {
-                    tracing::info!("Stop signal received, metadata_calculator is shutting down");
+                    tracing::info!("Stop signal received, l2_sender is shutting down");
                     self.vm_barrier.close();
                     break;
                 }
@@ -169,9 +169,9 @@ impl<G: L1GasPriceProvider> L2Sender<G> {
     ) -> anyhow::Result<()> {
         data.from = Some(self.eth_signer.get_address().await.unwrap());
         data.nonce = Some(self.get_nonce().await);
-        data.transaction_type = Some(2.into());
+        data.transaction_type = Some(EIP_1559_TX_TYPE.into());
 
-        let tx: L2Tx = L2Tx::from_request(data.clone().into(), self.config.max_tx_size)?;
+        let tx = L2Tx::from_request(data.clone().into(), self.config.max_tx_size)?;
 
         let scale_factor = self.config.estimate_gas_scale_factor;
         let acceptable_overestimation = self.config.estimate_gas_acceptable_overestimation;
@@ -191,7 +191,7 @@ impl<G: L1GasPriceProvider> L2Sender<G> {
             chain_id: self.config.chain_id.as_u64(),
             max_priority_fee_per_gas: fee.max_priority_fee_per_gas,
             gas_price: None,
-            transaction_type: Some(EIP_1559_TX_TYPE.into()),
+            transaction_type: data.transaction_type,
             access_list: None,
             max_fee_per_gas: fee.max_fee_per_gas,
         };
