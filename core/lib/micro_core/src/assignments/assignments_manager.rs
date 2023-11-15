@@ -1,8 +1,6 @@
-use std::ops::Add;
-
-use async_trait::async_trait;
-
+use crate::l1_gas_price::L1GasPriceProvider;
 use crate::l2_sender::L2Sender;
+use async_trait::async_trait;
 use micro_config::constants::DEPOSIT_ADDRESS;
 use micro_contracts::sys_deposit_contract;
 use micro_dal::ConnectionPool;
@@ -11,27 +9,26 @@ use micro_types::{
     assignment_user_summary::UserStatus,
     ethabi::{Contract, Token},
     transaction_request::CallRequest,
-    web3, L1BatchNumber, H256, U256,
+    Bytes, L1BatchNumber, H256, U256,
 };
-use micro_utils::{bytecode::hash_bytecode, bytes_to_be_words, u256_to_h256};
-
+use std::ops::Add;
 use std::time::Duration;
 
 #[derive(Debug)]
-pub struct AssignmentsManager {
+pub struct AssignmentsManager<G: L1GasPriceProvider> {
     pool: ConnectionPool,
     processing_timeout: Duration,
     retry_interval_ms: u64,
-    l2_sender: L2Sender,
+    l2_sender: L2Sender<G>,
     deposit_abi: Contract,
 }
 
-impl AssignmentsManager {
+impl<G: L1GasPriceProvider> AssignmentsManager<G> {
     pub fn new(
         processing_timeout: Duration,
         retry_interval_ms: u64,
         pool: ConnectionPool,
-        l2_sender: L2Sender,
+        l2_sender: L2Sender<G>,
     ) -> Self {
         Self {
             retry_interval_ms,
@@ -61,10 +58,11 @@ impl AssignmentsManager {
             user_list.sort_by(|a, b| a.base_score.cmp(&b.base_score));
             tracing::info!("assign_proof_tasks list: {:?}", user_list);
             if let Some(top_user) = user_list.first() {
+                let address = top_user.verification_address;
                 //TODO error
                 let _ = connection
                     .assignments_dal()
-                    .insert_assignments(top_user.verification_address, &block_number)
+                    .insert_assignments(address.clone(), block_number.clone())
                     .await;
 
                 let abi_data = self
@@ -72,18 +70,18 @@ impl AssignmentsManager {
                     .function("assignment")
                     .unwrap()
                     .encode_input(&[
-                        Token::Address(top_user.verification_address),
-                        Token::Uint(&block_number.0),
+                        Token::Address(address.clone()),
+                        Token::Uint(U256::from(block_number.0)),
                     ])
                     .unwrap();
                 let data = CallRequest {
                     to: Some(DEPOSIT_ADDRESS),
-                    data: abi_data,
+                    data: Some(Bytes(abi_data)),
                     ..Default::default()
                 };
                 match self.l2_sender.get_caller().send(data).await {
                     Ok(tx_hash) => {
-                        tracing::info!("assign_proof_tasks tx is success address: {:?},block_number:{:?},tx_hash:{tx_hash}", &address,&block_number);
+                        tracing::info!("assign_proof_tasks tx is success address: {:?},block_number:{:?},tx_hash:{:?}", &address,&block_number,tx_hash);
                     }
                     _ => {
                         tracing::info!(
@@ -99,7 +97,8 @@ impl AssignmentsManager {
 
     pub async fn time_out_check(&mut self) {
         let mut connection = self.pool.access_storage().await.unwrap();
-        connection
+        //TODO error
+        let _ = connection
             .assignments_dal()
             .update_assigments_status_for_time(self.processing_timeout)
             .await;
@@ -116,21 +115,25 @@ impl AssignmentsManager {
                 .deposit_abi
                 .function("penalize")
                 .unwrap()
-                .encode_input(&[Token::Address(&address)])
+                .encode_input(&[Token::Address(address.clone())])
                 .unwrap();
 
             let data = CallRequest {
                 to: Some(DEPOSIT_ADDRESS),
-                data: abi_data,
+                data: Some(Bytes(abi_data)),
                 ..Default::default()
             };
             match self.l2_sender.get_caller().send(data).await {
                 Ok(tx_hash) => {
                     let hash = H256::from_slice(&tx_hash);
                     //todo error
-                    connection
+                    let _ = connection
                         .assignments_dal()
-                        .update_assigments_status_by_punished(&address, l1_batch_number, hash)
+                        .update_assigments_status_by_punished(
+                            address.clone(),
+                            l1_batch_number,
+                            hash,
+                        )
                         .await;
                 }
                 _ => {
@@ -142,16 +145,16 @@ impl AssignmentsManager {
 
     pub fn monitor_change_event() {}
 }
-/// Prove task assigned to verification node periodically.
-#[async_trait]
-impl PeriodicJob for AssignmentsManager {
-    const SERVICE_NAME: &'static str = "AssignmentsManager";
+// /// Prove task assigned to verification node periodically.
+// #[async_trait]
+// impl <G: L1GasPriceProvider>  PeriodicJob for AssignmentsManager<G>{
+//     const SERVICE_NAME: &'static str = "AssignmentsManager";
 
-    async fn run_routine_task(&mut self) -> anyhow::Result<()> {
-        Ok(())
-    }
+//     async fn run_routine_task(&mut self) -> anyhow::Result<()> {
+//         Ok(())
+//     }
 
-    fn polling_interval_ms(&self) -> u64 {
-        self.retry_interval_ms
-    }
-}
+//     fn polling_interval_ms(&self) -> u64 {
+//         self.retry_interval_ms
+//     }
+// }
