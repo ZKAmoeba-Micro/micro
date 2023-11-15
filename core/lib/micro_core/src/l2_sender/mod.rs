@@ -1,28 +1,101 @@
+use std::time::Duration;
+
 use futures::{
     channel::{mpsc, oneshot},
     StreamExt,
 };
-use micro_config::configs::eth_sender::SenderConfig;
-use micro_eth_signer::TransactionParameters;
-use micro_types::{ethabi::Bytes, transaction_request::CallRequest};
+use micro_dal::ConnectionPool;
+use micro_web3_decl::error::Web3Error;
 use tokio::sync::watch;
 
+use micro_config::configs::{api::Web3JsonRpcConfig, eth_sender::SenderConfig};
+use micro_eth_signer::{EthereumSigner, PrivateKeySigner, TransactionParameters};
+use micro_types::{
+    api, ethabi::Bytes, l2::L2Tx, transaction_request::CallRequest, L2ChainId, EIP_1559_TX_TYPE,
+    H256, U256, USED_BOOTLOADER_MEMORY_BYTES,
+};
+
 use self::caller::Data;
+use crate::{
+    api_server::{
+        execution_sandbox::{BlockArgs, VmConcurrencyBarrier},
+        tx_sender::TxSender,
+    },
+    l1_gas_price::L1GasPriceProvider,
+};
+
+const GRACEFUL_SHUTDOWN_TIMEOUT: Duration = Duration::from_secs(15);
 
 pub mod caller;
 
-pub struct L2Sender {
-    config: SenderConfig,
+#[derive(Debug)]
+pub struct L2SenderConfig {
+    sender_config: SenderConfig,
+    pub estimate_gas_scale_factor: f64,
+    pub estimate_gas_acceptable_overestimation: u32,
+    pub max_tx_size: usize,
+    pub chain_id: L2ChainId,
+}
+
+impl L2SenderConfig {
+    pub fn new(
+        sender_config: SenderConfig,
+        web3_json_rpc_config: Web3JsonRpcConfig,
+        chain_id: L2ChainId,
+    ) -> Self {
+        Self {
+            sender_config,
+            estimate_gas_scale_factor: web3_json_rpc_config.estimate_gas_scale_factor,
+            estimate_gas_acceptable_overestimation: web3_json_rpc_config
+                .estimate_gas_acceptable_overestimation,
+            max_tx_size: web3_json_rpc_config.max_tx_size,
+            chain_id,
+        }
+    }
+
+    fn private_key(&self) -> Option<H256> {
+        self.sender_config.private_key()
+    }
+}
+
+#[derive(Debug)]
+pub struct L2Sender<G: L1GasPriceProvider> {
+    config: L2SenderConfig,
+
+    pool: ConnectionPool,
+
+    tx_sender: TxSender<G>,
+    vm_barrier: VmConcurrencyBarrier,
+
+    eth_signer: PrivateKeySigner,
 
     msg_receiver: mpsc::UnboundedReceiver<caller::Data>,
     msg_sender: mpsc::UnboundedSender<caller::Data>,
 }
 
-impl L2Sender {
-    pub fn new(config: SenderConfig) -> Self {
+impl<G: L1GasPriceProvider> L2Sender<G> {
+    pub fn new(
+        config: L2SenderConfig,
+        pool: ConnectionPool,
+        tx_sender: TxSender<G>,
+        vm_barrier: VmConcurrencyBarrier,
+    ) -> Self {
         let (tx, rx) = mpsc::unbounded();
+
+        let operator_private_key = config
+            .private_key()
+            .expect("Operator private key is required for signing client");
+        let eth_signer = PrivateKeySigner::new(operator_private_key);
+
         L2Sender {
             config,
+            pool,
+
+            tx_sender,
+            vm_barrier,
+
+            eth_signer,
+
             msg_receiver: rx,
             msg_sender: tx,
         }
@@ -36,12 +109,14 @@ impl L2Sender {
         loop {
             if *stop_receiver.borrow_and_update() {
                 tracing::info!("Stop signal received, metadata_calculator is shutting down");
+                self.vm_barrier.close();
                 break;
             }
 
             tokio::select! {
                 _ = stop_receiver.changed() => {
                     tracing::info!("Stop signal received, metadata_calculator is shutting down");
+                    self.vm_barrier.close();
                     break;
                 }
                 data = self.msg_receiver.next() => {
@@ -51,6 +126,8 @@ impl L2Sender {
                 }
             }
         }
+
+        Self::wait_for_vm(self.vm_barrier).await;
 
         Ok(())
     }
@@ -67,14 +144,112 @@ impl L2Sender {
         data: CallRequest,
         callback: oneshot::Sender<Bytes>,
     ) -> anyhow::Result<()> {
+        let mut connection = self.pool.access_storage_tagged("api").await.unwrap();
+        let block_args = BlockArgs::new(
+            &mut connection,
+            api::BlockId::Number(api::BlockNumber::Latest),
+        )
+        .await
+        .map_err(|err| internal_error("l2 sender", err))?
+        .ok_or(Web3Error::NoBlock)?;
+
+        let tx = L2Tx::from_request(data.into(), USED_BOOTLOADER_MEMORY_BYTES)?;
+
+        let res = self.tx_sender.eth_call(block_args, tx).await?;
+
+        callback.send(res).map_err(|_| Web3Error::InternalError)?;
+
         Ok(())
     }
 
     async fn send(
         &self,
-        data: TransactionParameters,
+        mut data: CallRequest,
         callback: oneshot::Sender<Bytes>,
     ) -> anyhow::Result<()> {
+        data.from = Some(self.eth_signer.get_address().await.unwrap());
+        data.nonce = Some(self.get_nonce().await);
+        data.transaction_type = Some(2.into());
+
+        let tx: L2Tx = L2Tx::from_request(data.clone().into(), self.config.max_tx_size)?;
+
+        let scale_factor = self.config.estimate_gas_scale_factor;
+        let acceptable_overestimation = self.config.estimate_gas_acceptable_overestimation;
+
+        let fee = self
+            .tx_sender
+            .get_txs_fee_in_wei(tx.into(), scale_factor, acceptable_overestimation)
+            .await
+            .map_err(|err| Web3Error::SubmitTransactionError(err.to_string(), err.data()))?;
+
+        let tx = TransactionParameters {
+            nonce: data.nonce.unwrap_or_default(),
+            to: data.to,
+            gas: fee.gas_limit,
+            value: data.value.unwrap_or_default(),
+            data: data.data.unwrap_or_default().0,
+            chain_id: self.config.chain_id.as_u64(),
+            max_priority_fee_per_gas: fee.max_priority_fee_per_gas,
+            gas_price: None,
+            transaction_type: Some(EIP_1559_TX_TYPE.into()),
+            access_list: None,
+            max_fee_per_gas: fee.max_fee_per_gas,
+        };
+        let signed_tx = self.eth_signer.sign_transaction(tx).await?;
+
+        let (tx_request, hash) =
+            api::TransactionRequest::from_bytes(&signed_tx, self.config.chain_id)?;
+        let l2_tx = L2Tx::from_request(tx_request, self.config.max_tx_size)?;
+
+        self.tx_sender.submit_tx(l2_tx).await?;
+
+        callback
+            .send(hash.as_bytes().to_vec())
+            .map_err(|_| Web3Error::InternalError)?;
+
         Ok(())
     }
+
+    async fn wait_for_vm(vm_barrier: VmConcurrencyBarrier) {
+        let wait_for_vm =
+            tokio::time::timeout(GRACEFUL_SHUTDOWN_TIMEOUT, vm_barrier.wait_until_stopped());
+        if wait_for_vm.await.is_err() {
+            tracing::warn!(
+                "VM execution on l2 sender server didn't stop after {GRACEFUL_SHUTDOWN_TIMEOUT:?}; \
+                 forcing shutdown anyway"
+            );
+        } else {
+            tracing::info!("VM execution on l2 sender server stopped");
+        }
+    }
+
+    async fn get_nonce(&self) -> U256 {
+        let mut connection = self.pool.access_storage_tagged("api").await.unwrap();
+
+        let latest_block_number = connection
+            .blocks_web3_dal()
+            .get_sealed_miniblock_number()
+            .await
+            .unwrap();
+        let nonce = connection
+            .storage_web3_dal()
+            .get_address_historical_nonce(
+                self.eth_signer.get_address().await.unwrap(),
+                latest_block_number,
+            )
+            .await
+            .unwrap();
+        nonce
+    }
+}
+
+pub fn internal_error(method_name: &str, error: impl ToString) -> Web3Error {
+    tracing::error!(
+        "Internal error in method {}: {}",
+        method_name,
+        error.to_string(),
+    );
+    metrics::counter!("l2.sender.internal_errors", 1, "method" => method_name.to_string());
+
+    Web3Error::InternalError
 }

@@ -19,7 +19,7 @@ mod tracers;
 mod validate;
 mod vm_metrics;
 
-pub(super) use self::{
+pub(crate) use self::{
     error::SandboxExecutionError,
     execute::{execute_tx_eth_call, execute_tx_with_pending_state, TxExecutionArgs},
     tracers::ApiTracer,

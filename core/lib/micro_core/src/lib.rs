@@ -47,7 +47,6 @@ use micro_types::{
 };
 use micro_verification_key_server::get_cached_commitments;
 
-use crate::api_server::tx_sender::TxSenderConfig;
 use crate::api_server::tx_sender::{TxSender, TxSenderBuilder};
 use crate::api_server::web3::{state::InternalApiConfig, Namespace};
 use crate::eth_sender::{Aggregator, EthTxManager};
@@ -76,6 +75,7 @@ use crate::witness_generator::{
     node_aggregation::NodeAggregationWitnessGenerator, scheduler::SchedulerWitnessGenerator,
 };
 use crate::{api_server::healthcheck::HealthCheckHandle, l2_sender::L2Sender};
+use crate::{api_server::tx_sender::TxSenderConfig, l2_sender::L2SenderConfig};
 use crate::{
     api_server::{
         contract_verification,
@@ -634,16 +634,60 @@ pub async fn initialize_components(
 
     let mut caller: Option<l2_sender::caller::Caller> = None;
     if components.contains(&Component::L2Sender) {
+        let started_at = Instant::now();
+        tracing::info!("initializing l2 sender");
+
         let storage_caches = match storage_caches {
             Some(storage_caches) => storage_caches,
             None => build_storage_caches(&replica_connection_pool, &mut task_futures)
                 .context("build_Storage_caches()")?,
         };
 
+        let network_config = NetworkConfig::from_env().context("NetworkConfig::from_env()")?;
         let eth_sender = ETHSenderConfig::from_env().context("ETHSenderConfig::from_env()")?;
+        let state_keeper_config =
+            StateKeeperConfig::from_env().context("StateKeeperConfig::from_env()")?;
+        let api_config = ApiConfig::from_env().context("ApiConfig::from_env()")?;
+        let tx_sender_config = TxSenderConfig::new(
+            &state_keeper_config,
+            &api_config.web3_json_rpc,
+            network_config.micro_network_id,
+        );
 
-        let l2_sender = L2Sender::new(eth_sender.sender);
+        let bounded_gas_adjuster = gas_adjuster
+            .get_or_init_bounded()
+            .await
+            .context("gas_adjuster.get_or_init_bounded()")?;
+
+        let (tx_sender, vm_barrier) = build_tx_sender(
+            &tx_sender_config,
+            &api_config.web3_json_rpc,
+            &state_keeper_config,
+            replica_connection_pool.clone(),
+            connection_pool.clone(),
+            bounded_gas_adjuster.clone(),
+            storage_caches.clone(),
+        )
+        .await;
+
+        let l2_sender_config = L2SenderConfig::new(
+            eth_sender.sender,
+            api_config.web3_json_rpc,
+            network_config.micro_network_id,
+        );
+
+        let l2_sender = L2Sender::new(
+            l2_sender_config,
+            connection_pool.clone(),
+            tx_sender,
+            vm_barrier,
+        );
         caller = Some(l2_sender.get_caller());
+
+        task_futures.extend([tokio::spawn(l2_sender.run(stop_receiver.clone()))]);
+
+        tracing::info!("initialized l2 sender in {:?}", started_at.elapsed());
+        metrics::gauge!("server.init.latency", started_at.elapsed(), "stage" => "l2_sender");
     }
 
     add_trees_to_task_futures(

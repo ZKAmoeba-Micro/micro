@@ -1,6 +1,5 @@
 use anyhow::Result;
 use futures::channel::{mpsc, oneshot};
-use micro_eth_signer::TransactionParameters;
 use micro_types::{ethabi::Bytes, transaction_request::CallRequest};
 
 pub struct Caller {
@@ -20,7 +19,7 @@ impl Caller {
         Ok(tr.await?)
     }
 
-    pub async fn send(&mut self, data: TransactionParameters) -> Result<Bytes> {
+    pub async fn send(&mut self, data: CallRequest) -> Result<Bytes> {
         let (callback, tr) = oneshot::channel::<Bytes>();
 
         self.sender.unbounded_send(Data::Send(data, callback))?;
@@ -31,5 +30,5 @@ impl Caller {
 
 pub enum Data {
     Call(CallRequest, oneshot::Sender<Bytes>),
-    Send(TransactionParameters, oneshot::Sender<Bytes>),
+    Send(CallRequest, oneshot::Sender<Bytes>),
 }
