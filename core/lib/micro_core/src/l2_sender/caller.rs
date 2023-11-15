@@ -2,6 +2,7 @@ use anyhow::Result;
 use futures::channel::{mpsc, oneshot};
 use micro_types::{ethabi::Bytes, transaction_request::CallRequest};
 
+#[derive(Debug)]
 pub struct Caller {
     sender: mpsc::UnboundedSender<Data>,
 }

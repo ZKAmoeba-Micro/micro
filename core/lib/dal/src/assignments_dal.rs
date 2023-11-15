@@ -27,7 +27,7 @@ pub enum ProverResultStatus {
 }
 
 impl AssignmentsDal<'_, '_> {
-    pub async fn insert_assignments(
+    pub async fn insert_and_update_assignments(
         &mut self,
         verification_address: Address,
         block_number: L1BatchNumber,
