@@ -1,4 +1,5 @@
 use crate::l1_gas_price::L1GasPriceProvider;
+use crate::l2_sender::caller::Caller;
 use crate::l2_sender::L2Sender;
 use async_trait::async_trait;
 use micro_config::constants::DEPOSIT_ADDRESS;
@@ -13,7 +14,6 @@ use micro_types::{
 };
 use std::ops::Add;
 use std::time::Duration;
-use crate::l2_sender::caller::Caller;
 
 #[derive(Debug)]
 pub struct AssignmentsManager {
@@ -149,7 +149,7 @@ impl AssignmentsManager {
 }
 // /// Prove task assigned to verification node periodically.
 #[async_trait]
-impl  PeriodicJob for AssignmentsManager{
+impl PeriodicJob for AssignmentsManager {
     const SERVICE_NAME: &'static str = "AssignmentsManager";
 
     async fn run_routine_task(&mut self) -> anyhow::Result<()> {
