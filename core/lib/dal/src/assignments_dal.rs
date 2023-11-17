@@ -7,7 +7,6 @@ use strum::{Display, EnumString};
 
 use crate::time_utils::pg_interval_from_duration;
 
-
 #[derive(Debug)]
 pub struct AssignmentsDal<'a, 'c> {
     pub(crate) storage: &'a mut StorageProcessor<'c>,

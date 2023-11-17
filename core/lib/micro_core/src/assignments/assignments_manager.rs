@@ -211,13 +211,14 @@ impl AssignmentsManager {
             };
             let block_number = log.block_number.unwrap();
             let param_info = AssignmentUserSummaryInfo::new(address, base_score, batch_number);
-            let _=connection
+            let _ = connection
                 .assignment_user_summary_dal()
                 .add_or_update_assignment_user_summary_info(
                     param_info,
                     user_status,
                     MiniblockNumber(U64::as_u32(&block_number)),
-                ).await;
+                )
+                .await;
         }
     }
 }

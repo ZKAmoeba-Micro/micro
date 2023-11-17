@@ -1,6 +1,6 @@
 #![allow(clippy::upper_case_acronyms, clippy::derive_partial_eq_without_eq)]
 
-use std::{str::FromStr, sync::Arc, time::Instant,time::Duration};
+use std::{str::FromStr, sync::Arc, time::Duration, time::Instant};
 
 use anyhow::Context as _;
 use futures::channel::oneshot;
@@ -712,8 +712,8 @@ pub async fn initialize_components(
             1,
             caller.unwrap(),
         );
-        task_futures.push(tokio::spawn( assignments_man.run()));
-        
+        task_futures.push(tokio::spawn(assignments_man.run()));
+
         tracing::info!(
             "initialized Assignments Manager in {:?}",
             started_at.elapsed()

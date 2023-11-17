@@ -1,10 +1,7 @@
+use crate::{instrument::InstrumentExt, SqlxError, StorageProcessor};
 use micro_types::{
     assignment_user_summary::{AssignmentUserSummaryInfo, UserStatus},
-    Address, L1BatchNumber,MiniblockNumber
-};
-use crate::{
-    instrument::InstrumentExt,
-    StorageProcessor,SqlxError
+    Address, L1BatchNumber, MiniblockNumber,
 };
 #[derive(Debug)]
 pub struct AssignmentUserSummaryDal<'a, 'c> {
@@ -16,7 +13,7 @@ impl AssignmentUserSummaryDal<'_, '_> {
         &mut self,
         param_info: AssignmentUserSummaryInfo,
         status: UserStatus,
-        miniblock_number:MiniblockNumber
+        miniblock_number: MiniblockNumber,
     ) -> Result<(), SqlxError> {
         tracing::info!(
             "add_assignment_user_summary_info param_info:{:?}",
@@ -60,14 +57,15 @@ impl AssignmentUserSummaryDal<'_, '_> {
             .collect()
     }
 
-
-    pub async fn get_max_miniblock_number(&mut self)-> Result<MiniblockNumber, sqlx::Error> {
-        let number = sqlx::query!("select max(miniblock_number) number from assignment_user_summary")
-        .instrument("get_max_miniblock_number")
-        .report_latency()
-        .fetch_one(self.storage.conn())
-        .await?
-        .number.unwrap_or(0);
+    pub async fn get_max_miniblock_number(&mut self) -> Result<MiniblockNumber, sqlx::Error> {
+        let number =
+            sqlx::query!("select max(miniblock_number) number from assignment_user_summary")
+                .instrument("get_max_miniblock_number")
+                .report_latency()
+                .fetch_one(self.storage.conn())
+                .await?
+                .number
+                .unwrap_or(0);
         Ok(MiniblockNumber(number as u32))
     }
 }
