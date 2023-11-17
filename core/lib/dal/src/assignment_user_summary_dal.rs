@@ -1,7 +1,10 @@
-use crate::{SqlxError, StorageProcessor};
 use micro_types::{
     assignment_user_summary::{AssignmentUserSummaryInfo, UserStatus},
-    Address, L1BatchNumber,
+    Address, L1BatchNumber,MiniblockNumber
+};
+use crate::{
+    instrument::InstrumentExt,
+    StorageProcessor,SqlxError
 };
 #[derive(Debug)]
 pub struct AssignmentUserSummaryDal<'a, 'c> {
@@ -9,27 +12,27 @@ pub struct AssignmentUserSummaryDal<'a, 'c> {
 }
 
 impl AssignmentUserSummaryDal<'_, '_> {
-    pub async fn add_assignment_user_summary_info(
+    pub async fn add_or_update_assignment_user_summary_info(
         &mut self,
         param_info: AssignmentUserSummaryInfo,
         status: UserStatus,
+        miniblock_number:MiniblockNumber
     ) -> Result<(), SqlxError> {
         tracing::info!(
             "add_assignment_user_summary_info param_info:{:?}",
             param_info
         );
-
         sqlx::query!(
-            "
-            INSERT INTO assignment_user_summary (verification_address,status,base_score,last_batch_number,created_at,update_at)
-            VALUES ($1, $2, $3, $4, now(), now())
+            "INSERT INTO assignment_user_summary (verification_address,status,base_score,last_batch_number,miniblock_number,created_at,update_at)
+            VALUES ($1, $2, $3, $4,$5, now(), now())
             ON CONFLICT(verification_address)
-            DO UPDATE SET update_at=now()
-            ",
+            DO UPDATE  SET status=excluded.status,base_score=excluded.base_score,last_batch_number=excluded.last_batch_number,miniblock_number=excluded.miniblock_number,update_at=now()",
             param_info.verification_address.as_bytes(),
             status.to_string(),
             param_info.base_score as i32,
-            param_info.last_batch_number.0 as i64
+            param_info.last_batch_number.0 as i64,
+            miniblock_number.0 as i64,
+
         )
         .execute(self.storage.conn())
         .await?;
@@ -55,5 +58,16 @@ impl AssignmentUserSummaryDal<'_, '_> {
                 last_batch_number: L1BatchNumber::from(row.last_batch_number as u32),
             })
             .collect()
+    }
+
+
+    pub async fn get_max_miniblock_number(&mut self)-> Result<MiniblockNumber, sqlx::Error> {
+        let number = sqlx::query!("select max(miniblock_number) number from assignment_user_summary")
+        .instrument("get_max_miniblock_number")
+        .report_latency()
+        .fetch_one(self.storage.conn())
+        .await?
+        .number.unwrap_or(0);
+        Ok(MiniblockNumber(number as u32))
     }
 }

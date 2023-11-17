@@ -109,4 +109,17 @@ impl ProofGenerationDal<'_, '_> {
         .then_some(())
         .ok_or(sqlx::Error::RowNotFound)
     }
+
+
+    pub async fn get_batch_number_list(&mut self) -> Vec<L1BatchNumber> {
+        let result = sqlx::query!("SELECT l1_batch_number FROM proof_generation_details WHERE status = 'ready_to_be_proven' ORDER BY l1_batch_number ASC FOR UPDATE SKIP LOCKED")
+        .fetch_all(self.storage.conn())
+        .await
+        .unwrap();
+        result
+            .into_iter()
+            .map(|row| {L1BatchNumber(row.l1_batch_number as u32)
+            })
+            .collect()
+    }
 }

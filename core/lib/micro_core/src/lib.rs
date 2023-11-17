@@ -1,6 +1,6 @@
 #![allow(clippy::upper_case_acronyms, clippy::derive_partial_eq_without_eq)]
 
-use std::{str::FromStr, sync::Arc, time::Instant};
+use std::{str::FromStr, sync::Arc, time::Instant,time::Duration};
 
 use anyhow::Context as _;
 use futures::channel::oneshot;
@@ -47,7 +47,6 @@ use micro_types::{
 };
 use micro_verification_key_server::get_cached_commitments;
 
-use crate::api_server::tx_sender::{TxSender, TxSenderBuilder};
 use crate::api_server::web3::{state::InternalApiConfig, Namespace};
 use crate::eth_sender::{Aggregator, EthTxManager};
 use crate::house_keeper::fri_proof_compressor_job_retry_manager::FriProofCompressorJobRetryManager;
@@ -76,6 +75,10 @@ use crate::witness_generator::{
 };
 use crate::{api_server::healthcheck::HealthCheckHandle, l2_sender::L2Sender};
 use crate::{api_server::tx_sender::TxSenderConfig, l2_sender::L2SenderConfig};
+use crate::{
+    api_server::tx_sender::{TxSender, TxSenderBuilder},
+    assignments::assignments_manager::AssignmentsManager,
+};
 use crate::{
     api_server::{
         contract_verification,
@@ -243,6 +246,8 @@ pub enum Component {
 
     // l2 sender
     L2Sender,
+    //allocation program
+    AssignmentsManager,
 }
 
 #[derive(Debug)]
@@ -312,6 +317,7 @@ impl FromStr for Components {
             "eth_tx_manager" => Ok(Components(vec![Component::EthTxManager])),
             "proof_data_handler" => Ok(Components(vec![Component::ProofDataHandler])),
             "l2_sender" => Ok(Components(vec![Component::L2Sender])),
+            "assignments" => Ok(Components(vec![Component::AssignmentsManager])),
             other => Err(format!("{} is not a valid component name", other)),
         }
     }
@@ -688,6 +694,31 @@ pub async fn initialize_components(
 
         tracing::info!("initialized l2 sender in {:?}", started_at.elapsed());
         metrics::gauge!("server.init.latency", started_at.elapsed(), "stage" => "l2_sender");
+    }
+
+    if components.contains(&Component::AssignmentsManager) {
+        let started_at = Instant::now();
+        tracing::info!("initializing Assignments Manager");
+
+        let assignment_pool = ConnectionPool::singleton(DbVariant::Master)
+            .build()
+            .await
+            .context("failed to build assignment_pool")?;
+        //TODO Add configuration
+        let assignments_man = AssignmentsManager::new(
+            Duration::from_secs(60),
+            3000,
+            assignment_pool,
+            1,
+            caller.unwrap(),
+        );
+        task_futures.push(tokio::spawn( assignments_man.run()));
+        
+        tracing::info!(
+            "initialized Assignments Manager in {:?}",
+            started_at.elapsed()
+        );
+        metrics::gauge!("server.init.latency", started_at.elapsed(), "stage" => "assignments_manager");
     }
 
     add_trees_to_task_futures(

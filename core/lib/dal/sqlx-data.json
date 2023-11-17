@@ -925,6 +925,24 @@
     },
     "query": "SELECT COUNT(*) as \"count!\" FROM l1_batches WHERE number = $1 AND hash = $2 AND merkle_root_hash = $3 AND parent_hash = $4 AND l2_l1_merkle_root = $5"
   },
+  "0e477f5155977a1bb5093c5a2b00d5c99a55ea3cb8293e218f1a68f9b4cb4a6c": {
+    "describe": {
+      "columns": [
+        {
+          "name": "l1_batch_number",
+          "ordinal": 0,
+          "type_info": "Int8"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Left": []
+      }
+    },
+    "query": "SELECT l1_batch_number FROM proof_generation_details WHERE status = 'ready_to_be_proven' ORDER BY l1_batch_number ASC FOR UPDATE SKIP LOCKED"
+  },
   "0ee31e6e2ec60f427d8dec719ec0ba03ef75bc610e878ae32b0bf61c4c2c1366": {
     "describe": {
       "columns": [
@@ -4424,21 +4442,6 @@
       }
     },
     "query": "DELETE FROM l2_to_l1_logs WHERE miniblock_number > $1"
-  },
-  "4c6aa48abfd55e029ea07aebd09cd64f11ddd2a27893f22f0eb38fb7e2b0fc94": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Bytea",
-          "Text",
-          "Int4",
-          "Int8"
-        ]
-      }
-    },
-    "query": "\n            INSERT INTO assignment_user_summary (verification_address,status,base_score,last_batch_number,created_at,update_at)\n            VALUES ($1, $2, $3, $4, now(), now())\n            ON CONFLICT(verification_address)\n            DO UPDATE SET update_at=now()\n            "
   },
   "4c83881635e957872a435737392bfed829de58780887c9a0fa7921ea648296fb": {
     "describe": {
@@ -11075,6 +11078,24 @@
     },
     "query": "UPDATE proof_generation_details SET status='generated', proof_blob_url = $1, updated_at = now() WHERE l1_batch_number = $2"
   },
+  "e6b6e5f6961d4b72eb0d0e8f367de7252424613564ae964d0a707dc0e3b93bcb": {
+    "describe": {
+      "columns": [
+        {
+          "name": "number",
+          "ordinal": 0,
+          "type_info": "Int8"
+        }
+      ],
+      "nullable": [
+        null
+      ],
+      "parameters": {
+        "Left": []
+      }
+    },
+    "query": "select max(miniblock_number) number from assignment_user_summary"
+  },
   "e832cb91a19bd4303471010b81379e89c7fadecfaaae533d0a44f4146bf227fc": {
     "describe": {
       "columns": [
@@ -11377,6 +11398,22 @@
       }
     },
     "query": "UPDATE l1_batches SET predicted_commit_gas_cost = $2, updated_at = now() WHERE number = $1"
+  },
+  "eccdd3c0c9101aa1ececd415e61cd3cd81d269b162c8be2a5e7b85b976a2d537": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Bytea",
+          "Text",
+          "Int4",
+          "Int8",
+          "Int8"
+        ]
+      }
+    },
+    "query": "INSERT INTO assignment_user_summary (verification_address,status,base_score,last_batch_number,miniblock_number,created_at,update_at)\n            VALUES ($1, $2, $3, $4,$5, now(), now())\n            ON CONFLICT(verification_address)\n            DO UPDATE  SET status=excluded.status,base_score=excluded.base_score,last_batch_number=excluded.last_batch_number,miniblock_number=excluded.miniblock_number,update_at=now()"
   },
   "ed50c609371b4588964e29f8757c41973706710090a80eb025ec263ce3d019b4": {
     "describe": {
