@@ -177,10 +177,17 @@ impl AssignmentsManager {
                 .unwrap();
         }
         let next_number = (latest_mini_block_number.0 as i32) + 99;
+        let mut verification_address_list = Vec::new();
+
+        //Multiple parameter lists for one event
         let mut topics = Vec::new();
+
+        //Verification address parameter of the event
         for signal in &self.event_signatures {
-            let topic = (1, vec![*signal]);
+            let h256 = vec![*signal];
+            let topic = (1, h256);
             topics.push(topic);
+            verification_address_list.push(H256::as_bytes(signal));
         }
 
         let filter = GetLogsFilter {
@@ -192,7 +199,7 @@ impl AssignmentsManager {
 
         let logs = connection
             .events_web3_dal()
-            .get_every_address_last_logs(filter, i32::MAX as usize)
+            .get_every_address_last_logs(filter, verification_address_list, i32::MAX as usize)
             .await
             .map_err(|err| internal_error(METHOD_NAME, err))
             .unwrap();

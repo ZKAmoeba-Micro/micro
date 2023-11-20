@@ -119,11 +119,12 @@ impl EventsWeb3Dal<'_, '_> {
     pub async fn get_every_address_last_logs(
         &mut self,
         filter: GetLogsFilter,
+        verification_address_list: Vec<&[u8]>,
         limit: usize,
     ) -> Result<Vec<Log>, SqlxError> {
         {
             let (where_sql, arg_index) = self.build_get_logs_where_clause(&filter);
-
+            let limit_index = arg_index + 1;
             let query = format!(
                 r#"
                     WITH events_select AS (
@@ -133,7 +134,7 @@ impl EventsWeb3Dal<'_, '_> {
                             event_index_in_block, event_index_in_tx
                         FROM events
                         WHERE {}
-                        AND (topic2,miniblock_number,event_index_in_block) in (select topic2,max(miniblock_number) miniblock_number,max(event_index_in_block) event_index_in_block from events group by topic2)
+                        AND (topic2,miniblock_number,event_index_in_block) in (select topic2,max(miniblock_number) miniblock_number,max(event_index_in_block) event_index_in_block from events where topic1 = ANY(${}) group by topic2)
                         ORDER BY miniblock_number ASC, event_index_in_block ASC
                         LIMIT ${}
                     )
@@ -142,7 +143,13 @@ impl EventsWeb3Dal<'_, '_> {
                     LEFT JOIN miniblocks ON events_select.miniblock_number = miniblocks.number
                     ORDER BY miniblock_number ASC, event_index_in_block ASC
                     "#,
-                where_sql, arg_index
+                where_sql, arg_index, limit_index
+            );
+            tracing::info!("get_every_address_last_logs logs:{:?}", &query);
+            tracing::info!("get_every_address_last_logs filter:{:?}", &filter);
+            tracing::info!(
+                "get_every_address_last_logs verification_address_list:{:?}",
+                &verification_address_list
             );
 
             let mut query = sqlx::query_as(&query);
@@ -154,6 +161,10 @@ impl EventsWeb3Dal<'_, '_> {
                 let topics: Vec<_> = topics.iter().map(H256::as_bytes).collect();
                 query = query.bind(topics);
             }
+            if !verification_address_list.is_empty() {
+                query = query.bind(verification_address_list);
+            }
+
             query = query.bind(limit as i32);
 
             let db_logs: Vec<StorageWeb3Log> = query
