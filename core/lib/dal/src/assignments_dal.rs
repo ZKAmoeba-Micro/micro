@@ -95,6 +95,36 @@ impl AssignmentsDal<'_, '_> {
         Ok(())
     }
 
+    pub async fn update_assigments_status_be_punished(
+        &mut self,
+        verification_address: Address,
+        l1_batch_number: L1BatchNumber,
+    ) -> Result<(), SqlxError> {
+        let mut transaction = self.storage.start_transaction().await.unwrap();
+
+        sqlx::query!(
+            "UPDATE assignments \
+             SET status ='be_punished', updated_at = now() \
+             WHERE verification_address = $1 AND l1_batch_number = $2",
+            verification_address.as_bytes(),
+            l1_batch_number.0 as i64,
+        )
+        .execute(transaction.conn())
+        .await?;
+
+        sqlx::query!(
+            "UPDATE proof_generation_details \
+             SET status = 'ready_to_be_proven', updated_at = now() \
+             WHERE status = 'generated' AND l1_batch_number = $1",
+            l1_batch_number.0 as i64
+        )
+        .execute(transaction.conn())
+        .await?;
+        transaction.commit().await.unwrap();
+
+        Ok(())
+    }
+
     pub async fn update_assigments_status_by_punished(
         &mut self,
         verification_address: Address,
@@ -191,6 +221,21 @@ impl AssignmentsDal<'_, '_> {
         .map(|row| (ProverResultStatus::from_str(&row.status).unwrap(), row.created_at.timestamp_millis()));
 
         Ok(status_and_created_at)
+    }
+
+    pub async fn get_verification_address(
+        &mut self,
+        l1_batch_number: L1BatchNumber,
+    ) -> Result<Address, SqlxError> {
+        let address = sqlx::query!(
+            "SELECT verification_address FROM assignments WHERE l1_batch_number = $1 AND status = 'successful' LIMIT 1",
+            l1_batch_number.0 as i64
+        )
+        .fetch_one(self.storage.conn())
+        .await?
+        .verification_address;
+
+        Ok(Address::from_slice(&address))
     }
 
     pub async fn save_proof_artifacts_metadata(

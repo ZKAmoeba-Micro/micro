@@ -3322,6 +3322,18 @@
     },
     "query": "SELECT MAX(number) as \"number\" FROM miniblocks"
   },
+  "34a07dedbd65e436648fcbb7ef546d363848df80ea981d19752b399044c9f4e3": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      }
+    },
+    "query": "UPDATE proof_generation_details SET status = 'ready_to_be_proven', updated_at = now() WHERE status = 'generated' AND l1_batch_number = $1"
+  },
   "357347157ed8ff19d223c54533c3a85bd7e64a37514d657f8d49bd6eb5be1806": {
     "describe": {
       "columns": [
@@ -8340,6 +8352,26 @@
     },
     "query": "\n                SELECT\n                    (SELECT l1_batch_number\n                    FROM prover_jobs\n                    WHERE status NOT IN ('successful', 'skipped')\n                    ORDER BY l1_batch_number\n                    LIMIT 1) as \"successful_limit!\",\n                    \n                    (SELECT l1_batch_number\n                    FROM prover_jobs\n                    WHERE status <> 'queued'\n                    ORDER BY l1_batch_number DESC\n                    LIMIT 1) as \"queued_limit!\",\n\n                    (SELECT MAX(l1_batch_number) as \"max!\" FROM prover_jobs) as \"max_block!\"\n                "
   },
+  "9ce2c512b92fa53fc82bfb7946f6b65e81b4cd797bc7971c9dba6dc3fceb021c": {
+    "describe": {
+      "columns": [
+        {
+          "name": "verification_address",
+          "ordinal": 0,
+          "type_info": "Bytea"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      }
+    },
+    "query": "SELECT verification_address FROM assignments WHERE l1_batch_number = $1 AND status = 'successful' LIMIT 1"
+  },
   "9d28c1be3bda0c4fb37567d4a56730e801f48fbb2abad42ea894ebd8ee40412d": {
     "describe": {
       "columns": [],
@@ -11385,6 +11417,19 @@
       }
     },
     "query": "\n                SELECT * FROM transactions\n                WHERE hash = $1\n            "
+  },
+  "eb2c2888c2ca714be2504b1cb6c929d2ad11fc4e635043e68938141cb015b3e2": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Bytea",
+          "Int8"
+        ]
+      }
+    },
+    "query": "UPDATE assignments SET status ='be_punished', updated_at = now() WHERE verification_address = $1 AND l1_batch_number = $2"
   },
   "eb95c3daeffd23d35d4e047e3bb8dc44e93492a6d41cf0fd1624d3ea4a2267c9": {
     "describe": {

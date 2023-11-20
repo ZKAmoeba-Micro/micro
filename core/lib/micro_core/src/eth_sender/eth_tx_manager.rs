@@ -9,6 +9,7 @@ use micro_eth_client::{
     BoundEthInterface,
 };
 use micro_types::{
+    aggregated_operations::AggregatedActionType,
     eth_sender::EthTx,
     web3::{contract::Options, error::Error as Web3Error},
     L1BlockNumber, Nonce, DEPLOY_L2_CONTRACT_TX_GAS_LIMIT, H256, U256,
@@ -657,6 +658,9 @@ where
                 let res = self.send_eth_tx(storage, &tx, 0, current_block).await;
                 if let Err(e) = res {
                     tracing::warn!("send new eth tx failed {}", e);
+                    if tx.tx_type == AggregatedActionType::PublishProofOnchain {
+                        self.check_proof_invalid(storage, &tx, e).await;
+                    }
                 }
             }
         }
@@ -693,9 +697,41 @@ where
                 .await;
             if let Err(e) = res {
                 tracing::warn!("send eth tx failed {}", e);
+                if tx.tx_type == AggregatedActionType::PublishProofOnchain {
+                    self.check_proof_invalid(storage, &tx, e).await;
+                }
             }
         }
 
         Ok(l1_block_numbers.latest)
+    }
+
+    async fn check_proof_invalid(
+        &mut self,
+        storage: &mut StorageProcessor<'_>,
+        tx: &EthTx,
+        e: ETHSenderError,
+    ) {
+        if !e.to_string().contains("Error(p)") {
+            return;
+        }
+        // proof verification fail
+        let l1_batch_headers = storage
+            .blocks_dal()
+            .get_l1_batches_for_eth_tx_id(tx.id)
+            .await
+            .unwrap();
+        for l1_batch_header in l1_batch_headers {
+            let verification_address = storage
+                .assignments_dal()
+                .get_verification_address(l1_batch_header.number)
+                .await
+                .unwrap();
+            storage
+                .assignments_dal()
+                .update_assigments_status_be_punished(verification_address, l1_batch_header.number)
+                .await
+                .unwrap();
+        }
     }
 }
