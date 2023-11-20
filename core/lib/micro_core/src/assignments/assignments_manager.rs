@@ -60,12 +60,13 @@ impl AssignmentsManager {
             .select_normal_user_list(UserStatus::Normal)
             .await;
         let user_count = user_list.len();
-        tracing::info!("assign_proof_tasks list size: {:?}", user_count);
         if user_count > 0 {
+            tracing::info!("assign_proof_tasks list size: {:?}", user_count);
             let batch_numbers = connection
                 .proof_generation_dal()
                 .get_batch_number_list()
                 .await;
+            tracing::info!("assign_proof_tasks list: {:?}", user_list);
             for batch_number in batch_numbers {
                 for user in &mut user_list {
                     if let Some(sub_value) = &batch_number.0.checked_sub(user.last_batch_number.0) {
@@ -75,7 +76,6 @@ impl AssignmentsManager {
                     }
                 }
                 user_list.sort_by(|a, b| a.base_score.cmp(&b.base_score));
-                tracing::info!("assign_proof_tasks list: {:?}", user_list);
                 if let Some(top_user) = user_list.first() {
                     let address = top_user.verification_address;
                     //TODO error
