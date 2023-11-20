@@ -103,7 +103,7 @@ impl AssignmentsManager {
                         }
                         _ => {
                             //TODO
-                            tracing::info!(
+                            tracing::error!(
                                 "assign_proof_tasks tx is fail address: {:?},block_number:{:?}",
                                 &address,
                                 &batch_number
@@ -155,7 +155,7 @@ impl AssignmentsManager {
                         .await;
                 }
                 _ => {
-                    tracing::info!("send_be_punished_tx is fail address: {:?}", &address);
+                    tracing::error!("send_be_punished_tx is fail address: {:?}", &address);
                 }
             };
         }
