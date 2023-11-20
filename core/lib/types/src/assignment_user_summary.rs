@@ -11,6 +11,8 @@ pub enum UserStatus {
     Frozon,
     #[strum(serialize = "applying")]
     Applying,
+    #[strum(serialize = "unknow")]
+    Unknow,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

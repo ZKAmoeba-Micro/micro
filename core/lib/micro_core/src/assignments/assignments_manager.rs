@@ -206,8 +206,15 @@ impl AssignmentsManager {
             let user_status = match status {
                 0 => UserStatus::UnDeposit,
                 1 => UserStatus::Normal,
+                2 => UserStatus::Frozon,
                 3 => UserStatus::Applying,
-                _ => UserStatus::Frozon,
+                _ => {
+                    tracing::error!(
+                        "monitor_change_event user_status is Unknow,address: {:?}",
+                        &address
+                    );
+                    UserStatus::Unknow
+                }
             };
             let block_number = log.block_number.unwrap();
             let param_info = AssignmentUserSummaryInfo::new(address, base_score, batch_number);
