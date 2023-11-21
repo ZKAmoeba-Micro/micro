@@ -1,19 +1,19 @@
 use micro_basic_types::{Address, L1BatchNumber};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, strum::Display, strum::EnumString, strum::AsRefStr)]
-pub enum UserStatus {
-    #[strum(serialize = "undeposit")]
-    UnDeposit,
-    #[strum(serialize = "normal")]
-    Normal,
-    #[strum(serialize = "frozon")]
-    Frozon,
-    #[strum(serialize = "applying")]
-    Applying,
-    #[strum(serialize = "unknow")]
-    Unknow,
-}
+// #[derive(Debug, strum::Display, strum::EnumString, strum::AsRefStr)]
+// pub enum UserStatus {
+//     #[strum(serialize = "undeposit")]
+//     UnDeposit,
+//     #[strum(serialize = "normal")]
+//     Normal,
+//     #[strum(serialize = "frozon")]
+//     Frozon,
+//     #[strum(serialize = "applying")]
+//     Applying,
+//     #[strum(serialize = "unknow")]
+//     Unknow,
+// }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]

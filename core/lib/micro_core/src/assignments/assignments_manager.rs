@@ -6,19 +6,13 @@ use micro_dal::ConnectionPool;
 use micro_prover_utils::periodic_job::PeriodicJob;
 use micro_types::{
     api::{BlockNumber, GetLogsFilter},
-    assignment_user_summary::{AssignmentUserSummaryInfo, UserStatus},
+    assignment_user_summary::AssignmentUserSummaryInfo,
     ethabi::{Contract, Token},
     l2::score_update::{ScoreUpdate, Status},
     transaction_request::CallRequest,
-    Bytes, L1BatchNumber, MiniblockNumber, H256, U256, U64,
+    Bytes, L1BatchNumber, MiniblockNumber, H256, U256,
 };
-use micro_utils::{h256_to_account_address, h256_to_u32};
-use std::{
-    collections::HashMap,
-    convert::TryFrom,
-    ops::Add,
-    time::{Duration, Instant},
-};
+use std::{collections::HashMap, convert::TryFrom, ops::Add, time::Duration};
 #[derive(Debug)]
 
 pub struct AssignmentsManager {
@@ -63,7 +57,7 @@ impl AssignmentsManager {
         let mut connection = self.pool.access_storage().await.unwrap();
         let mut user_list = connection
             .assignment_user_summary_dal()
-            .select_normal_user_list(UserStatus::Normal)
+            .select_normal_user_list(Status::Normal)
             .await;
         let user_count = user_list.len();
         if user_count > 0 {
@@ -220,18 +214,11 @@ impl AssignmentsManager {
         }
 
         let scores: Vec<ScoreUpdate> = scores_map.values().cloned().collect();
-
         for score in scores {
             let status = score.status;
             if status == Status::Unknow {
                 continue;
             }
-            let user_status = match status {
-                Status::UnDeposit => UserStatus::UnDeposit,
-                Status::Normal => UserStatus::Normal,
-                Status::Applying => UserStatus::Applying,
-                _ => UserStatus::Frozon,
-            };
             let param_info = AssignmentUserSummaryInfo::new(
                 score.prover,
                 score.base_score.as_u32() as u16,
@@ -241,7 +228,7 @@ impl AssignmentsManager {
                 .assignment_user_summary_dal()
                 .add_or_update_assignment_user_summary_info(
                     param_info,
-                    user_status,
+                    status,
                     MiniblockNumber(score.mini_block_number),
                 )
                 .await;

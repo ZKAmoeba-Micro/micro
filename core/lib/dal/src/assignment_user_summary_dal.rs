@@ -1,7 +1,7 @@
 use crate::{instrument::InstrumentExt, SqlxError, StorageProcessor};
 use micro_types::{
-    assignment_user_summary::{AssignmentUserSummaryInfo, UserStatus},
-    Address, L1BatchNumber, MiniblockNumber,
+    assignment_user_summary::AssignmentUserSummaryInfo, l2::score_update::Status, Address,
+    L1BatchNumber, MiniblockNumber,
 };
 #[derive(Debug)]
 pub struct AssignmentUserSummaryDal<'a, 'c> {
@@ -12,7 +12,7 @@ impl AssignmentUserSummaryDal<'_, '_> {
     pub async fn add_or_update_assignment_user_summary_info(
         &mut self,
         param_info: AssignmentUserSummaryInfo,
-        status: UserStatus,
+        status: Status,
         miniblock_number: MiniblockNumber,
     ) -> Result<(), SqlxError> {
         tracing::info!(
@@ -38,7 +38,7 @@ impl AssignmentUserSummaryDal<'_, '_> {
 
     pub async fn select_normal_user_list(
         &mut self,
-        status: UserStatus,
+        status: Status,
     ) -> Vec<AssignmentUserSummaryInfo> {
         let result = sqlx::query!("select verification_address,base_score,last_batch_number from assignment_user_summary where status=$1",
             status.to_string()

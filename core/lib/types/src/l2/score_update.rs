@@ -6,12 +6,19 @@ use micro_basic_types::ethabi::{decode, ParamType};
 use micro_utils::{h256_to_account_address, h256_to_u256};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(
+    Debug, strum::Display, strum::EnumString, Clone, Serialize, Deserialize, PartialEq, Eq,
+)]
 pub enum Status {
+    #[strum(serialize = "undeposit")]
     UnDeposit,
+    #[strum(serialize = "normal")]
     Normal,
+    #[strum(serialize = "frozen")]
     Frozen,
+    #[strum(serialize = "applying")]
     Applying,
+    #[strum(serialize = "unknow")]
     Unknow,
 }
 
