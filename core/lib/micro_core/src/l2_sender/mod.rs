@@ -121,7 +121,10 @@ impl<G: L1GasPriceProvider> L2Sender<G> {
                 }
                 data = self.msg_receiver.next() => {
                     if let Some(data) = data {
-                        self.process(data).await?;
+                        let res = self.process(data).await;
+                        if let Err(e) = res {
+                            tracing::error!("process l2 sender tx failed {:?}", e);
+                        }
                     }
                 }
             }
@@ -184,7 +187,18 @@ impl<G: L1GasPriceProvider> L2Sender<G> {
             .tx_sender
             .get_txs_fee_in_wei(tx.into(), scale_factor, acceptable_overestimation)
             .await
-            .map_err(|err| Web3Error::SubmitTransactionError(err.to_string(), err.data()))?;
+            .map_err(|err| Web3Error::SubmitTransactionError(err.to_string(), err.data()));
+
+        let fee = match fee {
+            Ok(f) => f,
+            Err(e) => {
+                callback
+                    .send(Err(e))
+                    .map_err(|_| Web3Error::InternalError)?;
+
+                return Ok(());
+            }
+        };
 
         let tx = TransactionParameters {
             nonce: data.nonce.unwrap_or_default(),
