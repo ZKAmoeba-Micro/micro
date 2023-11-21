@@ -8,11 +8,17 @@ use micro_types::{
     api::{BlockNumber, GetLogsFilter},
     assignment_user_summary::{AssignmentUserSummaryInfo, UserStatus},
     ethabi::{Contract, Token},
+    l2::score_update::{ScoreUpdate, Status},
     transaction_request::CallRequest,
     Bytes, L1BatchNumber, MiniblockNumber, H256, U256, U64,
 };
 use micro_utils::{h256_to_account_address, h256_to_u32};
-use std::{ops::Add, time::Duration};
+use std::{
+    collections::HashMap,
+    convert::TryFrom,
+    ops::Add,
+    time::{Duration, Instant},
+};
 #[derive(Debug)]
 
 pub struct AssignmentsManager {
@@ -199,18 +205,33 @@ impl AssignmentsManager {
 
         let logs = connection
             .events_web3_dal()
+<<<<<<< HEAD
             .get_every_address_last_logs(filter, verification_address_list, i32::MAX as usize)
+=======
+            .get_logs(filter, i32::MAX as usize)
+>>>>>>> cefe0cb (update monitor_change_event)
             .await
             .map_err(|err| internal_error(METHOD_NAME, err))
             .unwrap();
 
+        if logs.is_empty() {
+            return;
+        }
+        let mut scores_map = HashMap::new();
         for log in logs {
-            let address = h256_to_account_address(&log.topics[1]);
-            let status = h256_to_u32(log.topics[2]);
-            let base_score = h256_to_u32(log.topics[3]) as u16;
-            let batch_number = L1BatchNumber(h256_to_u32(H256::from_slice(&log.data.0)));
+            let score_update = ScoreUpdate::try_from(log).unwrap();
+            scores_map.insert(score_update.prover, score_update);
+        }
 
+        let scores: Vec<ScoreUpdate> = scores_map.values().cloned().collect();
+
+        for score in scores {
+            let status = score.status;
+            if status == Status::Unknow {
+                continue;
+            }
             let user_status = match status {
+<<<<<<< HEAD
                 0 => UserStatus::UnDeposit,
                 1 => UserStatus::Normal,
                 2 => UserStatus::Frozon,
@@ -222,18 +243,51 @@ impl AssignmentsManager {
                     );
                     UserStatus::Unknow
                 }
+=======
+                Status::UnDeposit => UserStatus::UnDeposit,
+                Status::Normal => UserStatus::Normal,
+                Status::Applying => UserStatus::Applying,
+                _ => UserStatus::Frozon,
+>>>>>>> cefe0cb (update monitor_change_event)
             };
-            let block_number = log.block_number.unwrap();
-            let param_info = AssignmentUserSummaryInfo::new(address, base_score, batch_number);
+            let param_info = AssignmentUserSummaryInfo::new(
+                score.prover,
+                score.base_score.as_u32() as u16,
+                L1BatchNumber(score.batch_number.as_u32()),
+            );
             let _ = connection
                 .assignment_user_summary_dal()
                 .add_or_update_assignment_user_summary_info(
                     param_info,
                     user_status,
-                    MiniblockNumber(U64::as_u32(&block_number)),
+                    MiniblockNumber(score.mini_block_number),
                 )
                 .await;
         }
+
+        // for log in logs {
+        //     let address = h256_to_account_address(&log.topics[1]);
+        //     let status = h256_to_u32(log.topics[2]);
+        //     let base_score = h256_to_u32(log.topics[3]) as u16;
+        //     let batch_number = L1BatchNumber(h256_to_u32(H256::from_slice(&log.data.0)));
+
+        //     let user_status = match status {
+        //         0 => UserStatus::UnDeposit,
+        //         1 => UserStatus::Normal,
+        //         3 => UserStatus::Applying,
+        //         _ => UserStatus::Frozon,
+        //     };
+        //     let block_number = log.block_number.unwrap();
+        //     let param_info = AssignmentUserSummaryInfo::new(address, base_score, batch_number);
+        //     let _ = connection
+        //         .assignment_user_summary_dal()
+        //         .add_or_update_assignment_user_summary_info(
+        //             param_info,
+        //             user_status,
+        //             MiniblockNumber(U64::as_u32(&block_number)),
+        //         )
+        //         .await;
+        // }
     }
 }
 // /// Prove task assigned to verification node periodically.
