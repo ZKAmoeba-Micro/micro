@@ -205,11 +205,7 @@ impl AssignmentsManager {
 
         let logs = connection
             .events_web3_dal()
-<<<<<<< HEAD
-            .get_every_address_last_logs(filter, verification_address_list, i32::MAX as usize)
-=======
             .get_logs(filter, i32::MAX as usize)
->>>>>>> cefe0cb (update monitor_change_event)
             .await
             .map_err(|err| internal_error(METHOD_NAME, err))
             .unwrap();
@@ -231,24 +227,10 @@ impl AssignmentsManager {
                 continue;
             }
             let user_status = match status {
-<<<<<<< HEAD
-                0 => UserStatus::UnDeposit,
-                1 => UserStatus::Normal,
-                2 => UserStatus::Frozon,
-                3 => UserStatus::Applying,
-                _ => {
-                    tracing::error!(
-                        "monitor_change_event user_status is Unknow,address: {:?}",
-                        &address
-                    );
-                    UserStatus::Unknow
-                }
-=======
                 Status::UnDeposit => UserStatus::UnDeposit,
                 Status::Normal => UserStatus::Normal,
                 Status::Applying => UserStatus::Applying,
                 _ => UserStatus::Frozon,
->>>>>>> cefe0cb (update monitor_change_event)
             };
             let param_info = AssignmentUserSummaryInfo::new(
                 score.prover,
