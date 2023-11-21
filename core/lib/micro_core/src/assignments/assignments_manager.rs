@@ -101,12 +101,13 @@ impl AssignmentsManager {
                         Ok(tx_hash) => {
                             tracing::info!("assign_proof_tasks tx is success address: {:?},block_number:{:?},tx_hash:{:?}", &address,&batch_number,tx_hash);
                         }
-                        _ => {
+                        e => {
                             //TODO
                             tracing::error!(
-                                "assign_proof_tasks tx is fail address: {:?},block_number:{:?}",
+                                "assign_proof_tasks tx is fail address: {:?},block_number:{:?}, error: {:?}",
                                 &address,
-                                &batch_number
+                                &batch_number,
+                                e,
                             );
                         }
                     };
@@ -142,8 +143,7 @@ impl AssignmentsManager {
                 ..Default::default()
             };
             match self.l2_sender.send(data).await {
-                Ok(tx_hash) => {
-                    let hash = H256::from_slice(&tx_hash);
+                Ok(Ok(hash)) => {
                     //todo error
                     let _ = connection
                         .assignments_dal()
@@ -154,8 +154,12 @@ impl AssignmentsManager {
                         )
                         .await;
                 }
-                _ => {
-                    tracing::error!("send_be_punished_tx is fail address: {:?}", &address);
+                e => {
+                    tracing::error!(
+                        "send_be_punished_tx is fail address: {:?}, error {:?}",
+                        &address,
+                        e
+                    );
                 }
             };
         }

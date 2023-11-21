@@ -11,8 +11,8 @@ use tokio::sync::watch;
 use micro_config::configs::{api::Web3JsonRpcConfig, eth_sender::SenderConfig};
 use micro_eth_signer::{EthereumSigner, PrivateKeySigner, TransactionParameters};
 use micro_types::{
-    api, ethabi::Bytes, l2::L2Tx, transaction_request::CallRequest, L2ChainId, EIP_1559_TX_TYPE,
-    H256, U256, USED_BOOTLOADER_MEMORY_BYTES,
+    api, l2::L2Tx, transaction_request::CallRequest, L2ChainId, EIP_1559_TX_TYPE, H256, U256,
+    USED_BOOTLOADER_MEMORY_BYTES,
 };
 
 use self::caller::Data;
@@ -142,7 +142,7 @@ impl<G: L1GasPriceProvider> L2Sender<G> {
     async fn call(
         &self,
         data: CallRequest,
-        callback: oneshot::Sender<Bytes>,
+        callback: oneshot::Sender<Result<Vec<u8>, Web3Error>>,
     ) -> anyhow::Result<()> {
         let mut connection = self.pool.access_storage_tagged("api").await.unwrap();
         let block_args = BlockArgs::new(
@@ -155,9 +155,13 @@ impl<G: L1GasPriceProvider> L2Sender<G> {
 
         let tx = L2Tx::from_request(data.into(), USED_BOOTLOADER_MEMORY_BYTES)?;
 
-        let res = self.tx_sender.eth_call(block_args, tx).await?;
+        let call_result = self.tx_sender.eth_call(block_args, tx).await;
+        let call_result = call_result
+            .map_err(|err| Web3Error::SubmitTransactionError(err.to_string(), err.data()));
 
-        callback.send(res).map_err(|_| Web3Error::InternalError)?;
+        callback
+            .send(call_result)
+            .map_err(|_| Web3Error::InternalError)?;
 
         Ok(())
     }
@@ -165,7 +169,7 @@ impl<G: L1GasPriceProvider> L2Sender<G> {
     async fn send(
         &self,
         mut data: CallRequest,
-        callback: oneshot::Sender<Bytes>,
+        callback: oneshot::Sender<Result<H256, Web3Error>>,
     ) -> anyhow::Result<()> {
         data.from = Some(self.eth_signer.get_address().await.unwrap());
         data.nonce = Some(self.get_nonce().await);
@@ -202,10 +206,19 @@ impl<G: L1GasPriceProvider> L2Sender<G> {
         let mut l2_tx = L2Tx::from_request(tx_request, self.config.max_tx_size)?;
         l2_tx.set_input(signed_tx, hash);
 
-        self.tx_sender.submit_tx(l2_tx).await?;
+        let submit_result = self.tx_sender.submit_tx(l2_tx).await;
+        let submit_result = submit_result.map(|_| hash).map_err(|err| {
+            tracing::debug!("Send raw transaction error: {err}");
+            metrics::counter!(
+                "l2.submit_tx_error",
+                1,
+                "reason" => err.grafana_error_code()
+            );
+            Web3Error::SubmitTransactionError(err.to_string(), err.data())
+        });
 
         callback
-            .send(hash.as_bytes().to_vec())
+            .send(submit_result)
             .map_err(|_| Web3Error::InternalError)?;
 
         Ok(())
@@ -227,20 +240,11 @@ impl<G: L1GasPriceProvider> L2Sender<G> {
     async fn get_nonce(&self) -> U256 {
         let mut connection = self.pool.access_storage_tagged("api").await.unwrap();
 
-        let latest_block_number = connection
-            .blocks_web3_dal()
-            .get_sealed_miniblock_number()
+        connection
+            .transactions_web3_dal()
+            .next_nonce_by_initiator_account(self.eth_signer.get_address().await.unwrap())
             .await
-            .unwrap();
-        let nonce = connection
-            .storage_web3_dal()
-            .get_address_historical_nonce(
-                self.eth_signer.get_address().await.unwrap(),
-                latest_block_number,
-            )
-            .await
-            .unwrap();
-        nonce
+            .unwrap()
     }
 }
 
