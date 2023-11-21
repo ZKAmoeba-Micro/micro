@@ -925,24 +925,6 @@
     },
     "query": "SELECT COUNT(*) as \"count!\" FROM l1_batches WHERE number = $1 AND hash = $2 AND merkle_root_hash = $3 AND parent_hash = $4 AND l2_l1_merkle_root = $5"
   },
-  "0e477f5155977a1bb5093c5a2b00d5c99a55ea3cb8293e218f1a68f9b4cb4a6c": {
-    "describe": {
-      "columns": [
-        {
-          "name": "l1_batch_number",
-          "ordinal": 0,
-          "type_info": "Int8"
-        }
-      ],
-      "nullable": [
-        false
-      ],
-      "parameters": {
-        "Left": []
-      }
-    },
-    "query": "SELECT l1_batch_number FROM proof_generation_details WHERE status = 'ready_to_be_proven' ORDER BY l1_batch_number ASC FOR UPDATE SKIP LOCKED"
-  },
   "0ee31e6e2ec60f427d8dec719ec0ba03ef75bc610e878ae32b0bf61c4c2c1366": {
     "describe": {
       "columns": [
@@ -9667,6 +9649,24 @@
       }
     },
     "query": "SELECT l1_address, l2_address FROM tokens WHERE well_known = true"
+  },
+  "b5af3baa7d45b043f22cecd87248c90db3faef4bf370a03654a794d5bfff326a": {
+    "describe": {
+      "columns": [
+        {
+          "name": "l1_batch_number",
+          "ordinal": 0,
+          "type_info": "Int8"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Left": []
+      }
+    },
+    "query": "SELECT l1_batch_number FROM proof_generation_details WHERE status = 'ready_to_be_proven' and l1_batch_number not in (select l1_batch_number from assignments where status ='assigned_not_certified') ORDER BY l1_batch_number ASC FOR UPDATE SKIP LOCKED"
   },
   "b6c8e0827b2389a14433c031332962495311562ae9652ae7e9409a4bf48dc55b": {
     "describe": {

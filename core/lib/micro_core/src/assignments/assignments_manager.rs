@@ -67,6 +67,7 @@ impl AssignmentsManager {
                 .get_batch_number_list()
                 .await;
             tracing::info!("assign_proof_tasks list: {:?}", user_list);
+            tracing::info!("assign_proof_tasks batch_numbers: {:?}", batch_numbers);
             for batch_number in batch_numbers {
                 for user in &mut user_list {
                     if let Some(sub_value) = &batch_number.0.checked_sub(user.last_batch_number.0) {
@@ -97,17 +98,18 @@ impl AssignmentsManager {
                         data: Some(Bytes(abi_data)),
                         ..Default::default()
                     };
+                    
                     match self.l2_sender.send(data).await {
                         Ok(tx_hash) => {
                             tracing::info!("assign_proof_tasks tx is success address: {:?},block_number:{:?},tx_hash:{:?}", &address,&batch_number,tx_hash);
                         }
-                        e => {
+                        Err(r) => {
                             //TODO
                             tracing::error!(
-                                "assign_proof_tasks tx is fail address: {:?},block_number:{:?}, error: {:?}",
+                                "assign_proof_tasks tx is fail address: {:?},block_number:{:?},err:{}",
                                 &address,
                                 &batch_number,
-                                e,
+                                r
                             );
                         }
                     };

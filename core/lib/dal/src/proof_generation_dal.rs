@@ -111,7 +111,7 @@ impl ProofGenerationDal<'_, '_> {
     }
 
     pub async fn get_batch_number_list(&mut self) -> Vec<L1BatchNumber> {
-        let result = sqlx::query!("SELECT l1_batch_number FROM proof_generation_details WHERE status = 'ready_to_be_proven' ORDER BY l1_batch_number ASC FOR UPDATE SKIP LOCKED")
+        let result = sqlx::query!("SELECT l1_batch_number FROM proof_generation_details WHERE status = 'ready_to_be_proven' and l1_batch_number not in (select l1_batch_number from assignments where status ='assigned_not_certified') ORDER BY l1_batch_number ASC FOR UPDATE SKIP LOCKED")
         .fetch_all(self.storage.conn())
         .await
         .unwrap();

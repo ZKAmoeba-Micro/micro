@@ -706,8 +706,8 @@ pub async fn initialize_components(
             .context("failed to build assignment_pool")?;
         //TODO Add configuration
         let assignments_man = AssignmentsManager::new(
-            Duration::from_secs(60),
-            3000,
+            Duration::from_secs(5*60),
+            60000,
             assignment_pool,
             1,
             caller.unwrap(),
