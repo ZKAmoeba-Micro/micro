@@ -98,7 +98,7 @@ impl AssignmentsManager {
                         data: Some(Bytes(abi_data)),
                         ..Default::default()
                     };
-                    
+
                     match self.l2_sender.send(data).await {
                         Ok(tx_hash) => {
                             tracing::info!("assign_proof_tasks tx is success address: {:?},block_number:{:?},tx_hash:{:?}", &address,&batch_number,tx_hash);
@@ -198,7 +198,7 @@ impl AssignmentsManager {
             addresses: vec![DEPOSIT_ADDRESS],
             topics: topics,
         };
-
+        tracing::warn!("monitor_change_event filter: {:?}", &filter);
         let logs = connection
             .events_web3_dal()
             .get_logs(filter, i32::MAX as usize)
@@ -207,6 +207,7 @@ impl AssignmentsManager {
             .unwrap();
 
         if logs.is_empty() {
+            tracing::warn!("monitor_change_event logs is null");
             return;
         }
         let mut scores_map = HashMap::new();
@@ -214,6 +215,7 @@ impl AssignmentsManager {
             let score_update = ScoreUpdate::try_from(log).unwrap();
             scores_map.insert(score_update.prover, score_update);
         }
+        tracing::warn!("monitor_change_event scores_map:{:?}", scores_map);
 
         let scores: Vec<ScoreUpdate> = scores_map.values().cloned().collect();
         for score in scores {
