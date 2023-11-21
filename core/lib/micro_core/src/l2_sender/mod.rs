@@ -199,7 +199,8 @@ impl<G: L1GasPriceProvider> L2Sender<G> {
 
         let (tx_request, hash) =
             api::TransactionRequest::from_bytes(&signed_tx, self.config.chain_id)?;
-        let l2_tx = L2Tx::from_request(tx_request, self.config.max_tx_size)?;
+        let mut l2_tx = L2Tx::from_request(tx_request, self.config.max_tx_size)?;
+        l2_tx.set_input(signed_tx, hash);
 
         self.tx_sender.submit_tx(l2_tx).await?;
 
