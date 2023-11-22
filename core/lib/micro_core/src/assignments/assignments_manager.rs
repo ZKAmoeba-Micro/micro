@@ -1,8 +1,9 @@
 use crate::{api_server::web3::backend_jsonrpc::error::internal_error, l2_sender::caller::Caller};
 use async_trait::async_trait;
+use chrono::Utc;
 use micro_config::constants::DEPOSIT_ADDRESS;
 use micro_contracts::sys_deposit_contract;
-use micro_dal::ConnectionPool;
+use micro_dal::{assignments_dal::ProverResultStatus, ConnectionPool};
 use micro_prover_utils::periodic_job::PeriodicJob;
 use micro_types::{
     api::{BlockNumber, GetLogsFilter},
@@ -70,22 +71,39 @@ impl AssignmentsManager {
                 .await;
             tracing::info!("assign_proof_tasks list: {:?}", user_list);
             tracing::info!("assign_proof_tasks batch_numbers: {:?}", batch_numbers);
+            let now: i64 = Utc::now().timestamp_millis() / 1000;
             for batch_number in batch_numbers {
                 for user in &mut user_list {
-                    if let Some(sub_value) = &batch_number.0.checked_sub(user.last_batch_number.0) {
-                        if let Some(dyn_score) = sub_value.checked_mul(self.once_score.into()) {
-                            user.base_score = user.base_score.add(dyn_score as u16);
-                        }
+                    let sub_value = now - user.last_time;
+                    if let Some(dyn_score) = sub_value.checked_mul(self.once_score.into()) {
+                        user.base_score = user.base_score.add(dyn_score as u16);
                     }
                 }
                 user_list.sort_by(|a, b| a.base_score.cmp(&b.base_score));
+                tracing::info!("assign_proof_tasks batch_numbers: {:?}", user_list);
                 if let Some(top_user) = user_list.first() {
                     let address = top_user.verification_address;
-                    //TODO error
-                    let _ = connection
+                    let status = connection
                         .assignments_dal()
-                        .insert_and_update_assignments(address.clone(), batch_number.clone())
+                        .get_last_status(address.clone(), batch_number.clone())
                         .await;
+
+                    match status {
+                        Ok(s) => {
+                            if s.to_string() != ProverResultStatus::Failed.to_string() {
+                                continue;
+                            }
+                        }
+                        Err(e) => tracing::error!("assign_proof_tasks status e:{:?}", e),
+                    }
+                    let res = connection
+                        .assignments_dal()
+                        .insert_and_update_assignments(address.clone(), batch_number.clone(), now)
+                        .await;
+                    match res {
+                        Err(r) => tracing::error!("assign_proof_tasks status res:{:?}", r),
+                        _ => {}
+                    }
                     let abi_data = self
                         .deposit_abi
                         .function("assignment")
@@ -240,7 +258,7 @@ impl AssignmentsManager {
             let param_info = AssignmentUserSummaryInfo::new(
                 score.prover,
                 score.base_score.as_u32() as u16,
-                L1BatchNumber(score.latest_assignment_time.as_u32()),
+                score.latest_assignment_time.as_u64() as i64,
             );
             let _ = connection
                 .assignment_user_summary_dal()

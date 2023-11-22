@@ -31,19 +31,20 @@ impl AssignmentsDal<'_, '_> {
         &mut self,
         verification_address: Address,
         block_number: L1BatchNumber,
+        last_time: i64,
     ) -> Result<(), SqlxError> {
         let mut transaction = self.storage.start_transaction().await.unwrap();
 
         tracing::info!("insert_assignments verification_address:{verification_address},block_number:{block_number}");
 
-        sqlx::query!("INSERT INTO assignments (verification_address,l1_batch_number, status, created_at, updated_at) VALUES ($1,$2, 'assigned_not_certified', now(), now()) ON CONFLICT (verification_address,l1_batch_number) DO NOTHING",
+        sqlx::query!("INSERT INTO assignments (verification_address,l1_batch_number, status, created_at, updated_at) VALUES ($1,$2, 'assigned_not_certified', now(), now())",
              verification_address.as_bytes(),
              block_number.0 as i64,
         )
         .execute(transaction.conn())
         .await?;
-        sqlx::query!("UPDATE assignment_user_summary SET last_batch_number=$1, update_at = now() WHERE  verification_address = $2",
-        block_number.0 as i64,
+        sqlx::query!("UPDATE assignment_user_summary SET last_time=$1, update_at = now() WHERE  verification_address = $2",
+        last_time,
         verification_address.as_bytes(),
         )
         .execute(transaction.conn())
@@ -272,5 +273,25 @@ impl AssignmentsDal<'_, '_> {
         transaction.commit().await.unwrap();
 
         Ok(())
+    }
+
+    pub async fn get_last_status(
+        &mut self,
+        prover: Address,
+        block_number: L1BatchNumber,
+    ) -> Result<ProverResultStatus, SqlxError> {
+        let row = sqlx::query!("SELECT status FROM assignments WHERE verification_address = $1 AND l1_batch_number = $2 order by created_at desc LIMIT 1",
+            prover.as_bytes(),
+            block_number.0 as i64
+        )
+        .fetch_optional(self.storage.conn())
+        .await
+        .unwrap();
+        tracing::info!("get_last_status row:{:?}", row);
+
+        match row {
+            Some(r) => Ok(ProverResultStatus::from_str(&r.status).unwrap()),
+            None => Ok(ProverResultStatus::Failed.into()),
+        }
     }
 }
