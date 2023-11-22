@@ -1,10 +1,9 @@
 //! Testing harness for the IO.
 
-use micro_state::PostgresStorageCaches;
 use std::{sync::Arc, time::Duration};
 use vm::constants::BLOCK_GAS_LIMIT;
 
-use micro_config::configs::{api::Web3JsonRpcConfig, chain::StateKeeperConfig};
+use micro_config::configs::chain::StateKeeperConfig;
 use micro_config::GasAdjusterConfig;
 use micro_contracts::BaseSystemContracts;
 use micro_dal::ConnectionPool;

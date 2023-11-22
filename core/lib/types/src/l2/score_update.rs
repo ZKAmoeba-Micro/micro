@@ -27,7 +27,7 @@ pub struct ScoreUpdate {
     pub prover: Address,
     pub status: Status,
     pub base_score: U256,
-    pub batch_number: U256,
+    pub latest_assignment_time: U256,
     pub mini_block_number: u32,
 }
 
@@ -52,7 +52,7 @@ impl TryFrom<Log> for ScoreUpdate {
 
         let mut decoded = decode(&[ParamType::Uint(256)], &event.data.0).unwrap();
 
-        let batch_number = decoded.remove(0).into_uint().unwrap();
+        let latest_assignment_time = decoded.remove(0).into_uint().unwrap();
 
         // //todo  put info to data,not topics
         // let mut decoded = decode(
@@ -76,13 +76,13 @@ impl TryFrom<Log> for ScoreUpdate {
         //     _ => return Err(Self::Error::InvalidData),
         // };
         // let base_score = decoded.remove(0).into_uint().unwrap();
-        // let batch_number = decoded.remove(0).into_uint().unwrap();
+        // let latest_assignment_time = decoded.remove(0).into_uint().unwrap();
 
         Ok(ScoreUpdate {
             prover,
             status,
             base_score,
-            batch_number,
+            latest_assignment_time,
             mini_block_number,
         })
     }

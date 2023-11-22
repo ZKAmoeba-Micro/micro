@@ -10,7 +10,7 @@ use micro_types::{
     ethabi::{Contract, Token},
     l2::score_update::{ScoreUpdate, Status},
     transaction_request::CallRequest,
-    Bytes, L1BatchNumber, MiniblockNumber, H256, U256,
+    Bytes, L1BatchNumber, MiniblockNumber, H256,
 };
 use std::{collections::HashMap, convert::TryFrom, ops::Add, time::Duration};
 #[derive(Debug)]
@@ -90,10 +90,7 @@ impl AssignmentsManager {
                         .deposit_abi
                         .function("assignment")
                         .unwrap()
-                        .encode_input(&[
-                            Token::Address(address.clone()),
-                            Token::Uint(U256::from(batch_number.0)),
-                        ])
+                        .encode_input(&[Token::Address(address.clone())])
                         .unwrap();
                     let data = CallRequest {
                         to: Some(DEPOSIT_ADDRESS),
@@ -243,7 +240,7 @@ impl AssignmentsManager {
             let param_info = AssignmentUserSummaryInfo::new(
                 score.prover,
                 score.base_score.as_u32() as u16,
-                L1BatchNumber(score.batch_number.as_u32()),
+                L1BatchNumber(score.latest_assignment_time.as_u32()),
             );
             let _ = connection
                 .assignment_user_summary_dal()
