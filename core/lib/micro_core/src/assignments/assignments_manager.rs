@@ -24,6 +24,7 @@ pub struct AssignmentsManager {
     l2_sender: Caller,
     deposit_abi: Contract,
     event_signatures: Vec<H256>,
+    from_block: u32,
 }
 
 impl AssignmentsManager {
@@ -50,6 +51,7 @@ impl AssignmentsManager {
             l2_sender,
             deposit_abi: contract_abi,
             event_signatures,
+            from_block: 0_u32,
         }
     }
 
@@ -168,21 +170,36 @@ impl AssignmentsManager {
     }
     async fn monitor_change_event(&mut self) {
         const METHOD_NAME: &str = "monitor_change_event";
-
         let mut connection = self.pool.access_storage().await.unwrap();
-        let mut latest_mini_block_number = connection
+        let latest_mini_block_number = connection
             .assignment_user_summary_dal()
             .get_max_miniblock_number()
             .await
-            .unwrap();
+            .unwrap_or(MiniblockNumber(self.from_block));
+        tracing::warn!(
+            "monitor_change_event latest_mini_block_number: {:?},from:{}",
+            &latest_mini_block_number,
+            self.from_block
+        );
         if latest_mini_block_number.0 == 0 {
-            latest_mini_block_number = connection
-                .blocks_web3_dal()
-                .get_sealed_miniblock_number()
-                .await
-                .unwrap();
+            self.from_block = self.from_block;
+        } else if latest_mini_block_number.0 != 0 && latest_mini_block_number.0 > self.from_block {
+            self.from_block = latest_mini_block_number.0;
+        } else {
+            self.from_block = self.from_block + 1;
         }
-        let next_number = (latest_mini_block_number.0 as i32) + 99;
+        // if self.from_block==0 || (latest_mini_block_number.0!=0 && latest_mini_block_number.0 >self.from_block){
+        //     self.from_block=latest_mini_block_number.0;
+        // }
+        // if latest_mini_block_number.0 == 0 {
+        //     latest_mini_block_number = connection
+        //         .blocks_web3_dal()
+        //         .get_sealed_miniblock_number()
+        //         .await
+        //         .unwrap();
+        // }
+
+        let next_number = (self.from_block as i32) + 99;
         //Multiple parameter lists for one event
         let mut topics = Vec::new();
         //Verification address parameter of the event
@@ -193,7 +210,7 @@ impl AssignmentsManager {
         }
 
         let filter = GetLogsFilter {
-            from_block: latest_mini_block_number,
+            from_block: MiniblockNumber(self.from_block),
             to_block: Some(BlockNumber::Number(next_number.into())),
             addresses: vec![DEPOSIT_ADDRESS],
             topics: topics,
