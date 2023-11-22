@@ -105,7 +105,7 @@ impl AssignmentsDal<'_, '_> {
         sqlx::query!(
             "UPDATE assignments \
              SET status ='be_punished', updated_at = now() \
-             WHERE verification_address = $1 AND l1_batch_number = $2",
+             WHERE verification_address = $1 AND l1_batch_number = $2 AND status = 'successful'",
             verification_address.as_bytes(),
             l1_batch_number.0 as i64,
         )
@@ -212,7 +212,7 @@ impl AssignmentsDal<'_, '_> {
         l1_batch_number: L1BatchNumber,
     ) -> Result<Option<(ProverResultStatus, i64)>, SqlxError> {
         let status_and_created_at = sqlx::query!(
-            "SELECT status, created_at FROM assignments WHERE verification_address = $1 AND l1_batch_number = $2 LIMIT 1",
+            "SELECT status, created_at FROM assignments WHERE verification_address = $1 AND l1_batch_number = $2 ORDER BY created_at DESC LIMIT 1",
             prover.as_bytes(),
             l1_batch_number.0 as i64
         )

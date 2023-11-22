@@ -3426,33 +3426,6 @@
     },
     "query": "\n                    SELECT l1_batch_number, leaf_layer_subqueues_blob_url, aggregation_outputs_blob_url FROM node_aggregation_witness_jobs\n                    WHERE status='successful' AND is_blob_cleaned=FALSE\n                    AND leaf_layer_subqueues_blob_url is NOT NULL\n                    AND aggregation_outputs_blob_url is NOT NULL\n                    AND updated_at < NOW() - INTERVAL '30 days'\n                    LIMIT $1;\n                "
   },
-  "3761d87c781f78cd47f80c40b6c9d9f81f8194087b284d003e5f5a51a50d6a55": {
-    "describe": {
-      "columns": [
-        {
-          "name": "status",
-          "ordinal": 0,
-          "type_info": "Text"
-        },
-        {
-          "name": "created_at",
-          "ordinal": 1,
-          "type_info": "Timestamp"
-        }
-      ],
-      "nullable": [
-        false,
-        false
-      ],
-      "parameters": {
-        "Left": [
-          "Bytea",
-          "Int8"
-        ]
-      }
-    },
-    "query": "SELECT status, created_at FROM assignments WHERE verification_address = $1 AND l1_batch_number = $2 LIMIT 1"
-  },
   "37e4a0eea7b72bd3b75c26e003f3fa62039d9b614f0f2fa3d61e8c5e95f002fd": {
     "describe": {
       "columns": [
@@ -10474,6 +10447,19 @@
     },
     "query": "\n                UPDATE contract_verification_requests\n                SET status = 'failed', updated_at = now(), error = $2, compilation_errors = $3, panic_message = $4\n                WHERE id = $1\n                "
   },
+  "d0bd7cb5f00ac52a4cd731a8a6ce58e1c2fa79dacdba701f4354ec72347eaaf3": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Bytea",
+          "Int8"
+        ]
+      }
+    },
+    "query": "UPDATE assignments SET status ='be_punished', updated_at = now() WHERE verification_address = $1 AND l1_batch_number = $2 AND status = 'successful'"
+  },
   "d0ff67e7c59684a0e4409726544cf850dbdbb36d038ebbc6a1c5bf0e76b0358c": {
     "describe": {
       "columns": [
@@ -11128,6 +11114,33 @@
     },
     "query": "select max(miniblock_number) number from assignment_user_summary"
   },
+  "e79747950106b68228c8b577ee22c6a7a7460f7414672c7737bba3345aac206d": {
+    "describe": {
+      "columns": [
+        {
+          "name": "status",
+          "ordinal": 0,
+          "type_info": "Text"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 1,
+          "type_info": "Timestamp"
+        }
+      ],
+      "nullable": [
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Bytea",
+          "Int8"
+        ]
+      }
+    },
+    "query": "SELECT status, created_at FROM assignments WHERE verification_address = $1 AND l1_batch_number = $2 ORDER BY created_at DESC LIMIT 1"
+  },
   "e832cb91a19bd4303471010b81379e89c7fadecfaaae533d0a44f4146bf227fc": {
     "describe": {
       "columns": [
@@ -11417,19 +11430,6 @@
       }
     },
     "query": "\n                SELECT * FROM transactions\n                WHERE hash = $1\n            "
-  },
-  "eb2c2888c2ca714be2504b1cb6c929d2ad11fc4e635043e68938141cb015b3e2": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Bytea",
-          "Int8"
-        ]
-      }
-    },
-    "query": "UPDATE assignments SET status ='be_punished', updated_at = now() WHERE verification_address = $1 AND l1_batch_number = $2"
   },
   "eb95c3daeffd23d35d4e047e3bb8dc44e93492a6d41cf0fd1624d3ea4a2267c9": {
     "describe": {
