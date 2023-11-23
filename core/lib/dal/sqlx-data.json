@@ -244,18 +244,6 @@
     },
     "query": "\n                WITH events_select AS (\n                    SELECT\n                        address, topic1, topic2, topic3, topic4, value,\n                        miniblock_number, tx_hash, tx_index_in_block,\n                        event_index_in_block, event_index_in_tx\n                    FROM events\n                    WHERE miniblock_number > $1\n                    ORDER BY miniblock_number ASC, event_index_in_block ASC\n                )\n                SELECT miniblocks.hash as \"block_hash?\",\n                    address as \"address!\", topic1 as \"topic1!\", topic2 as \"topic2!\", topic3 as \"topic3!\", topic4 as \"topic4!\", value as \"value!\",\n                    miniblock_number as \"miniblock_number!\", miniblocks.l1_batch_number as \"l1_batch_number?\", tx_hash as \"tx_hash!\",\n                    tx_index_in_block as \"tx_index_in_block!\", event_index_in_block as \"event_index_in_block!\", event_index_in_tx as \"event_index_in_tx!\"\n                FROM events_select\n                INNER JOIN miniblocks ON events_select.miniblock_number = miniblocks.number\n                ORDER BY miniblock_number ASC, event_index_in_block ASC\n                "
   },
-  "053cda3ee1baf71c98cf1c5b6360e6290b26f48bc7ac1d7c7d55144f50cf78d5": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Interval"
-        ]
-      }
-    },
-    "query": "update assignments set status ='be_punished', updated_at = now() where (verification_address,l1_batch_number) in (select verification_address,l1_batch_number from assignments where now()>created_at + $1::interval and status='assigned_not_certified' )"
-  },
   "0608677396b09cda3f09d22dd42318028de7c2b9fff6ac176383a06f8f3ae761": {
     "describe": {
       "columns": [
@@ -5184,6 +5172,18 @@
       }
     },
     "query": "\n                UPDATE prover_jobs_fri\n                SET status = 'failed', error = $1, updated_at = now()\n                WHERE id = $2\n                "
+  },
+  "5b9b9211d9a24a2896c1825f7c23ce0141b3bb89a8be80d03688ba54182a8bd9": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Interval"
+        ]
+      }
+    },
+    "query": "update assignments set status ='be_punished', updated_at = now() where (verification_address,l1_batch_number) in (select verification_address,l1_batch_number from assignments where now()>created_at + $1::interval and status='assigned_not_certified' and tx_hash is null )"
   },
   "5bc8a41ae0f255b966df2102f1bd9059d55833e0afaf6e62c7ddcc9c06de8deb": {
     "describe": {
