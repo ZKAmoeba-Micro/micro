@@ -11,7 +11,7 @@ use micro_types::{
     ethabi::{Contract, Token},
     l2::score_update::{ScoreUpdate, Status},
     transaction_request::CallRequest,
-    Bytes, L1BatchNumber, MiniblockNumber, H256,
+    Bytes, MiniblockNumber, H256,
 };
 use std::{collections::HashMap, convert::TryFrom, ops::Add, time::Duration};
 #[derive(Debug)]
@@ -72,65 +72,67 @@ impl AssignmentsManager {
             tracing::info!("assign_proof_tasks list: {:?}", user_list);
             tracing::info!("assign_proof_tasks batch_numbers: {:?}", batch_numbers);
             let now: i64 = Utc::now().timestamp_millis() / 1000;
-            for batch_number in batch_numbers {
-                for user in &mut user_list {
-                    let sub_value = now - user.last_time;
-                    if let Some(dyn_score) = sub_value.checked_mul(self.once_score.into()) {
-                        user.base_score = user.base_score.add(dyn_score as u16);
-                    }
-                }
-                user_list.sort_by(|a, b| a.base_score.cmp(&b.base_score));
-                tracing::info!("assign_proof_tasks batch_numbers: {:?}", user_list);
-                if let Some(top_user) = user_list.first() {
-                    let address = top_user.verification_address;
-                    let status = connection
-                        .assignments_dal()
-                        .get_last_status(address.clone(), batch_number.clone())
-                        .await;
 
-                    match status {
-                        Ok(s) => {
-                            if s.to_string() != ProverResultStatus::Failed.to_string() {
-                                continue;
-                            }
-                        }
-                        Err(e) => tracing::error!("assign_proof_tasks status e:{:?}", e),
-                    }
-                    let res = connection
-                        .assignments_dal()
-                        .insert_and_update_assignments(address.clone(), batch_number.clone(), now)
-                        .await;
-                    match res {
-                        Err(r) => tracing::error!("assign_proof_tasks status res:{:?}", r),
-                        _ => {}
-                    }
-                    let abi_data = self
-                        .deposit_abi
-                        .function("assignment")
-                        .unwrap()
-                        .encode_input(&[Token::Address(address.clone())])
-                        .unwrap();
-                    let data = CallRequest {
-                        to: Some(DEPOSIT_ADDRESS),
-                        data: Some(Bytes(abi_data)),
-                        ..Default::default()
-                    };
-
-                    match self.l2_sender.send(data).await {
-                        Ok(tx_hash) => {
-                            tracing::info!("assign_proof_tasks tx is success address: {:?},block_number:{:?},tx_hash:{:?}", &address,&batch_number,tx_hash);
-                        }
-                        Err(r) => {
-                            //TODO
-                            tracing::error!(
-                                "assign_proof_tasks tx is fail address: {:?},block_number:{:?},err:{}",
-                                &address,
-                                &batch_number,
-                                r
-                            );
-                        }
-                    };
+            for user in &mut user_list {
+                let sub_value = now - user.last_time;
+                if let Some(dyn_score) = sub_value.checked_mul(self.once_score.into()) {
+                    user.base_score = user.base_score.add(dyn_score as u16);
                 }
+            }
+            user_list.sort_by(|a, b| b.base_score.cmp(&a.base_score));
+            tracing::info!("assign_proof_tasks user_list: {:?}", user_list);
+
+            for (index, batch_number) in batch_numbers.iter().enumerate() {
+                let top_user = user_list.get(index % user_count).unwrap();
+
+                let address = top_user.verification_address;
+                let status = connection
+                    .assignments_dal()
+                    .get_last_status(address.clone(), batch_number.clone())
+                    .await;
+
+                match status {
+                    Ok(s) => {
+                        if s.to_string() != ProverResultStatus::Failed.to_string() {
+                            continue;
+                        }
+                    }
+                    Err(e) => tracing::error!("assign_proof_tasks status e:{:?}", e),
+                }
+                let res = connection
+                    .assignments_dal()
+                    .insert_and_update_assignments(address.clone(), batch_number.clone(), now)
+                    .await;
+                match res {
+                    Err(r) => tracing::error!("assign_proof_tasks status res:{:?}", r),
+                    _ => {}
+                }
+                let abi_data = self
+                    .deposit_abi
+                    .function("assignment")
+                    .unwrap()
+                    .encode_input(&[Token::Address(address.clone())])
+                    .unwrap();
+                let data = CallRequest {
+                    to: Some(DEPOSIT_ADDRESS),
+                    data: Some(Bytes(abi_data)),
+                    ..Default::default()
+                };
+
+                match self.l2_sender.send(data).await {
+                    Ok(tx_hash) => {
+                        tracing::info!("assign_proof_tasks tx is success address: {:?},block_number:{:?},tx_hash:{:?}", &address,&batch_number,tx_hash);
+                    }
+                    Err(r) => {
+                        //TODO
+                        tracing::error!(
+                            "assign_proof_tasks tx is fail address: {:?},block_number:{:?},err:{}",
+                            &address,
+                            &batch_number,
+                            r
+                        );
+                    }
+                };
             }
         }
     }
