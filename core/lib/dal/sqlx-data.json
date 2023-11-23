@@ -1934,6 +1934,30 @@
     },
     "query": "SELECT recursion_scheduler_level_vk_hash, recursion_node_level_vk_hash, recursion_leaf_level_vk_hash, recursion_circuits_set_vks_hash\n                FROM protocol_versions\n                WHERE id = $1\n            "
   },
+  "21ffaec7455ea7e3a70a160fd862f1a569a23734e882fb93d4a770cda51f1ea7": {
+    "describe": {
+      "columns": [
+        {
+          "name": "verification_address",
+          "ordinal": 0,
+          "type_info": "Bytea"
+        },
+        {
+          "name": "l1_batch_number",
+          "ordinal": 1,
+          "type_info": "Int8"
+        }
+      ],
+      "nullable": [
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": []
+      }
+    },
+    "query": "SELECT verification_address,l1_batch_number FROM ( SELECT verification_address,l1_batch_number,status,tx_hash,COUNT(*) OVER (PARTITION BY verification_address) AS total_count FROM assignments WHERE status IN ('failed', 'be_punished') ORDER BY created_at ) AS subquery WHERE total_count > 1 AND status = 'be_punished' and tx_hash is null"
+  },
   "22b57675a726d9cfeb82a60ba50c36cab1548d197ea56a7658d3f005df07c60b": {
     "describe": {
       "columns": [
@@ -4823,6 +4847,18 @@
     },
     "query": "SELECT bytecode_hash, bytecode FROM factory_deps INNER JOIN miniblocks ON miniblocks.number = factory_deps.miniblock_number WHERE miniblocks.l1_batch_number = $1"
   },
+  "558aafd29a98ac157b3d7f37b77f8a6fcb408b0c83ccd70ec69f2a5e06438de5": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Interval"
+        ]
+      }
+    },
+    "query": "update assignments set status ='be_punished', updated_at = now() where (verification_address,l1_batch_number) in (select verification_address,l1_batch_number from assignments where now()>created_at + $1::interval and status='assigned_not_certified' ) and tx_hash is null"
+  },
   "55debba852ef32f3b5ba6ffcb745f7b59d6888a21cb8792f8f9027e3b164a245": {
     "describe": {
       "columns": [
@@ -5172,18 +5208,6 @@
       }
     },
     "query": "\n                UPDATE prover_jobs_fri\n                SET status = 'failed', error = $1, updated_at = now()\n                WHERE id = $2\n                "
-  },
-  "5b9b9211d9a24a2896c1825f7c23ce0141b3bb89a8be80d03688ba54182a8bd9": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Interval"
-        ]
-      }
-    },
-    "query": "update assignments set status ='be_punished', updated_at = now() where (verification_address,l1_batch_number) in (select verification_address,l1_batch_number from assignments where now()>created_at + $1::interval and status='assigned_not_certified' and tx_hash is null )"
   },
   "5bc8a41ae0f255b966df2102f1bd9059d55833e0afaf6e62c7ddcc9c06de8deb": {
     "describe": {
@@ -11177,30 +11201,6 @@
       }
     },
     "query": "SELECT status, created_at FROM assignments WHERE verification_address = $1 AND l1_batch_number = $2 ORDER BY created_at DESC LIMIT 1"
-  },
-  "e832cb91a19bd4303471010b81379e89c7fadecfaaae533d0a44f4146bf227fc": {
-    "describe": {
-      "columns": [
-        {
-          "name": "verification_address",
-          "ordinal": 0,
-          "type_info": "Bytea"
-        },
-        {
-          "name": "l1_batch_number",
-          "ordinal": 1,
-          "type_info": "Int8"
-        }
-      ],
-      "nullable": [
-        false,
-        false
-      ],
-      "parameters": {
-        "Left": []
-      }
-    },
-    "query": "SELECT verification_address,l1_batch_number FROM ( SELECT verification_address,l1_batch_number,status,tx_hash,COUNT(*) OVER (PARTITION BY verification_address) AS total_count FROM assignments WHERE status IN ('failed', 'be_punished') ) AS subquery WHERE total_count > 1 AND status = 'be_punished' and tx_hash is null"
   },
   "e900682a160af90d532da47a1222fc1d7c9962ee8996dbd9b9bb63f13820cf2b": {
     "describe": {
