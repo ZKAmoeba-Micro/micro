@@ -5739,19 +5739,6 @@
     },
     "query": "\n                INSERT INTO compiler_versions (version, compiler, created_at, updated_at)\n                SELECT u.version, $2, now(), now()\n                FROM UNNEST($1::text[])\n                AS u(version)\n                ON CONFLICT (version, compiler) DO NOTHING"
   },
-  "646e4055dd55f0bbdfcdd548570f8dad2b43f3ff3c888f6e0912ceee06a216f3": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Bytea",
-          "Int8"
-        ]
-      }
-    },
-    "query": "INSERT INTO assignments (verification_address,l1_batch_number, status, created_at, updated_at) VALUES ($1,$2, 'assigned_not_certified', now(), now())"
-  },
   "64b1bce209f43ee9f8294a270047cd58c20b973d8fef29c662742cad89363ffe": {
     "describe": {
       "columns": [
@@ -8321,6 +8308,19 @@
       }
     },
     "query": "\n                    INSERT INTO prover_jobs_fri (l1_batch_number, circuit_id, circuit_blob_url, aggregation_round, sequence_number, depth, is_node_final_proof, protocol_version, status, created_at, updated_at)\n                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'queued', now(), now())\n                    ON CONFLICT(l1_batch_number, aggregation_round, circuit_id, depth, sequence_number)\n                    DO UPDATE SET updated_at=now()\n                    "
+  },
+  "9e3429cc7483189d8467079337e447d37dd5d44e5eac6f6e75c2d67fa8d6558d": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Bytea",
+          "Int8"
+        ]
+      }
+    },
+    "query": "INSERT INTO assignments (verification_address,l1_batch_number, status, created_at, updated_at) VALUES ($1,$2, 'assigned_not_certified', now(), now())"
   },
   "9feee3fd267dc4e58185aeae7cab798c03eefa69470e4b98716615cecf6c012a": {
     "describe": {
