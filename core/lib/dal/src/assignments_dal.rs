@@ -74,7 +74,7 @@ impl AssignmentsDal<'_, '_> {
             where (verification_address,l1_batch_number) \
             in (select verification_address,l1_batch_number \
                 from assignments \
-                where now()>created_at + $1::interval and status='assigned_not_certified' \
+                where now()>created_at + $1::interval and status='assigned_not_certified' and tx_hash is null \
             )",
                 &processing_timeout,
             )
