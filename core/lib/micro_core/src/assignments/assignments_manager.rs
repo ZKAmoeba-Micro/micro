@@ -208,13 +208,15 @@ impl AssignmentsManager {
         // if self.from_block==0 || (latest_mini_block_number.0!=0 && latest_mini_block_number.0 >self.from_block){
         //     self.from_block=latest_mini_block_number.0;
         // }
-        // if latest_mini_block_number.0 == 0 {
-        //     latest_mini_block_number = connection
-        //         .blocks_web3_dal()
-        //         .get_sealed_miniblock_number()
-        //         .await
-        //         .unwrap();
-        // }
+
+        let sealed_mini_number = connection
+            .blocks_web3_dal()
+            .get_sealed_miniblock_number()
+            .await
+            .unwrap();
+        if self.from_block > sealed_mini_number.0 {
+            self.from_block = sealed_mini_number.0;
+        }
 
         let next_number = (self.from_block as i32) + 99;
         //Multiple parameter lists for one event
