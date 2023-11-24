@@ -61,7 +61,7 @@ impl AssignmentsDal<'_, '_> {
         // let time_str: &str = if !m_time.is_empty() { m_time } else { "'60 M'" };
 
         let processing_timeout = pg_interval_from_duration(processing_timeout);
-        let count = sqlx::query!("select count(1) as num from assignments where now()>created_at + $1::interval and status='assigned_not_certified'",&processing_timeout)
+        let count = sqlx::query!("select count(1) as num from assignments where now()>created_at + $1::interval and status in('assigned_not_certified','picked_by_prover')",&processing_timeout)
         .fetch_one(self.storage.conn())
         .await?
         .num;
@@ -74,7 +74,7 @@ impl AssignmentsDal<'_, '_> {
             where (verification_address,l1_batch_number) \
             in (select verification_address,l1_batch_number \
                 from assignments \
-                where now()>created_at + $1::interval and status='assigned_not_certified' \
+                where now()>created_at + $1::interval and status in('assigned_not_certified','picked_by_prover') \
             ) and tx_hash is null",
                 &processing_timeout,
             )

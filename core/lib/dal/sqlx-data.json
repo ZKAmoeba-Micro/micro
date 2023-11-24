@@ -4847,18 +4847,6 @@
     },
     "query": "SELECT bytecode_hash, bytecode FROM factory_deps INNER JOIN miniblocks ON miniblocks.number = factory_deps.miniblock_number WHERE miniblocks.l1_batch_number = $1"
   },
-  "558aafd29a98ac157b3d7f37b77f8a6fcb408b0c83ccd70ec69f2a5e06438de5": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Interval"
-        ]
-      }
-    },
-    "query": "update assignments set status ='be_punished', updated_at = now() where (verification_address,l1_batch_number) in (select verification_address,l1_batch_number from assignments where now()>created_at + $1::interval and status='assigned_not_certified' ) and tx_hash is null"
-  },
   "55debba852ef32f3b5ba6ffcb745f7b59d6888a21cb8792f8f9027e3b164a245": {
     "describe": {
       "columns": [
@@ -4900,26 +4888,6 @@
       }
     },
     "query": "UPDATE miniblocks SET protocol_version = $1 WHERE l1_batch_number IS NULL"
-  },
-  "56f28942cbc70c61f489e377160da5012e5f79861ed40d8134092758c0e7f045": {
-    "describe": {
-      "columns": [
-        {
-          "name": "num",
-          "ordinal": 0,
-          "type_info": "Int8"
-        }
-      ],
-      "nullable": [
-        null
-      ],
-      "parameters": {
-        "Left": [
-          "Interval"
-        ]
-      }
-    },
-    "query": "select count(1) as num from assignments where now()>created_at + $1::interval and status='assigned_not_certified'"
   },
   "57742ed088179b89b50920a2ab1a103b745598ee0ba05d1793fc54e63b477319": {
     "describe": {
@@ -5866,6 +5834,26 @@
       }
     },
     "query": "\n                UPDATE node_aggregation_witness_jobs_fri\n                SET status ='failed', error= $1, updated_at = now()\n                WHERE id = $2\n               "
+  },
+  "668a99b6d2d1d2daa640be9f7a9130d4b1bd8dc9e4ac080347b47c444a8f9e72": {
+    "describe": {
+      "columns": [
+        {
+          "name": "num",
+          "ordinal": 0,
+          "type_info": "Int8"
+        }
+      ],
+      "nullable": [
+        null
+      ],
+      "parameters": {
+        "Left": [
+          "Interval"
+        ]
+      }
+    },
+    "query": "select count(1) as num from assignments where now()>created_at + $1::interval and status in('assigned_not_certified','picked_by_prover')"
   },
   "66f1f192849b412798bc36dfebaff120cdb2db500fea9e05d63938b93d344a39": {
     "describe": {
@@ -9542,6 +9530,18 @@
       }
     },
     "query": "UPDATE miniblocks SET hash = u.hash   FROM UNNEST($1::bigint[], $2::bytea[]) AS u(number, hash) WHERE miniblocks.number = u.number\n        "
+  },
+  "b30068700252d1387eb139a8125dccfb15ddebec1adff1761ac9f7a215a30ba8": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Interval"
+        ]
+      }
+    },
+    "query": "update assignments set status ='be_punished', updated_at = now() where (verification_address,l1_batch_number) in (select verification_address,l1_batch_number from assignments where now()>created_at + $1::interval and status in('assigned_not_certified','picked_by_prover') ) and tx_hash is null"
   },
   "b479b7d3334f8d4566c294a44e2adb282fbc66a87be5c248c65211c2a8a07db0": {
     "describe": {
