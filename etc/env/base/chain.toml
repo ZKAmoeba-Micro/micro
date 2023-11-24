@@ -17,7 +17,7 @@ fee_account_addr = "0x26937d59db4463254c930D5f31353F14AA89a0F7"
 transaction_slots = 250
 
 max_allowed_l2_tx_gas_limit = 4000000000
-block_commit_deadline_ms = 180000
+block_commit_deadline_ms = 3600000
 miniblock_commit_deadline_ms = 1000
 miniblock_seal_queue_capacity = 10
 # Max gas that can used to include single block in aggregated operation
