@@ -302,10 +302,11 @@ impl AssignmentsManager {
 impl PeriodicJob for AssignmentsManager {
     const SERVICE_NAME: &'static str = "AssignmentsManager";
     async fn run_routine_task(&mut self) -> anyhow::Result<()> {
+        self.monitor_change_event().await;
         self.assign_proof_tasks().await;
         self.time_out_check().await;
         self.send_be_punished_tx().await;
-        self.monitor_change_event().await;
+
         Ok(())
     }
     fn polling_interval_ms(&self) -> u64 {

@@ -913,6 +913,30 @@
     },
     "query": "SELECT COUNT(*) as \"count!\" FROM l1_batches WHERE number = $1 AND hash = $2 AND merkle_root_hash = $3 AND parent_hash = $4 AND l2_l1_merkle_root = $5"
   },
+  "0e422650c59b8720c42d3ab5f9ba96800ec52f724b50c2ef6803cbdc7c75ef96": {
+    "describe": {
+      "columns": [
+        {
+          "name": "verification_address",
+          "ordinal": 0,
+          "type_info": "Bytea"
+        },
+        {
+          "name": "l1_batch_number",
+          "ordinal": 1,
+          "type_info": "Int8"
+        }
+      ],
+      "nullable": [
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": []
+      }
+    },
+    "query": "SELECT verification_address,l1_batch_number FROM ( SELECT verification_address,l1_batch_number,status,tx_hash,COUNT(*) OVER (PARTITION BY verification_address) AS total_count FROM assignments WHERE status IN ('failed', 'be_punished') ORDER BY created_at ) AS subquery WHERE total_count > 0 AND status = 'be_punished' and tx_hash is null"
+  },
   "0ee31e6e2ec60f427d8dec719ec0ba03ef75bc610e878ae32b0bf61c4c2c1366": {
     "describe": {
       "columns": [
@@ -1933,30 +1957,6 @@
       }
     },
     "query": "SELECT recursion_scheduler_level_vk_hash, recursion_node_level_vk_hash, recursion_leaf_level_vk_hash, recursion_circuits_set_vks_hash\n                FROM protocol_versions\n                WHERE id = $1\n            "
-  },
-  "21ffaec7455ea7e3a70a160fd862f1a569a23734e882fb93d4a770cda51f1ea7": {
-    "describe": {
-      "columns": [
-        {
-          "name": "verification_address",
-          "ordinal": 0,
-          "type_info": "Bytea"
-        },
-        {
-          "name": "l1_batch_number",
-          "ordinal": 1,
-          "type_info": "Int8"
-        }
-      ],
-      "nullable": [
-        false,
-        false
-      ],
-      "parameters": {
-        "Left": []
-      }
-    },
-    "query": "SELECT verification_address,l1_batch_number FROM ( SELECT verification_address,l1_batch_number,status,tx_hash,COUNT(*) OVER (PARTITION BY verification_address) AS total_count FROM assignments WHERE status IN ('failed', 'be_punished') ORDER BY created_at ) AS subquery WHERE total_count > 1 AND status = 'be_punished' and tx_hash is null"
   },
   "22b57675a726d9cfeb82a60ba50c36cab1548d197ea56a7658d3f005df07c60b": {
     "describe": {

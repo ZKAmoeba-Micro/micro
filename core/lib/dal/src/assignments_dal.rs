@@ -150,7 +150,7 @@ impl AssignmentsDal<'_, '_> {
         FROM ( \
             SELECT verification_address,l1_batch_number,status,tx_hash,COUNT(*) OVER (PARTITION BY verification_address) AS total_count \
             FROM assignments \
-            WHERE status IN ('failed', 'be_punished') ORDER BY created_at ) AS subquery WHERE total_count > 1 AND status = 'be_punished' and tx_hash is null")
+            WHERE status IN ('failed', 'be_punished') ORDER BY created_at ) AS subquery WHERE total_count > 0 AND status = 'be_punished' and tx_hash is null")
         .fetch_all(self.storage.conn())
         .await
         .unwrap();
