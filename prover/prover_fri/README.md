@@ -91,8 +91,8 @@ pre-requisite. This is useful for debugging and testing Machine specs:
    FRI_PROVER_SETUP_DATA_PATH=/path/to/above-generated/gpu-setup-data
    ```
 
-5. Run server `zk server --components=api,eth,tree,state_keeper,housekeeper,proof_data_handler` to produce blocks to be
-   proven
+5. Run server `zk server --components=api,eth,tree,state_keeper,housekeeper,proof_data_handler,l2_sender,assignments` to
+   produce blocks to be proven
 6. Run prover gateway to fetch blocks to be proven from server :
    `zk f cargo run --release --bin micro_prover_fri_gateway`
 7. Run 4 witness generators to generate witness for each round:

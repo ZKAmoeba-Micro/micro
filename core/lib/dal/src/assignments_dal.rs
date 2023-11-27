@@ -65,14 +65,14 @@ impl AssignmentsDal<'_, '_> {
         .fetch_one(self.storage.conn())
         .await?
         .num;
+        tracing::info!("update_assigments_status_for_time count:{:?}", count);
         if count != Some(0) {
             let mut transaction = self.storage.start_transaction().await.unwrap();
 
             sqlx::query!(
                 "update assignments \
             set status ='be_punished', updated_at = now() \
-            where (verification_address,l1_batch_number) \
-            in (select verification_address,l1_batch_number \
+            where id in (select id \
                 from assignments \
                 where now()>created_at + $1::interval and status in('assigned_not_certified','picked_by_prover') \
             ) and tx_hash is null",
@@ -128,27 +128,27 @@ impl AssignmentsDal<'_, '_> {
 
     pub async fn update_assigments_status_by_punished(
         &mut self,
+        id: i32,
         verification_address: Address,
         block_number: L1BatchNumber,
         tx_hash: H256,
     ) -> Result<(), SqlxError> {
         tracing::info!("update_assigments_status verification_address:{verification_address},block_number:{block_number},tx_hash:{tx_hash}");
 
-        sqlx::query!("UPDATE assignments SET status='failed',tx_hash=$1,updated_at=now() WHERE status='be_punished' and verification_address=$2 and l1_batch_number = $3 and tx_hash is null",
+        sqlx::query!("UPDATE assignments SET status='failed',tx_hash=$1,updated_at=now() WHERE id=$2 and status='be_punished' and tx_hash is null",
             tx_hash.as_bytes(),
-            verification_address.as_bytes(),
-            block_number.0 as i64,
+            id
         )
         .execute(self.storage.conn())
         .await?;
         Ok(())
     }
 
-    pub async fn get_punished_address_list(&mut self) -> Vec<(Address, L1BatchNumber)> {
+    pub async fn get_punished_address_list(&mut self) -> Vec<(i32, Address, L1BatchNumber)> {
         let result = sqlx::query!(
-        "SELECT verification_address,l1_batch_number \
+        "SELECT id,verification_address,l1_batch_number \
         FROM ( \
-            SELECT verification_address,l1_batch_number,status,tx_hash,COUNT(*) OVER (PARTITION BY verification_address) AS total_count \
+            SELECT id,verification_address,l1_batch_number,status,tx_hash,COUNT(*) OVER (PARTITION BY verification_address) AS total_count \
             FROM assignments \
             WHERE status IN ('failed', 'be_punished') ORDER BY created_at ) AS subquery WHERE total_count > 0 AND status = 'be_punished' and tx_hash is null")
         .fetch_all(self.storage.conn())
@@ -159,6 +159,7 @@ impl AssignmentsDal<'_, '_> {
             .into_iter()
             .map(|row| {
                 (
+                    row.id,
                     Address::from_slice(&row.verification_address),
                     L1BatchNumber(row.l1_batch_number as u32),
                 )

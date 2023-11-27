@@ -1,4 +1,5 @@
 CREATE TABLE assignments (
+    id SERIAL NOT NULL PRIMARY KEY ,
     verification_address bytea NOT NULL,
     l1_batch_number bigint NOT NULL,
     tx_hash bytea  NULL,

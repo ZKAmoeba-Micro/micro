@@ -150,7 +150,7 @@ impl AssignmentsManager {
             .assignments_dal()
             .get_punished_address_list()
             .await;
-        for (address, l1_batch_number) in res {
+        for (id, address, l1_batch_number) in res {
             let abi_data = self
                 .deposit_abi
                 .function("penalize")
@@ -169,6 +169,7 @@ impl AssignmentsManager {
                     let _ = connection
                         .assignments_dal()
                         .update_assigments_status_by_punished(
+                            id,
                             address.clone(),
                             l1_batch_number,
                             hash,
