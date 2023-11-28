@@ -1,10 +1,6 @@
 #![feature(generic_const_exprs)]
 
 use anyhow::Context as _;
-use prometheus_exporter::PrometheusExporterConfig;
-use std::time::{Instant,Duration};
-use structopt::StructOpt;
-use tokio::{sync::watch,time::sleep};
 use micro_config::configs::{FriWitnessGeneratorConfig, PrometheusConfig};
 use micro_config::ObjectStoreConfig;
 use micro_dal::{connection::DbVariant, ConnectionPool};
@@ -15,6 +11,10 @@ use micro_types::proofs::AggregationRound;
 use micro_types::web3::futures::StreamExt;
 use micro_utils::wait_for_tasks::wait_for_tasks;
 use micro_vk_setup_data_server_fri::commitment_utils::get_cached_commitments;
+use prometheus_exporter::PrometheusExporterConfig;
+use std::time::{Duration, Instant};
+use structopt::StructOpt;
+use tokio::{sync::watch, time::sleep};
 
 use crate::basic_circuits::BasicWitnessGenerator;
 use crate::leaf_aggregation::LeafAggregationWitnessGenerator;
@@ -71,12 +71,11 @@ async fn main() -> anyhow::Result<()> {
     let started_at = Instant::now();
     let use_push_gateway = opt.batch_size.is_some();
 
-    let store_factory = ObjectStoreFactory::prover_from_env()
-        .context("ObjectStoreFactor::prover_from_env()")?;
-    let config = FriWitnessGeneratorConfig::from_env()
-        .context("FriWitnessGeneratorConfig::from_env()")?;
-    let prometheus_config = PrometheusConfig::from_env()
-        .context("PrometheusConfig::from_env()")?;
+    let store_factory =
+        ObjectStoreFactory::prover_from_env().context("ObjectStoreFactor::prover_from_env()")?;
+    let config =
+        FriWitnessGeneratorConfig::from_env().context("FriWitnessGeneratorConfig::from_env()")?;
+    let prometheus_config = PrometheusConfig::from_env().context("PrometheusConfig::from_env()")?;
     let connection_pool = ConnectionPool::builder(DbVariant::Master)
         .build()
         .await
@@ -87,25 +86,24 @@ async fn main() -> anyhow::Result<()> {
         .context("failed to build a prover_connection_pool")?;
     let (stop_sender, stop_receiver) = watch::channel(false);
     let vk_commitments = get_cached_commitments();
-    let mut n=0;
+    let mut n = 0;
     let mut protocol_versions = Vec::new();
-    let mut count: usize = protocol_versions.len();
-    while count ==0 {
-         if n >0 {
+    while protocol_versions.len() == 0 {
+        if n > 0 {
             sleep(Duration::from_millis(5000)).await;
             tracing::warn!(
                 "initializing the witness generator,protocol_versions: {:?}",
                 protocol_versions
             );
-         }
-         protocol_versions = prover_connection_pool
-        .access_storage().await.unwrap()
-        .fri_protocol_versions_dal()
-        .protocol_version_for(&vk_commitments)
-        .await;
-        count = protocol_versions.len();
-        n+=1;
-
+        }
+        protocol_versions = prover_connection_pool
+            .access_storage()
+            .await
+            .unwrap()
+            .fri_protocol_versions_dal()
+            .protocol_version_for(&vk_commitments)
+            .await;
+        n += 1;
     }
     tracing::info!(
         "initializing the {:?} witness generator, batch size: {:?} with protocol_versions: {:?}",
@@ -131,10 +129,10 @@ async fn main() -> anyhow::Result<()> {
                 true => Some(
                     ObjectStoreFactory::new(
                         ObjectStoreConfig::public_from_env()
-                            .context("ObjectStoreConfig::public_from_env()")?
+                            .context("ObjectStoreConfig::public_from_env()")?,
                     )
-                        .create_store()
-                        .await,
+                    .create_store()
+                    .await,
                 ),
             };
             let generator = BasicWitnessGenerator::new(
