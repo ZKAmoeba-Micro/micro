@@ -219,7 +219,7 @@ impl AssignmentsManager {
             self.from_block = sealed_mini_number.0;
         }
 
-        let next_number = (self.from_block as i32) + 99;
+        let next_number = (self.from_block as i32) + 1024;
         //Multiple parameter lists for one event
         let mut topics = Vec::new();
         //Verification address parameter of the event
