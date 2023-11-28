@@ -173,12 +173,12 @@ impl AssignmentsDal<'_, '_> {
         let result: Option<L1BatchNumber> = sqlx::query!(
             "UPDATE assignments \
              SET status = 'picked_by_prover', updated_at = now() \
-             WHERE l1_batch_number = ( \
-                 SELECT l1_batch_number \
+             WHERE id = ( \
+                 SELECT id \
                  FROM assignments \
                  WHERE status = 'assigned_not_certified' \
                  AND verification_address = $1 \
-                 ORDER BY l1_batch_number ASC \
+                 ORDER BY id ASC \
                  LIMIT 1 \
                  FOR UPDATE \
                  SKIP LOCKED \

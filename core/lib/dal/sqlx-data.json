@@ -4203,6 +4203,26 @@
     },
     "query": "VACUUM storage_logs"
   },
+  "493351e258426efc88f87fb0569b335451e0afcc2948955a16cd75cee8071fbc": {
+    "describe": {
+      "columns": [
+        {
+          "name": "l1_batch_number",
+          "ordinal": 0,
+          "type_info": "Int8"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Bytea"
+        ]
+      }
+    },
+    "query": "UPDATE assignments SET status = 'picked_by_prover', updated_at = now() WHERE id = ( SELECT id FROM assignments WHERE status = 'assigned_not_certified' AND verification_address = $1 ORDER BY id ASC LIMIT 1 FOR UPDATE SKIP LOCKED ) RETURNING assignments.l1_batch_number"
+  },
   "4ab8a25620b5400d836e1b847320d4e176629a27e1a6cb0666ab02bb55371769": {
     "describe": {
       "columns": [
@@ -10867,26 +10887,6 @@
       }
     },
     "query": "INSERT INTO storage (hashed_key, address, key, value, tx_hash, created_at, updated_at) SELECT u.hashed_key, u.address, u.key, u.value, u.tx_hash, now(), now() FROM UNNEST ($1::bytea[], $2::bytea[], $3::bytea[], $4::bytea[], $5::bytea[]) AS u(hashed_key, address, key, value, tx_hash) ON CONFLICT (hashed_key) DO UPDATE SET tx_hash = excluded.tx_hash, value = excluded.value, updated_at = now()"
-  },
-  "df6dda86be7039c859383f2b1c1c531e21e11dca37d27fd88c0841cf0980d435": {
-    "describe": {
-      "columns": [
-        {
-          "name": "l1_batch_number",
-          "ordinal": 0,
-          "type_info": "Int8"
-        }
-      ],
-      "nullable": [
-        false
-      ],
-      "parameters": {
-        "Left": [
-          "Bytea"
-        ]
-      }
-    },
-    "query": "UPDATE assignments SET status = 'picked_by_prover', updated_at = now() WHERE l1_batch_number = ( SELECT l1_batch_number FROM assignments WHERE status = 'assigned_not_certified' AND verification_address = $1 ORDER BY l1_batch_number ASC LIMIT 1 FOR UPDATE SKIP LOCKED ) RETURNING assignments.l1_batch_number"
   },
   "df857ee85c600bd90687b2ed91517d91a5dc4de3cd6c15c34119ca52a3321828": {
     "describe": {
