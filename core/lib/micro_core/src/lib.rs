@@ -1,6 +1,6 @@
 #![allow(clippy::upper_case_acronyms, clippy::derive_partial_eq_without_eq)]
 
-use std::{str::FromStr, sync::Arc, time::Duration, time::Instant};
+use std::{str::FromStr, sync::Arc, time::Instant};
 
 use anyhow::Context as _;
 use futures::channel::oneshot;
@@ -704,12 +704,13 @@ pub async fn initialize_components(
             .build()
             .await
             .context("failed to build assignment_pool")?;
-        //TODO Add configuration
+        let proof_data_handler =
+            ProofDataHandlerConfig::from_env().context("ProofDataHandlerConfig::from_env()")?;
         let assignments_man = AssignmentsManager::new(
-            Duration::from_secs(60 * 60),
-            60000,
+            proof_data_handler.proof_generation_timeout(),
+            proof_data_handler.retry_interval_ms,
             assignment_pool,
-            1,
+            proof_data_handler.once_score,
             caller.unwrap(),
         );
         task_futures.push(tokio::spawn(assignments_man.run()));

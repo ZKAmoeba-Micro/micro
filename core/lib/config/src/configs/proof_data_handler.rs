@@ -14,6 +14,10 @@ pub struct ProofDataHandlerConfig {
     pub proof_generation_timeout_in_secs: u16,
     pub protocol_version_loading_mode: ProtocolVersionLoadingMode,
     pub fri_protocol_version_id: u16,
+    //Task polling interval, in milliseconds
+    pub retry_interval_ms: u64,
+    //The number of points for participating once
+    pub once_score: u32,
 }
 
 impl ProofDataHandlerConfig {
@@ -39,6 +43,8 @@ mod tests {
             proof_generation_timeout_in_secs: 18000,
             protocol_version_loading_mode: ProtocolVersionLoadingMode::FromEnvVar,
             fri_protocol_version_id: 2,
+            retry_interval_ms: 30000,
+            once_score: 1,
         }
     }
 
@@ -49,6 +55,8 @@ mod tests {
             PROOF_DATA_HANDLER_HTTP_PORT="3320"
             PROOF_DATA_HANDLER_PROTOCOL_VERSION_LOADING_MODE="FromEnvVar"
             PROOF_DATA_HANDLER_FRI_PROTOCOL_VERSION_ID="2"
+            PROOF_DATA_HANDLER_RETRY_INTERVAL_MS="30000"
+            PROOF_DATA_HANDLER_ONCE_SCORE="1"
         "#;
         let mut lock = MUTEX.lock();
         lock.set_env(config);
