@@ -2,9 +2,9 @@
 
 use anyhow::Context as _;
 use prometheus_exporter::PrometheusExporterConfig;
-use std::time::Instant;
+use std::time::{Instant,Duration};
 use structopt::StructOpt;
-use tokio::sync::watch;
+use tokio::{sync::watch,time::sleep};
 use micro_config::configs::{FriWitnessGeneratorConfig, PrometheusConfig};
 use micro_config::ObjectStoreConfig;
 use micro_dal::{connection::DbVariant, ConnectionPool};
@@ -87,12 +87,26 @@ async fn main() -> anyhow::Result<()> {
         .context("failed to build a prover_connection_pool")?;
     let (stop_sender, stop_receiver) = watch::channel(false);
     let vk_commitments = get_cached_commitments();
-    let protocol_versions = prover_connection_pool
+    let mut n=0;
+    let mut protocol_versions = Vec::new();
+    let mut count: usize = protocol_versions.len();
+    while count ==0 {
+         if n >0 {
+            sleep(Duration::from_millis(5000)).await;
+            tracing::warn!(
+                "initializing the witness generator,protocol_versions: {:?}",
+                protocol_versions
+            );
+         }
+         protocol_versions = prover_connection_pool
         .access_storage().await.unwrap()
         .fri_protocol_versions_dal()
         .protocol_version_for(&vk_commitments)
         .await;
+        count = protocol_versions.len();
+        n+=1;
 
+    }
     tracing::info!(
         "initializing the {:?} witness generator, batch size: {:?} with protocol_versions: {:?}",
         opt.round,
