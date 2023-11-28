@@ -1,0 +1,29 @@
+version: "3.2"
+services:
+  postgres:
+    image: "postgres:14"
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./volumes/postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_HOST_AUTH_METHOD=trust
+
+  node:
+    image: "zkamoeba/external-node:latest"
+    depends_on:
+      - postgres
+    ports:
+      - "3060:3060"
+      - "3061:3061"
+    volumes:
+      - ./db/ext-node:/db/ext-node
+    env_file:
+      - ./.env
+
+  object-store:
+    image: "zkamoeba/object-store:latest"
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./artifacts:/artifacts
