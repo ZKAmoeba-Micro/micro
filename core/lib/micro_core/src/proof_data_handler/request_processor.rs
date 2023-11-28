@@ -8,10 +8,9 @@ use micro_config::configs::{
 use micro_dal::assignments_dal::ProverResultStatus;
 use micro_types::commitment::serialize_commitments;
 use micro_types::web3::signing::keccak256;
-use micro_types::{Address, PackedEthSignature};
+use micro_types::PackedEthSignature;
 use micro_utils::u256_to_h256;
 use std::convert::TryFrom;
-use std::str::FromStr;
 use std::sync::Arc;
 
 use micro_dal::{ConnectionPool, SqlxError};
@@ -161,7 +160,7 @@ impl RequestProcessor {
         tracing::info!("Received proof for block number: {:?}", l1_batch_number);
         let l1_batch_number = L1BatchNumber(l1_batch_number);
         match payload {
-            SubmitProofRequest::Proof(proof) => {
+            SubmitProofRequest::Proof(mut proof) => {
                 // recover prover address
                 let prover_addr = proof
                     .signature_recover_signer(l1_batch_number)
@@ -180,9 +179,11 @@ impl RequestProcessor {
                     .map_err(RequestProcessorError::Sqlx)?;
 
                 if let Some((ProverResultStatus::PickedByProver, created_at)) = job {
-                    let now = Utc::now().timestamp_millis();
-                    if now - created_at > self.config.proof_generation_timeout_in_secs as i64 * 1000
-                    {
+                    let now = Utc::now().timestamp();
+                    let time_taken = now - created_at;
+                    proof.time_taken = time_taken as u64;
+
+                    if time_taken > self.config.proof_generation_timeout_in_secs as i64 {
                         return Err(RequestProcessorError::ProveTimeout);
                     }
                 } else {

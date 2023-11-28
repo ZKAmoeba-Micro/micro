@@ -220,7 +220,7 @@ impl AssignmentsDal<'_, '_> {
         )
         .fetch_optional(self.storage.conn())
         .await?
-        .map(|row| (ProverResultStatus::from_str(&row.status).unwrap(), row.created_at.timestamp_millis()));
+        .map(|row| (ProverResultStatus::from_str(&row.status).unwrap(), row.created_at.timestamp()));
 
         Ok(status_and_created_at)
     }
