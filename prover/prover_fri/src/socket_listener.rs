@@ -1,26 +1,26 @@
 #[cfg(feature = "gpu")]
 pub mod gpu_socket_listener {
-    use shivini::synthesis_utils::{
-        init_base_layer_cs_for_repeated_proving, init_recursive_layer_cs_for_repeated_proving,
-    };
-    use std::net::SocketAddr;
-    use std::time::Instant;
     use micro_dal::ConnectionPool;
     use micro_types::proofs::AggregationRound;
     use micro_types::proofs::{GpuProverInstanceStatus, SocketAddress};
     use micro_vk_setup_data_server_fri::{
         get_finalization_hints, get_round_for_recursive_circuit_type,
     };
+    use shivini::synthesis_utils::{
+        init_base_layer_cs_for_repeated_proving, init_recursive_layer_cs_for_repeated_proving,
+    };
+    use std::net::SocketAddr;
+    use std::time::Instant;
 
     use crate::utils::{GpuProverJob, ProvingAssembly, SharedWitnessVectorQueue};
     use anyhow::Context as _;
+    use micro_object_store::bincode;
+    use micro_prover_fri_types::{CircuitWrapper, ProverServiceDataKey, WitnessVectorArtifacts};
     use tokio::sync::watch;
     use tokio::{
         io::copy,
         net::{TcpListener, TcpStream},
     };
-    use micro_object_store::bincode;
-    use micro_prover_fri_types::{CircuitWrapper, ProverServiceDataKey, WitnessVectorArtifacts};
 
     pub(crate) struct SocketListener {
         address: SocketAddress,
@@ -59,7 +59,9 @@ pub mod gpu_socket_listener {
 
             let _lock = self.queue.lock().await;
             self.pool
-                .access_storage().await.unwrap()
+                .access_storage()
+                .await
+                .unwrap()
                 .fri_gpu_prover_queue_dal()
                 .insert_prover_instance(
                     self.address.clone(),
@@ -91,7 +93,10 @@ pub mod gpu_socket_listener {
                     now.elapsed().as_millis()
                 );
 
-                self.handle_incoming_file(stream).await.context("handle_incoming_file()")?;
+                let res = self.handle_incoming_file(stream).await;
+                if let Err(e) = res {
+                    tracing::error!("handle_incoming_file failed() {}", e);
+                }
 
                 now = Instant::now();
             }
@@ -120,7 +125,8 @@ pub mod gpu_socket_listener {
                 witness_vector.prover_job.circuit_wrapper.clone(),
                 witness_vector.prover_job.job_id,
                 witness_vector.prover_job.setup_data_key.circuit_id,
-            ).context("generate_assembly_for_repeated_proving()")?;
+            )
+            .context("generate_assembly_for_repeated_proving()")?;
             let gpu_prover_job = GpuProverJob {
                 witness_vector_artifacts: witness_vector,
                 assembly,
@@ -139,7 +145,9 @@ pub mod gpu_socket_listener {
             };
 
             self.pool
-                .access_storage().await.unwrap()
+                .access_storage()
+                .await
+                .unwrap()
                 .fri_gpu_prover_queue_dal()
                 .update_prover_instance_status(self.address.clone(), status, self.zone.clone())
                 .await;
@@ -159,8 +167,8 @@ pub mod gpu_socket_listener {
                     base_circuit.numeric_circuit_type(),
                     AggregationRound::BasicCircuits,
                 );
-                let finalization_hint = get_finalization_hints(key)
-                    .context("get_finalization_hints()")?;
+                let finalization_hint =
+                    get_finalization_hints(key).context("get_finalization_hints()")?;
                 init_base_layer_cs_for_repeated_proving(base_circuit, &finalization_hint)
             }
             CircuitWrapper::Recursive(recursive_circuit) => {
@@ -168,8 +176,8 @@ pub mod gpu_socket_listener {
                     recursive_circuit.numeric_circuit_type(),
                     get_round_for_recursive_circuit_type(recursive_circuit.numeric_circuit_type()),
                 );
-                let finalization_hint = get_finalization_hints(key)
-                    .context("get_finalization_hints()")?;
+                let finalization_hint =
+                    get_finalization_hints(key).context("get_finalization_hints()")?;
                 init_recursive_layer_cs_for_repeated_proving(recursive_circuit, &finalization_hint)
             }
         };
