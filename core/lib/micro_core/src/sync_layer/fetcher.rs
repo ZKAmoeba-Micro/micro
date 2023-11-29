@@ -122,12 +122,12 @@ impl MainNodeFetcher {
 
             if !progressed {
                 // We didn't fetch any updated on this iteration, so to prevent a busy loop we wait a bit.
-                let log_message = if has_action_capacity {
-                    "No updates to discover, waiting for new blocks on the main node"
-                } else {
-                    "Local action queue is full, waiting for state keeper to process the queue"
-                };
-                tracing::debug!("{log_message}");
+                // let log_message = if has_action_capacity {
+                //     "No updates to discover, waiting for new blocks on the main node"
+                // } else {
+                //     "Local action queue is full, waiting for state keeper to process the queue"
+                // };
+                // tracing::debug!("{log_message}");
                 tokio::time::sleep(DELAY_INTERVAL).await;
             }
         }
