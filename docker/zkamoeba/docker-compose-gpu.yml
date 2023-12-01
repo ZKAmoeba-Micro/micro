@@ -7,4 +7,4 @@ services:
     volumes:
       - ./setup-data:/usr/src/setup-data
     env_file:
-      - ./.env
+      - ./prover.env

@@ -10,7 +10,7 @@ services:
     volumes:
       - ./setup-data:/usr/src/setup-data
     env_file:
-      - ./.env
+      - ./prover.env
     command: --round=basic_circuits
 
   witness-generator-leaf:
@@ -18,7 +18,7 @@ services:
     volumes:
       - ./setup-data:/usr/src/setup-data
     env_file:
-      - ./.env
+      - ./prover.env
     command: --round=leaf_aggregation
 
   witness-generator-node:
@@ -26,7 +26,7 @@ services:
     volumes:
       - ./setup-data:/usr/src/setup-data
     env_file:
-      - ./.env
+      - ./prover.env
     command: --round=node_aggregation
 
   witness-generator-scheduler:
@@ -34,7 +34,7 @@ services:
     volumes:
       - ./setup-data:/usr/src/setup-data
     env_file:
-      - ./.env
+      - ./prover.env
     command: --round=scheduler
 
   witness-vector-generator:
@@ -42,7 +42,7 @@ services:
     volumes:
       - ./setup-data:/usr/src/setup-data
     env_file:
-      - ./.env
+      - ./prover.env
     deploy:
       mode: replicated
       replicas: 5
@@ -52,4 +52,4 @@ services:
     volumes:
       - ./setup-data:/usr/src/setup-data
     env_file:
-      - ./.env
+      - ./prover.env
