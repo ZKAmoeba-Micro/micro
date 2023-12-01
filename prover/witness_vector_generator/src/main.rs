@@ -7,7 +7,7 @@ use tokio::{sync::oneshot, sync::watch};
 
 use crate::generator::WitnessVectorGenerator;
 use micro_config::configs::fri_prover_group::FriProverGroupConfig;
-use micro_config::configs::{FriWitnessVectorGeneratorConfig};
+use micro_config::configs::FriWitnessVectorGeneratorConfig;
 use micro_dal::connection::DbVariant;
 use micro_dal::ConnectionPool;
 use micro_object_store::ObjectStoreFactory;
@@ -54,17 +54,26 @@ async fn main() -> anyhow::Result<()> {
     let specialized_group_id = config.specialized_group_id;
     let exporter_config = PrometheusExporterConfig::pull(config.prometheus_listener_port);
 
-    let pool = ConnectionPool::builder(DbVariant::Prover).build().await
+    let pool = ConnectionPool::builder(DbVariant::Prover)
+        .build()
+        .await
         .context("failed to build a connection pool")?;
     let blob_store = ObjectStoreFactory::prover_from_env()
         .context("ObjectStoreFactor::prover_from_env()")?
-        .create_store().await;
+        .create_store()
+        .await;
     let circuit_ids_for_round_to_be_proven = FriProverGroupConfig::from_env()
         .get_circuit_ids_for_group_id(specialized_group_id)
         .unwrap_or(vec![]);
     let circuit_ids_for_round_to_be_proven =
         get_all_circuit_id_round_tuples_for(circuit_ids_for_round_to_be_proven);
     let zone = get_zone().await.context("get_zone()")?;
+    tracing::info!(
+        "Starting witness vector generation for group: {} with circuits: {:?} in zone: {} ",
+        specialized_group_id,
+        circuit_ids_for_round_to_be_proven,
+        zone
+    );
     let vk_commitments = get_cached_commitments();
     let witness_vector_generator = WitnessVectorGenerator::new(
         blob_store,

@@ -86,10 +86,19 @@ async fn main() -> anyhow::Result<()> {
         .context("failed to build a prover_connection_pool")?;
     let (stop_sender, stop_receiver) = watch::channel(false);
     let vk_commitments = get_cached_commitments();
+
+    let mut stop_signal_receiver = get_stop_signal_receiver();
+
     let mut n = 0;
     let mut protocol_versions = Vec::new();
     while protocol_versions.len() == 0 {
         if n > 0 {
+            let stop = stop_signal_receiver.try_next();
+            if let Ok(_) = stop {
+                tracing::info!("Finished witness generation");
+                return Ok(());
+            }
+
             sleep(Duration::from_millis(5000)).await;
             tracing::warn!(
                 "initializing the witness generator,protocol_versions: {:?}",
@@ -191,7 +200,6 @@ async fn main() -> anyhow::Result<()> {
         "stage" => format!("fri_witness_generator_{:?}", opt.round)
     );
 
-    let mut stop_signal_receiver = get_stop_signal_receiver();
     let graceful_shutdown = None::<futures::future::Ready<()>>;
     let tasks_allowed_to_finish = false;
     tokio::select! {
