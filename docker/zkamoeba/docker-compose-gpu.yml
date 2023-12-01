@@ -2,6 +2,12 @@ version: "3.2"
 services:
   prover-gpu-fri:
     image: "zkamoeba/prover-gpu-fri:latest"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [gpu]
     ports:
       - "4000:4000"
     volumes:
