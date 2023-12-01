@@ -1,0 +1,14 @@
+version: "3.2"
+services:
+  setup_data_generator_fri:
+    image: "setup_data_generator_fri:latest"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [gpu]
+    volumes:  
+      - ./setup-data:/usr/src/setup-data
+    env_file:
+      - ./setup_data_generator_fri/setup.env
