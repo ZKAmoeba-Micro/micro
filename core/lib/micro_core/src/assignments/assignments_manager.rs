@@ -37,7 +37,7 @@ impl AssignmentsManager {
         l2_sender: Caller,
     ) -> Self {
         let contract_abi = sys_deposit_contract();
-        let events = vec!["ScoreUpdate"];
+        let events = vec!["AssignmentBatch", "Penalize"];
         let mut event_signatures = Vec::new();
         for name in events {
             let msg = format!("{} event is missing in abi", name);

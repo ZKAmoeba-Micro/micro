@@ -12,7 +12,7 @@ use crate::{
     DEPOSIT_ADDRESS, ECRECOVER_PRECOMPILE_ADDRESS, FEE_POOL_ADDRESS,
     IMMUTABLE_SIMULATOR_STORAGE_ADDRESS, KECCAK256_PRECOMPILE_ADDRESS, KNOWN_CODES_STORAGE_ADDRESS,
     L1_MESSENGER_ADDRESS, L2_ETH_TOKEN_ADDRESS, MSG_VALUE_SIMULATOR_ADDRESS, NONCE_HOLDER_ADDRESS,
-    PROOF_REWARD_POOL_ADDRESS, SHA256_PRECOMPILE_ADDRESS, SYSTEM_CONTEXT_ADDRESS,
+    PROOF_REWARD_POOL_ADDRESS, RECEVING_ADDRESS, SHA256_PRECOMPILE_ADDRESS, SYSTEM_CONTEXT_ADDRESS,
     WHITE_LIST_ADDRESS,
 };
 use once_cell::sync::Lazy;
@@ -25,7 +25,7 @@ use once_cell::sync::Lazy;
 pub const TX_NONCE_INCREMENT: U256 = U256([1, 0, 0, 0]); // 1
 pub const DEPLOYMENT_NONCE_INCREMENT: U256 = U256([0, 0, 1, 0]); // 2^128
 
-static SYSTEM_CONTRACT_LIST: [(&str, &str, Address, ContractLanguage); 24] = [
+static SYSTEM_CONTRACT_LIST: [(&str, &str, Address, ContractLanguage); 25] = [
     (
         "",
         "AccountCodeStorage",
@@ -140,6 +140,12 @@ static SYSTEM_CONTRACT_LIST: [(&str, &str, Address, ContractLanguage); 24] = [
         "",
         "BatchReward",
         BATCH_REWARD_ADDRESS,
+        ContractLanguage::Sol,
+    ),
+    (
+        "",
+        "RecevingAddress",
+        RECEVING_ADDRESS,
         ContractLanguage::Sol,
     ),
 ];
