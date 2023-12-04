@@ -23,6 +23,7 @@ pub mod gpu_socket_listener {
     };
 
     pub(crate) struct SocketListener {
+        interface_address: SocketAddress,
         address: SocketAddress,
         queue: SharedWitnessVectorQueue,
         pool: ConnectionPool,
@@ -32,6 +33,7 @@ pub mod gpu_socket_listener {
 
     impl SocketListener {
         pub fn new(
+            interface_address: SocketAddress,
             address: SocketAddress,
             queue: SharedWitnessVectorQueue,
             pool: ConnectionPool,
@@ -39,6 +41,7 @@ pub mod gpu_socket_listener {
             zone: String,
         ) -> Self {
             Self {
+                interface_address,
                 address,
                 queue,
                 pool,
@@ -50,8 +53,8 @@ pub mod gpu_socket_listener {
             let listening_address = SocketAddr::new(self.address.host, self.address.port);
             tracing::info!(
                 "Starting assembly receiver at host: {}, port: {}",
-                self.address.host,
-                self.address.port
+                self.interface_address.host,
+                self.interface_address.port
             );
             let listener = TcpListener::bind(listening_address)
                 .await
@@ -64,7 +67,7 @@ pub mod gpu_socket_listener {
                 .unwrap()
                 .fri_gpu_prover_queue_dal()
                 .insert_prover_instance(
-                    self.address.clone(),
+                    self.interface_address.clone(),
                     self.specialized_prover_group_id,
                     self.zone.clone(),
                 )

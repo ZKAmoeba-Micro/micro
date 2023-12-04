@@ -21,6 +21,7 @@ pub struct FriProverConfig {
     pub specialized_group_id: u8,
     pub witness_vector_generator_thread_count: Option<usize>,
     pub queue_capacity: usize,
+    pub witness_vector_receiver_host: Option<String>,
     pub witness_vector_receiver_port: u16,
 
     // whether to write to public GCS bucket for https://github.com/ZKAmoeba-Micro/micro-boojum-validator-cli
@@ -56,6 +57,7 @@ mod tests {
             specialized_group_id: 10,
             witness_vector_generator_thread_count: Some(5),
             queue_capacity: 10,
+            witness_vector_receiver_host: None,
             witness_vector_receiver_port: 3316,
             shall_save_to_public_bucket: true,
         }

@@ -111,6 +111,11 @@ impl RequestProcessor {
             return Err(RequestProcessorError::SignatureError);
         }
 
+        tracing::info!(
+            "Received request for proof generation data prover: {:?}",
+            prover_addr
+        );
+
         // get proof job by prover address
         let l1_batch_number = self
             .pool
