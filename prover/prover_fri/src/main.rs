@@ -191,6 +191,7 @@ async fn get_prover_tasks(
     circuit_ids_for_round_to_be_proven: Vec<CircuitIdRoundTuple>,
 ) -> anyhow::Result<Vec<JoinHandle<anyhow::Result<()>>>> {
     use gpu_prover_job_processor::gpu_prover;
+    use local_ip_address::local_ip;
     use micro_prover_fri_types::queue::FixedSizeQueue;
     use socket_listener::gpu_socket_listener;
     use std::sync::Arc;
@@ -202,8 +203,12 @@ async fn get_prover_tasks(
     let shared_witness_vector_queue = Arc::new(Mutex::new(witness_vector_queue));
     let consumer = shared_witness_vector_queue.clone();
     let zone = get_zone().await.context("get_zone()")?;
-    let mut local_ip = IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0));
-    let address = SocketAddress {
+    let local_ip = if let Some(ip) = prover_config.witness_vector_receiver_host.clone() {
+        IpAddr::V4(ip.parse().unwrap())
+    } else {
+        local_ip().context("Failed obtaining local IP address")?
+    };
+    let interface_address = SocketAddress {
         host: local_ip,
         port: prover_config.witness_vector_receiver_port,
     };
@@ -215,18 +220,11 @@ async fn get_prover_tasks(
         setup_load_mode,
         circuit_ids_for_round_to_be_proven.clone(),
         consumer,
-        address.clone(),
+        interface_address.clone(),
         zone.clone(),
     );
     let producer = shared_witness_vector_queue.clone();
 
-    if let Some(ip) = prover_config.witness_vector_receiver_host {
-        local_ip = IpAddr::V4(ip.parse().unwrap());
-    }
-    let interface_address = SocketAddress {
-        host: local_ip,
-        port: prover_config.witness_vector_receiver_port,
-    };
     tracing::info!(
         "local IP address is: {:?} in zone: {}",
         local_ip,
@@ -234,7 +232,10 @@ async fn get_prover_tasks(
     );
     let socket_listener = gpu_socket_listener::SocketListener::new(
         interface_address,
-        address,
+        SocketAddress {
+            host: IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0)),
+            port: prover_config.witness_vector_receiver_port,
+        },
         producer,
         pool.clone(),
         prover_config.specialized_group_id,

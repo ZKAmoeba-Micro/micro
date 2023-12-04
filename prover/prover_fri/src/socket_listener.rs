@@ -152,7 +152,11 @@ pub mod gpu_socket_listener {
                 .await
                 .unwrap()
                 .fri_gpu_prover_queue_dal()
-                .update_prover_instance_status(self.address.clone(), status, self.zone.clone())
+                .update_prover_instance_status(
+                    self.interface_address.clone(),
+                    status,
+                    self.zone.clone(),
+                )
                 .await;
             Ok(())
         }

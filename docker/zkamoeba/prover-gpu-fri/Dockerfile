@@ -1,4 +1,4 @@
-FROM nvidia/cuda:12.2.0-devel-ubuntu22.04 as builder
+FROM nvidia/cuda:12.0.0-devel-ubuntu22.04 as builder
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -10,8 +10,8 @@ ENV RUSTUP_HOME=/usr/local/rustup \
     CARGO_HOME=/usr/local/cargo \
     PATH=/usr/local/cargo/bin:$PATH
 
-# Building for Nvidia Turing
-ARG CUDA_ARCH=75
+# Building for Nvidia all
+ARG CUDA_ARCH=all
 ENV CUDAARCHS=${CUDA_ARCH}
 
 RUN curl https://sh.rustup.rs -sSf | bash -s -- -y && \
@@ -36,7 +36,7 @@ COPY . .
 
 RUN cd prover && cargo build --release --features "gpu" --bin micro_prover_fri
 
-FROM nvidia/cuda:12.2.0-runtime-ubuntu22.04
+FROM nvidia/cuda:12.0.0-runtime-ubuntu22.04
 
 RUN apt-get update && apt-get install -y curl libpq5 ca-certificates && rm -rf /var/lib/apt/lists/*
 
