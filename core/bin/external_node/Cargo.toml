@@ -8,7 +8,7 @@ repository = "https://github.com/ZKAmoeba-Micro/micro"
 license = "MIT OR Apache-2.0"
 keywords = ["blockchain", "micro"]
 categories = ["cryptography"]
-publish = false # We don't want to publish our binaries.
+publish = false                                        # We don't want to publish our binaries.
 
 [dependencies]
 micro_core = { path = "../../lib/micro_core" }
@@ -19,6 +19,7 @@ micro_utils = { path = "../../lib/utils" }
 micro_state = { path = "../../lib/state" }
 micro_basic_types = { path = "../../lib/basic_types" }
 micro_contracts = { path = "../../lib/contracts" }
+micro_prover_utils = { path = "../../lib/prover_utils" }
 
 prometheus_exporter = { path = "../../lib/prometheus_exporter" }
 micro_health_check = { path = "../../lib/health_check" }

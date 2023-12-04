@@ -4147,6 +4147,7 @@ dependencies = [
  "micro_core",
  "micro_dal",
  "micro_health_check",
+ "micro_prover_utils",
  "micro_state",
  "micro_storage",
  "micro_types",

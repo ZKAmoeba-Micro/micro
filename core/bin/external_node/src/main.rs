@@ -1,6 +1,15 @@
 use anyhow::Context;
 use clap::Parser;
-use tokio::{sync::watch, task, time::sleep};
+use micro_config::configs::{
+    house_keeper::HouseKeeperConfig, FriProofCompressorConfig, FriProverConfig,
+    FriWitnessGeneratorConfig,
+};
+use micro_health_check::CheckHealth;
+use tokio::{
+    sync::watch,
+    task::{self, JoinHandle},
+    time::sleep,
+};
 
 use std::{sync::Arc, time::Duration};
 
@@ -14,6 +23,13 @@ use micro_core::{
     },
     block_reverter::{BlockReverter, BlockReverterFlags, L1ExecutedBatchesRevert},
     consistency_checker::ConsistencyChecker,
+    house_keeper::{
+        fri_proof_compressor_job_retry_manager::FriProofCompressorJobRetryManager,
+        fri_prover_job_retry_manager::FriProverJobRetryManager,
+        fri_scheduler_circuit_queuer::SchedulerCircuitQueuer,
+        fri_witness_generator_jobs_retry_manager::FriWitnessGeneratorJobRetryManager,
+        waiting_to_queued_fri_witness_job_mover::WaitingToQueuedFriWitnessJobMover,
+    },
     l1_gas_price::MainNodeGasPriceFetcher,
     metadata_calculator::{
         MetadataCalculator, MetadataCalculatorConfig, MetadataCalculatorModeConfig,
@@ -30,7 +46,7 @@ use micro_core::{
     },
 };
 use micro_dal::{connection::DbVariant, healthcheck::ConnectionPoolHealthCheck, ConnectionPool};
-use micro_health_check::CheckHealth;
+use micro_prover_utils::periodic_job::PeriodicJob;
 use micro_state::PostgresStorageCaches;
 use micro_storage::RocksDB;
 use micro_utils::wait_for_tasks::wait_for_tasks;
@@ -95,6 +111,62 @@ async fn build_state_keeper(
     io.recalculate_miniblock_hashes().await;
 
     MicroStateKeeper::new(stop_receiver, io, batch_executor_base, sealer)
+}
+
+async fn add_house_keeper_to_task_futures(
+    task_futures: &mut Vec<JoinHandle<anyhow::Result<()>>>,
+) -> anyhow::Result<()> {
+    let house_keeper_config =
+        HouseKeeperConfig::from_env().context("HouseKeeperConfig::from_env()")?;
+
+    let prover_connection_pool = ConnectionPool::builder(DbVariant::Prover)
+        .set_max_size(Some(house_keeper_config.prover_db_pool_size))
+        .build()
+        .await
+        .context("failed to build a prover_connection_pool")?;
+
+    // All FRI Prover related components are configured below.
+    let fri_prover_config = FriProverConfig::from_env().context("FriProverConfig::from_env()")?;
+    let fri_prover_job_retry_manager = FriProverJobRetryManager::new(
+        fri_prover_config.max_attempts,
+        fri_prover_config.proof_generation_timeout(),
+        house_keeper_config.fri_prover_job_retrying_interval_ms,
+        prover_connection_pool.clone(),
+    );
+    task_futures.push(tokio::spawn(fri_prover_job_retry_manager.run()));
+
+    let fri_witness_gen_config =
+        FriWitnessGeneratorConfig::from_env().context("FriWitnessGeneratorConfig::from_env")?;
+    let fri_witness_gen_job_retry_manager = FriWitnessGeneratorJobRetryManager::new(
+        fri_witness_gen_config.max_attempts,
+        fri_witness_gen_config.witness_generation_timeout(),
+        house_keeper_config.fri_witness_generator_job_retrying_interval_ms,
+        prover_connection_pool.clone(),
+    );
+    task_futures.push(tokio::spawn(fri_witness_gen_job_retry_manager.run()));
+
+    let waiting_to_queued_fri_witness_job_mover = WaitingToQueuedFriWitnessJobMover::new(
+        house_keeper_config.fri_witness_job_moving_interval_ms,
+        prover_connection_pool.clone(),
+    );
+    task_futures.push(tokio::spawn(waiting_to_queued_fri_witness_job_mover.run()));
+
+    let scheduler_circuit_queuer = SchedulerCircuitQueuer::new(
+        house_keeper_config.fri_witness_job_moving_interval_ms,
+        prover_connection_pool.clone(),
+    );
+    task_futures.push(tokio::spawn(scheduler_circuit_queuer.run()));
+
+    let proof_compressor_config =
+        FriProofCompressorConfig::from_env().context("FriProofCompressorConfig")?;
+    let fri_proof_compressor_retry_manager = FriProofCompressorJobRetryManager::new(
+        proof_compressor_config.max_attempts,
+        proof_compressor_config.generation_timeout(),
+        house_keeper_config.fri_proof_compressor_job_retrying_interval_ms,
+        prover_connection_pool.clone(),
+    );
+    task_futures.push(tokio::spawn(fri_proof_compressor_retry_manager.run()));
+    Ok(())
 }
 
 async fn init_tasks(
@@ -288,6 +360,8 @@ async fn init_tasks(
     if let Some(consistency_checker) = consistency_checker_handle {
         task_handles.push(consistency_checker);
     }
+
+    add_house_keeper_to_task_futures(&mut task_handles).await?;
 
     Ok((task_handles, stop_sender, healthcheck_handle))
 }
