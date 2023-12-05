@@ -12,7 +12,6 @@ pub use sqlx::types::BigDecimal;
 
 // Local imports
 use crate::accounts_dal::AccountsDal;
-use crate::assignment_user_summary_dal::AssignmentUserSummaryDal;
 use crate::assignments_dal::AssignmentsDal;
 use crate::blocks_dal::BlocksDal;
 use crate::blocks_web3_dal::BlocksWeb3Dal;
@@ -48,7 +47,6 @@ use crate::witness_generator_dal::WitnessGeneratorDal;
 #[macro_use]
 mod macro_utils;
 pub mod accounts_dal;
-pub mod assignment_user_summary_dal;
 pub mod assignments_dal;
 pub mod blocks_dal;
 pub mod blocks_web3_dal;
@@ -205,10 +203,6 @@ impl<'a> StorageProcessor<'a> {
     pub fn accounts_dal(&mut self) -> AccountsDal<'_, 'a> {
         AccountsDal { storage: self }
     }
-    pub fn assignment_user_summary_dal(&mut self) -> AssignmentUserSummaryDal<'_, 'a> {
-        AssignmentUserSummaryDal { storage: self }
-    }
-
     pub fn blocks_dal(&mut self) -> BlocksDal<'_, 'a> {
         BlocksDal { storage: self }
     }

@@ -1,12 +1,10 @@
-use std::str::FromStr;
-
+use crate::instrument::InstrumentExt;
+use crate::time_utils::pg_interval_from_duration;
 use crate::{SqlxError, StorageProcessor};
-use micro_types::{Address, L1BatchNumber, H256};
+use micro_types::{Address, L1BatchNumber, MiniblockNumber, H256};
+use std::str::FromStr;
 use std::time::Duration;
 use strum::{Display, EnumString};
-
-use crate::time_utils::pg_interval_from_duration;
-
 #[derive(Debug)]
 pub struct AssignmentsDal<'a, 'c> {
     pub(crate) storage: &'a mut StorageProcessor<'c>,
@@ -31,25 +29,21 @@ impl AssignmentsDal<'_, '_> {
         &mut self,
         verification_address: Address,
         block_number: L1BatchNumber,
-        last_time: i64,
+        miniblock_number: MiniblockNumber,
+        storage_index: u64,
     ) -> Result<(), SqlxError> {
         let mut transaction = self.storage.start_transaction().await.unwrap();
 
-        tracing::info!("insert_assignments verification_address:{verification_address},block_number:{block_number}");
+        tracing::info!("insert_and_update_assignments verification_address:{verification_address},block_number:{block_number},miniblock_number:{miniblock_number},event_index:{storage_index}");
 
-        sqlx::query!("INSERT INTO assignments (verification_address,l1_batch_number, status, created_at, updated_at) VALUES ($1,$2, 'assigned_not_certified', now(), now())",
+        sqlx::query!("INSERT INTO assignments (verification_address,l1_batch_number,miniblock_number,storage_index,status,created_at,updated_at) VALUES ($1,$2,$3,$4,'assigned_not_certified', now(), now())",
              verification_address.as_bytes(),
              block_number.0 as i64,
+             miniblock_number.0 as i64,
+             storage_index as i64,
         )
         .execute(transaction.conn())
         .await?;
-        sqlx::query!("UPDATE assignment_user_summary SET last_time=$1, update_at = now() WHERE  verification_address = $2",
-        last_time,
-        verification_address.as_bytes(),
-        )
-        .execute(transaction.conn())
-        .await?;
-
         transaction.commit().await.unwrap();
         Ok(())
     }
@@ -128,27 +122,29 @@ impl AssignmentsDal<'_, '_> {
 
     pub async fn update_assigments_status_by_punished(
         &mut self,
-        id: i32,
+        storage_index: u64,
         verification_address: Address,
         block_number: L1BatchNumber,
         tx_hash: H256,
     ) -> Result<(), SqlxError> {
         tracing::info!("update_assigments_status verification_address:{verification_address},block_number:{block_number},tx_hash:{tx_hash}");
 
-        sqlx::query!("UPDATE assignments SET status='failed',tx_hash=$1,updated_at=now() WHERE id=$2 and status='be_punished' and tx_hash is null",
+        sqlx::query!("UPDATE assignments SET status='failed',tx_hash=$1,updated_at=now() WHERE storage_index=$2 and verification_address = $3 AND l1_batch_number = $4  and status='be_punished' and tx_hash is null",
             tx_hash.as_bytes(),
-            id
+            storage_index as i64,
+            verification_address.as_bytes(),
+            block_number.0 as i64,
         )
         .execute(self.storage.conn())
         .await?;
         Ok(())
     }
 
-    pub async fn get_punished_address_list(&mut self) -> Vec<(i32, Address, L1BatchNumber)> {
+    pub async fn get_punished_address_list(&mut self) -> Vec<(i32, Address, L1BatchNumber, u64)> {
         let result = sqlx::query!(
-        "SELECT id,verification_address,l1_batch_number \
+        "SELECT id,verification_address,l1_batch_number,storage_index \
         FROM ( \
-            SELECT id,verification_address,l1_batch_number,status,tx_hash,COUNT(*) OVER (PARTITION BY verification_address) AS total_count \
+            SELECT id,verification_address,l1_batch_number,storage_index,status,tx_hash,COUNT(*) OVER (PARTITION BY verification_address) AS total_count \
             FROM assignments \
             WHERE status IN ('failed', 'be_punished') ORDER BY created_at ) AS subquery WHERE total_count > 0 AND status = 'be_punished' and tx_hash is null")
         .fetch_all(self.storage.conn())
@@ -162,6 +158,7 @@ impl AssignmentsDal<'_, '_> {
                     row.id,
                     Address::from_slice(&row.verification_address),
                     L1BatchNumber(row.l1_batch_number as u32),
+                    row.storage_index as u64,
                 )
             })
             .collect()
@@ -276,23 +273,14 @@ impl AssignmentsDal<'_, '_> {
         Ok(())
     }
 
-    pub async fn get_last_status(
-        &mut self,
-        prover: Address,
-        block_number: L1BatchNumber,
-    ) -> Result<ProverResultStatus, SqlxError> {
-        let row = sqlx::query!("SELECT status FROM assignments WHERE verification_address = $1 AND l1_batch_number = $2 order by created_at desc LIMIT 1",
-            prover.as_bytes(),
-            block_number.0 as i64
-        )
-        .fetch_optional(self.storage.conn())
-        .await
-        .unwrap();
-        tracing::info!("get_last_status row:{:?}", row);
-
-        match row {
-            Some(r) => Ok(ProverResultStatus::from_str(&r.status).unwrap()),
-            None => Ok(ProverResultStatus::Failed.into()),
-        }
+    pub async fn get_max_mini_number(&mut self) -> Result<MiniblockNumber, sqlx::Error> {
+        let number = sqlx::query!("select max(miniblock_number) number from assignments")
+            .instrument("get_max_mini_number")
+            .report_latency()
+            .fetch_one(self.storage.conn())
+            .await?
+            .number
+            .unwrap_or(0);
+        Ok(MiniblockNumber(number as u32))
     }
 }
