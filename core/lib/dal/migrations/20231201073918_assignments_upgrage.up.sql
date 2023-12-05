@@ -1,7 +1,7 @@
 DROP INDEX IF EXISTS assignments_idx_status;
 DROP TABLE IF EXISTS assignments;
-
-
+DROP INDEX IF EXISTS assignment_user_summary_pkey;
+DROP TABLE IF EXISTS assignment_user_summary;
 
 
 CREATE TABLE assignments (
