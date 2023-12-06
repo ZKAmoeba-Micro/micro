@@ -4,7 +4,6 @@ use micro_basic_types::H256;
 use micro_contracts::sys_deposit_contract;
 use micro_utils::{h256_to_account_address, h256_to_u256};
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 use std::convert::TryFrom;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Penalize {
@@ -81,14 +80,14 @@ impl TryFrom<Log> for Penalize {
 
 impl EventMapBuilder for Penalize {
     type A = Penalize;
-    fn build_map(logs: Vec<Log>) -> HashMap<Address, Penalize> {
-        let mut as_map: HashMap<Address, Penalize> = HashMap::new();
+    fn build_map(logs: Vec<Log>) -> Vec<Penalize> {
+        let mut as_map: Vec<Penalize> = Vec::new();
         for log in logs {
             let tops = log.clone().topics;
             let event_name = tops.get(0).unwrap();
             if event_name == &Penalize::is_penalize() {
                 let at_add: Penalize = Penalize::try_from(log).unwrap();
-                as_map.insert(at_add.prover, at_add);
+                as_map.push(at_add);
             }
         }
         as_map

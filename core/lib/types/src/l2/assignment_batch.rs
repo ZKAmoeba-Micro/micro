@@ -6,7 +6,6 @@ use micro_basic_types::{
 };
 use micro_contracts::sys_deposit_contract;
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 use std::convert::TryFrom;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -76,14 +75,14 @@ impl TryFrom<Log> for AssignmentBatch {
 
 impl EventMapBuilder for AssignmentBatch {
     type A = AssignmentBatch;
-    fn build_map(logs: Vec<Log>) -> HashMap<Address, AssignmentBatch> {
-        let mut as_map: HashMap<Address, AssignmentBatch> = HashMap::new();
+    fn build_map(logs: Vec<Log>) -> Vec<AssignmentBatch> {
+        let mut as_map: Vec<AssignmentBatch> = Vec::new();
         for log in logs {
             let tops = log.clone().topics;
             let event_name = tops.get(0).unwrap();
             if event_name == &AssignmentBatch::is_assignment_batch() {
                 let at_add: AssignmentBatch = AssignmentBatch::try_from(log).unwrap();
-                as_map.insert(at_add.prover, at_add);
+                as_map.push(at_add);
             }
         }
         as_map

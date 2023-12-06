@@ -169,8 +169,7 @@ impl AssignmentsManager {
         tracing::warn!("monitor_change_event at_map:{:?}", at_map);
         tracing::warn!("monitor_change_event penalize_map:{:?}", penalize_map);
         if !&at_map.is_empty() {
-            let assignments_list: Vec<AssignmentBatch> = at_map.values().cloned().collect();
-            for assignment in assignments_list {
+            for assignment in at_map {
                 let res = connection
                     .assignments_dal()
                     .insert_and_update_assignments(
@@ -193,8 +192,7 @@ impl AssignmentsManager {
         }
 
         if !&penalize_map.is_empty() {
-            let assignments_list: Vec<Penalize> = penalize_map.values().cloned().collect();
-            for assignment in assignments_list {
+            for assignment in penalize_map {
                 let hash = match assignment.transaction_hash {
                     Some(value) => value,
                     None => H256::default(),
