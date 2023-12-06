@@ -126,8 +126,7 @@ impl AssignmentsManager {
         if latest_mini_block_number.0 == 0 {
             self.from_block = self.from_block;
         } else if latest_mini_block_number.0 != 0 && latest_mini_block_number.0 > self.from_block {
-            //The last query block has been processed, so we directly start from the next one, so add 1
-            self.from_block = latest_mini_block_number.0 + 1;
+            self.from_block = latest_mini_block_number.0;
         } else if self.from_block > sealed_mini_number.0 {
             self.from_block = sealed_mini_number.0;
         } else {
