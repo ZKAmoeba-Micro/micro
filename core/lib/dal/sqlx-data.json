@@ -4580,21 +4580,6 @@
     },
     "query": "UPDATE proof_compression_jobs_fri SET status = 'queued', attempts = attempts + 1, updated_at = now(), processing_started_at = now() WHERE (status = 'in_progress' AND  processing_started_at <= now() - $1::interval AND attempts < $2) OR (status = 'failed' AND attempts < $2) RETURNING l1_batch_number, status, attempts"
   },
-  "5055c1e706480b918644b30484d6010e9113b300a52d261be39e33e3a155eff2": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Bytea",
-          "Int8",
-          "Int8",
-          "Int8"
-        ]
-      }
-    },
-    "query": "INSERT INTO assignments (verification_address,l1_batch_number,miniblock_number,storage_index,status,created_at,updated_at) VALUES ($1,$2,$3,$4,'assigned_not_certified', now(), now())"
-  },
   "5089dfb745ff04a9b071b5785e68194a6f6a7a72754d23a65adc7d6838f7f640": {
     "describe": {
       "columns": [],
@@ -11817,6 +11802,21 @@
       }
     },
     "query": "SELECT address, key, value FROM storage_logs WHERE miniblock_number BETWEEN (SELECT MIN(number) FROM miniblocks WHERE l1_batch_number = $1) AND (SELECT MAX(number) FROM miniblocks WHERE l1_batch_number = $1) ORDER BY miniblock_number, operation_number"
+  },
+  "f76dbad3b96e33f5482f62a697b7dbe9995d162569960645aa49452518932f9e": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Bytea",
+          "Int8",
+          "Int8",
+          "Int8"
+        ]
+      }
+    },
+    "query": "INSERT INTO assignments (verification_address,l1_batch_number,miniblock_number,storage_index,status,created_at,updated_at) VALUES ($1,$2,$3,$4,'assigned_not_certified', now(), now()) ON CONFLICT(verification_address,l1_batch_number,storage_index) DO UPDATE  SET updated_at=now()"
   },
   "f78960549e6201527454d060d5b483db032f4df80b4269a624f0309ed9a6a38e": {
     "describe": {

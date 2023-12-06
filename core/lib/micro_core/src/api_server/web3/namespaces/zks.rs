@@ -6,8 +6,8 @@ use micro_dal::StorageProcessor;
 use micro_mini_merkle_tree::MiniMerkleTree;
 use micro_types::{
     api::{
-        BlockDetails, BridgeAddresses, GetLogsFilter, L1BatchDetails, L2ToL1LogProof,
-        ProtocolVersion, TransactionDetails,
+        BlockDetails, BridgeAddresses, GetEventLogsFilter, GetLogsFilter, L1BatchDetails,
+        L2ToL1LogProof, ProtocolVersion, TransactionDetails,
     },
     fee::Fee,
     l1::L1Tx,
@@ -269,17 +269,19 @@ impl<G: L1GasPriceProvider> ZksNamespace<G> {
 
         // Position of l1 log in L1 batch relative to logs with identical data
         let l1_log_relative_position = if let Some(l2_log_position) = l2_log_position {
+            let get_logs_filter = GetLogsFilter {
+                from_block: first_miniblock_of_l1_batch,
+                to_block: Some(block_number.0.into()),
+                addresses: vec![L1_MESSENGER_ADDRESS],
+                topics: vec![(2, vec![address_to_h256(&sender)]), (3, vec![msg])],
+            };
+            let get_filter = GetEventLogsFilter {
+                log_filter: get_logs_filter,
+                event_names: vec![],
+            };
             let logs = storage
                 .events_web3_dal()
-                .get_logs(
-                    GetLogsFilter {
-                        from_block: first_miniblock_of_l1_batch,
-                        to_block: Some(block_number.0.into()),
-                        addresses: vec![L1_MESSENGER_ADDRESS],
-                        topics: vec![(2, vec![address_to_h256(&sender)]), (3, vec![msg])],
-                    },
-                    self.state.api_config.req_entities_limit,
-                )
+                .get_logs(get_filter, self.state.api_config.req_entities_limit)
                 .await
                 .map_err(|err| internal_error(METHOD_NAME, err))?;
             let maybe_pos = logs.iter().position(|event| {

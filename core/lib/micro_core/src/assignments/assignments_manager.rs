@@ -6,7 +6,7 @@ use micro_dal::ConnectionPool;
 use micro_prover_utils::periodic_job::PeriodicJob;
 use micro_types::l2::event_map::EventMapBuilder;
 use micro_types::{
-    api::{BlockNumber, GetLogsFilter},
+    api::{BlockNumber, GetEventLogsFilter, GetLogsFilter},
     ethabi::{Contract, Token},
     l2::{
         assignment_batch::{AssignmentBatch, EVENTNAME},
@@ -124,13 +124,10 @@ impl AssignmentsManager {
             self.from_block
         );
         if latest_mini_block_number.0 == 0 {
-            if sealed_mini_number.0 > 0 {
-                self.from_block = sealed_mini_number.0;
-            } else {
-                self.from_block = self.from_block;
-            }
+            self.from_block = self.from_block;
         } else if latest_mini_block_number.0 != 0 && latest_mini_block_number.0 > self.from_block {
-            self.from_block = latest_mini_block_number.0;
+            //The last query block has been processed, so we directly start from the next one, so add 1
+            self.from_block = latest_mini_block_number.0 + 1;
         } else if self.from_block > sealed_mini_number.0 {
             self.from_block = sealed_mini_number.0;
         } else {
@@ -138,18 +135,22 @@ impl AssignmentsManager {
         }
         let next_number = (self.from_block as i32) + 1024;
         //Multiple parameter lists for one event
-        let mut topics = Vec::new();
+        let mut event_names = Vec::new();
         //Verification address parameter of the event
         for signal in &self.event_signatures {
             let h256 = vec![*signal];
-            let topic = (1, h256);
-            topics.push(topic);
+            //let topic = (1, h256);
+            event_names.push(h256);
         }
         let filter = GetLogsFilter {
             from_block: MiniblockNumber(self.from_block),
             to_block: Some(BlockNumber::Number(next_number.into())),
             addresses: vec![DEPOSIT_ADDRESS],
-            topics: topics,
+            topics: vec![],
+        };
+        let filter = GetEventLogsFilter {
+            log_filter: filter,
+            event_names: event_names,
         };
         tracing::warn!("monitor_change_event filter: {:?}", &filter);
         let logs: Vec<micro_types::api::Log> = connection

@@ -36,7 +36,7 @@ impl AssignmentsDal<'_, '_> {
 
         tracing::info!("insert_and_update_assignments verification_address:{verification_address},block_number:{block_number},miniblock_number:{miniblock_number},event_index:{storage_index}");
 
-        sqlx::query!("INSERT INTO assignments (verification_address,l1_batch_number,miniblock_number,storage_index,status,created_at,updated_at) VALUES ($1,$2,$3,$4,'assigned_not_certified', now(), now())",
+        sqlx::query!("INSERT INTO assignments (verification_address,l1_batch_number,miniblock_number,storage_index,status,created_at,updated_at) VALUES ($1,$2,$3,$4,'assigned_not_certified', now(), now()) ON CONFLICT(verification_address,l1_batch_number,storage_index) DO UPDATE  SET updated_at=now()",
              verification_address.as_bytes(),
              block_number.0 as i64,
              miniblock_number.0 as i64,

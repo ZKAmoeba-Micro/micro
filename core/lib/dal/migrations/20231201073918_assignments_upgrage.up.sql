@@ -1,6 +1,9 @@
 DROP INDEX IF EXISTS assignments_idx_status;
+DROP INDEX IF EXISTS assignments_unkey;
+
 DROP TABLE IF EXISTS assignments;
 DROP TABLE IF EXISTS assignment_user_summary;
+
 
 
 CREATE TABLE assignments (
@@ -16,3 +19,5 @@ CREATE TABLE assignments (
 );
 
 CREATE INDEX assignments_idx_status ON assignments (status);
+CREATE UNIQUE INDEX assignments_unkey ON assignments (verification_address,l1_batch_number,storage_index);
+
