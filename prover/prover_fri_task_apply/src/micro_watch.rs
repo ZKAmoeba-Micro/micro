@@ -43,8 +43,7 @@ impl<W: MicroClient + Sync> EthWatch<W> {
         let signer = Signer::new(eth_signer, address, chain_id);
         let wallet: Wallet<PrivateKeySigner, micro::HttpClient> =
             Wallet::with_http_client(&config.rpc_url, signer).unwrap();
-        // let last_processed_ethereum_block = client.finalized_block_number().await.unwrap();
-        let last_processed_micro_block = 0;
+        let last_processed_micro_block = client.finalized_block_number().await.unwrap();
         let poll_interval = config.poll_duration();
         Self {
             client,
@@ -57,13 +56,11 @@ impl<W: MicroClient + Sync> EthWatch<W> {
 
     pub async fn run(&mut self, stop_receiver: watch::Receiver<bool>) -> anyhow::Result<()> {
         let mut timer = tokio::time::interval(self.poll_interval);
-        tracing::info!("micro_watch start run ");
         loop {
             if *stop_receiver.borrow() {
                 tracing::info!("Stop signal received, eth_watch is shutting down");
                 break;
             }
-            tracing::info!("micro_watch start loop ");
             timer.tick().await;
 
             metrics::counter!("prover.task_apply.eth_poll", 1);
@@ -120,7 +117,6 @@ impl<W: MicroClient + Sync> EthWatch<W> {
     async fn task_apply(&mut self, event: Log) -> Result<(), Error> {
         let batch = NewBatch::try_from(event.clone()).unwrap();
         tracing::info!("task_apply  batch :{:?}", batch);
-
         let data = self
             .contract_abi
             .function("proofApply")
