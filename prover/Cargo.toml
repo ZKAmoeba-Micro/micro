@@ -14,6 +14,7 @@ members = [
     "witness_vector_generator",
     "prover_fri_gateway",
     "proof_fri_compressor",
+    "prover_fri_task_apply",
 ]
 
 resolver = "2"

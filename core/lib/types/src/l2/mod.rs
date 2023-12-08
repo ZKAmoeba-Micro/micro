@@ -19,6 +19,7 @@ use serde::{Deserialize, Serialize};
 pub mod assignment_batch;
 pub mod error;
 pub mod event_map;
+pub mod new_batch;
 pub mod penalize;
 
 use crate::api::TransactionRequest;

@@ -6,6 +6,7 @@ pub use self::{
     eth_sender::ETHSenderConfig, eth_sender::GasAdjusterConfig, eth_watch::ETHWatchConfig,
     fetcher::FetcherConfig, fri_proof_compressor::FriProofCompressorConfig,
     fri_prover::FriProverConfig, fri_prover_gateway::FriProverGatewayConfig,
+    fri_prover_task_apply::FriProverTaskApplyConfig,
     fri_witness_generator::FriWitnessGeneratorConfig,
     fri_witness_vector_generator::FriWitnessVectorGeneratorConfig, object_store::ObjectStoreConfig,
     proof_data_handler::ProofDataHandlerConfig, prover::ProverConfig, prover::ProverConfigs,
@@ -31,6 +32,7 @@ pub mod fri_proof_compressor;
 pub mod fri_prover;
 pub mod fri_prover_gateway;
 pub mod fri_prover_group;
+pub mod fri_prover_task_apply;
 pub mod fri_witness_generator;
 pub mod fri_witness_vector_generator;
 pub mod house_keeper;

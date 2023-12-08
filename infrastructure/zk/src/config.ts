@@ -30,7 +30,8 @@ const CONFIG_FILES = [
     'proof_data_handler.toml',
     'fri_witness_vector_generator.toml',
     'fri_prover_gateway.toml',
-    'fri_proof_compressor.toml'
+    'fri_proof_compressor.toml',
+    'fri_prover_task_apply.toml'
 ];
 
 function loadConfigFile(path: string) {

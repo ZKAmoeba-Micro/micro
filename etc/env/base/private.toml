@@ -17,3 +17,6 @@ fee_account_private_key = "0x848181ca4df71f9fe087f3ce10a503bb8d700775dfe8e948a07
 
 [fri_prover_gateway]
 prover_private_key = "0x848181ca4df71f9fe087f3ce10a503bb8d700775dfe8e948a07d40889a3e4200"
+
+[fri_prover_task_apply]
+prover_private_key = "0x848181ca4df71f9fe087f3ce10a503bb8d700775dfe8e948a07d40889a3e4200"
