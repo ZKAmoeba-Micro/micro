@@ -16,8 +16,11 @@ use crate::{
 
 use serde::{Deserialize, Serialize};
 
+pub mod assignment_batch;
 pub mod error;
-pub mod score_update;
+pub mod event_map;
+pub mod new_batch;
+pub mod penalize;
 
 use crate::api::TransactionRequest;
 use crate::fee::{encoding_len, Fee};

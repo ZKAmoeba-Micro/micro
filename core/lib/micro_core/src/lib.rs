@@ -710,7 +710,6 @@ pub async fn initialize_components(
             proof_data_handler.proof_generation_timeout(),
             proof_data_handler.retry_interval_ms,
             assignment_pool,
-            proof_data_handler.once_score,
             caller.unwrap(),
         );
         task_futures.push(tokio::spawn(assignments_man.run()));

@@ -15,7 +15,7 @@ use std::{
 use micro_config::configs::{api::Web3JsonRpcConfig, chain::NetworkConfig, ContractsConfig};
 use micro_dal::ConnectionPool;
 use micro_types::{
-    api::{self, BlockId, BlockNumber, GetLogsFilter},
+    api::{self, BlockId, BlockNumber, GetEventLogsFilter, GetLogsFilter},
     block::unpack_block_upgrade_info,
     l2::L2Tx,
     transaction_request::CallRequest,
@@ -508,6 +508,11 @@ impl<E> RpcState<E> {
             topics,
         };
 
+        let get_filter = GetEventLogsFilter {
+            log_filter: get_logs_filter,
+            event_names: vec![],
+        };
+
         let mut storage = self
             .connection_pool
             .access_storage_tagged("api")
@@ -519,7 +524,7 @@ impl<E> RpcState<E> {
         if from_block != to_block
             && storage
                 .events_web3_dal()
-                .get_log_block_number(&get_logs_filter, self.api_config.req_entities_limit)
+                .get_log_block_number(&get_filter, self.api_config.req_entities_limit)
                 .await
                 .map_err(|err| internal_error(METHOD_NAME, err))?
                 .is_some()
@@ -529,7 +534,7 @@ impl<E> RpcState<E> {
 
         let logs = storage
             .events_web3_dal()
-            .get_logs(get_logs_filter, i32::MAX as usize)
+            .get_logs(get_filter, i32::MAX as usize)
             .await
             .map_err(|err| internal_error(METHOD_NAME, err))?;
 

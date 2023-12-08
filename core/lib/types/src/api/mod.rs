@@ -553,6 +553,12 @@ pub struct GetLogsFilter {
     pub topics: Vec<(u32, Vec<H256>)>,
 }
 
+#[derive(Debug, Clone)]
+pub struct GetEventLogsFilter {
+    pub log_filter: GetLogsFilter,
+    pub event_names: Vec<Vec<H256>>,
+}
+
 /// Result of debugging block
 /// For some reasons geth returns result as {result: DebugCall}
 #[derive(Debug, Serialize, Deserialize, Clone)]

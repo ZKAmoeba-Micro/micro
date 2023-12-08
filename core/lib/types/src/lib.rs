@@ -33,7 +33,6 @@ pub use micro_basic_types::*;
 pub use zkevm_test_harness;
 
 pub mod aggregated_operations;
-pub mod assignment_user_summary;
 pub mod block;
 pub mod circuit;
 pub mod commitment;

@@ -2,8 +2,8 @@ use std::time::Instant;
 
 use micro_types::{
     api::{
-        BlockId, BlockNumber, GetLogsFilter, Transaction, TransactionId, TransactionReceipt,
-        TransactionVariant,
+        BlockId, BlockNumber, GetEventLogsFilter, GetLogsFilter, Transaction, TransactionId,
+        TransactionReceipt, TransactionVariant,
     },
     l2::{L2Tx, TransactionType},
     transaction_request::CallRequest,
@@ -838,6 +838,10 @@ impl<G: L1GasPriceProvider> EthNamespace<G> {
                     addresses,
                     topics,
                 };
+                let get_filter = GetEventLogsFilter {
+                    log_filter: get_logs_filter,
+                    event_names: vec![],
+                };
                 let to_block = self
                     .state
                     .resolve_filter_block_number(filter.to_block)
@@ -855,10 +859,7 @@ impl<G: L1GasPriceProvider> EthNamespace<G> {
                 if from_block != to_block {
                     if let Some(miniblock_number) = storage
                         .events_web3_dal()
-                        .get_log_block_number(
-                            &get_logs_filter,
-                            self.state.api_config.req_entities_limit,
-                        )
+                        .get_log_block_number(&get_filter, self.state.api_config.req_entities_limit)
                         .await
                         .map_err(|err| internal_error(METHOD_NAME, err))?
                     {
@@ -872,7 +873,7 @@ impl<G: L1GasPriceProvider> EthNamespace<G> {
 
                 let logs = storage
                     .events_web3_dal()
-                    .get_logs(get_logs_filter, i32::MAX as usize)
+                    .get_logs(get_filter, i32::MAX as usize)
                     .await
                     .map_err(|err| internal_error(METHOD_NAME, err))?;
                 let new_from_block = logs
