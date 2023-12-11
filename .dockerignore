@@ -32,6 +32,7 @@ contracts/.git
 !etc/system-contracts/contracts/artifacts
 !etc/system-contracts/contracts/precompiles/artifacts
 !etc/system-contracts/artifacts-zk
+!etc/contracts-test-data/artifacts-zk
 !etc/multivm_bootloaders
 !cargo
 !bellman-cuda
