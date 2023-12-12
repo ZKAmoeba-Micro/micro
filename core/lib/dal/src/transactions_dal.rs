@@ -505,9 +505,10 @@ impl TransactionsDal<'_, '_> {
                             l2_signatures.push(common_data.signature.clone());
                             l2_tx_formats.push(common_data.transaction_type as i32);
                             l2_errors.push(error.unwrap_or_default());
-                            let l2_effective_gas_price = common_data
-                                .fee
-                                .get_effective_gas_price(block_base_fee_per_gas);
+                            let l2_effective_gas_price = common_data.fee.get_effective_gas_price(
+                                block_base_fee_per_gas,
+                                common_data.transaction_type,
+                            );
                             l2_effective_gas_prices
                                 .push(u256_to_big_decimal(l2_effective_gas_price));
                             l2_execution_infos.push(serde_json::to_value(execution_info).unwrap());

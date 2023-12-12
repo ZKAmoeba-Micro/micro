@@ -1,7 +1,7 @@
 use micro_utils::ceil_div;
 use serde::{Deserialize, Serialize};
 
-use crate::U256;
+use crate::{l2::TransactionType, U256};
 
 #[derive(Debug, Default, Clone, Copy)]
 pub struct TransactionExecutionMetrics {
@@ -40,12 +40,18 @@ impl Fee {
         self.max_fee_per_gas * self.gas_limit
     }
 
-    pub fn get_effective_gas_price(&self, block_base_fee_per_gas: U256) -> U256 {
+    pub fn get_effective_gas_price(
+        &self,
+        block_base_fee_per_gas: U256,
+        tx_type: TransactionType,
+    ) -> U256 {
         assert!(block_base_fee_per_gas <= self.max_fee_per_gas);
         assert!(self.max_priority_fee_per_gas <= self.max_fee_per_gas);
 
-        if self.max_fee_per_gas == self.max_priority_fee_per_gas {
-            block_base_fee_per_gas
+        if tx_type == TransactionType::LegacyTransaction
+            || tx_type == TransactionType::EIP2930Transaction
+        {
+            self.max_fee_per_gas
         } else {
             // for EIP1559
             assert!(block_base_fee_per_gas + self.max_priority_fee_per_gas <= self.max_fee_per_gas);

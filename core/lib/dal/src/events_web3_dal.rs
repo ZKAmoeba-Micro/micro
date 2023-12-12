@@ -1,8 +1,8 @@
 use sqlx::Row;
 
 use micro_types::{
-    api::{GetEventLogsFilter, GetLogsFilter, Log},
-    event, Address, MiniblockNumber, H256,
+    api::{GetEventLogsFilter, Log},
+    Address, MiniblockNumber, H256,
 };
 
 use crate::{
@@ -206,7 +206,7 @@ impl EventsWeb3Dal<'_, '_> {
 #[cfg(test)]
 mod tests {
     use db_test_macro::db_test;
-    use micro_types::api::BlockNumber;
+    use micro_types::api::{BlockNumber, GetLogsFilter};
     use micro_types::{Address, H256};
 
     use super::*;
