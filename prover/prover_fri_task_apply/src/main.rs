@@ -18,18 +18,10 @@ mod micro_watch;
 async fn main() -> anyhow::Result<()> {
     #[allow(deprecated)] // TODO (QIT-21): Use centralized configuration approach.
     let log_format = vlog::log_format_from_env();
-    #[allow(deprecated)] // TODO (QIT-21): Use centralized configuration approach.
-    let sentry_url = vlog::sentry_url_from_env();
-    #[allow(deprecated)] // TODO (QIT-21): Use centralized configuration approach.
-    let environment = vlog::environment_from_env();
 
-    let mut builder = vlog::ObservabilityBuilder::new().with_log_format(log_format);
-    if let Some(sentry_url) = sentry_url {
-        builder = builder
-            .with_sentry_url(&sentry_url)
-            .context("Invalid Sentry URL")?
-            .with_sentry_environment(environment);
-    }
+    let builder: vlog::ObservabilityBuilder =
+        vlog::ObservabilityBuilder::new().with_log_format(log_format);
+
     let _guard = builder.build();
 
     std::env::vars().into_iter().for_each(|(k, v)| {
