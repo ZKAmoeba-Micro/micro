@@ -74,8 +74,8 @@ impl AssignmentsManager {
                 .function("penalize")
                 .unwrap()
                 .encode_input(&[
-                    Token::Address(address.clone()),
                     Token::Uint(U256::from(l1_batch_number.0)),
+                    Token::Address(address.clone()),
                     Token::Uint(U256::from(event_index)),
                 ])
                 .unwrap();
