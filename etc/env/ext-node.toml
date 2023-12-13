@@ -36,6 +36,8 @@ default_aa_hash = "0x0100065dc386f7b648718f2a0b08887b8d813e6b6728936fecb16a4bef7
 # WARN: Only to be used locally until the feature is fully tested.
 experimental_multivm_support = false
 
+with_prover = false
+
 [rust]
 # `RUST_LOG` environmnet variable for `env_logger`
 # Here we use TOML multiline strings: newlines will be trimmed.
