@@ -472,17 +472,6 @@ impl<G: L1GasPriceProvider> TxSender<G> {
             );
             return Err(SubmitTxError::MaxPriorityFeeGreaterThanMaxFee);
         }
-        if tx.common_data.fee.max_fee_per_gas
-            < tx.common_data.fee.max_priority_fee_per_gas
-                + U256::from(self.0.sender_config.fair_l2_gas_price)
-        {
-            tracing::info!(
-                "Submitted Tx is Unexecutable {:?} because of MaxPriorityFeePlusBaseFeeGreaterThanMaxFee {}",
-                tx.hash(),
-                tx.common_data.fee.max_fee_per_gas
-            );
-            return Err(SubmitTxError::MaxPriorityFeeGreaterThanMaxFee);
-        }
         if tx.execute.factory_deps_length() > MAX_NEW_FACTORY_DEPS {
             return Err(SubmitTxError::TooManyFactoryDependencies(
                 tx.execute.factory_deps_length(),

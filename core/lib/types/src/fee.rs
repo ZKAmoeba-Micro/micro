@@ -54,8 +54,11 @@ impl Fee {
             self.max_fee_per_gas
         } else {
             // for EIP1559
-            assert!(block_base_fee_per_gas + self.max_priority_fee_per_gas <= self.max_fee_per_gas);
-            block_base_fee_per_gas + self.max_priority_fee_per_gas
+            if block_base_fee_per_gas + self.max_priority_fee_per_gas <= self.max_fee_per_gas {
+                block_base_fee_per_gas + self.max_priority_fee_per_gas
+            } else {
+                self.max_fee_per_gas
+            }
         }
     }
 }

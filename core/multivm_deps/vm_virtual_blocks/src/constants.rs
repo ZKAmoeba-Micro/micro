@@ -66,7 +66,10 @@ pub(crate) const TX_DESCRIPTION_OFFSET: usize = BOOTLOADER_TX_DESCRIPTION_OFFSET
     + BOOTLOADER_TX_DESCRIPTION_SIZE * MAX_TXS_IN_BLOCK
     + MAX_POSTOP_SLOTS;
 
+pub(crate) const TX_TYPE_OFFSET: usize = 1;
 pub(crate) const TX_GAS_LIMIT_OFFSET: usize = 4;
+pub(crate) const TX_MAX_FEE_PER_GAS_OFFSET: usize = 6;
+pub(crate) const TX_MAX_PRIORITY_PER_FEE_OFFSET: usize = 7;
 
 const INITIAL_BASE_PAGE: u32 = 8;
 pub const BOOTLOADER_HEAP_PAGE: u32 = heap_page_from_base(MemoryPage(INITIAL_BASE_PAGE)).0;
