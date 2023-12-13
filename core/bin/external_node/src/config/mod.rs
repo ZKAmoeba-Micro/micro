@@ -350,6 +350,8 @@ pub struct RequiredENConfig {
     pub state_cache_path: String,
     /// Fast SSD path. Used as a RocksDB dir for the Merkle tree (*new* implementation).
     pub merkle_tree_path: String,
+    /// With prover
+    pub with_prover: bool,
 }
 
 impl RequiredENConfig {

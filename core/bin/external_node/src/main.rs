@@ -361,7 +361,9 @@ async fn init_tasks(
         task_handles.push(consistency_checker);
     }
 
-    add_house_keeper_to_task_futures(&mut task_handles).await?;
+    if config.required.with_prover {
+        add_house_keeper_to_task_futures(&mut task_handles).await?;
+    }
 
     Ok((task_handles, stop_sender, healthcheck_handle))
 }
