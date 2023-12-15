@@ -2,3 +2,4 @@
 rpc_url = "http://127.0.0.1:3050"
 poll_duration_secs = 60
 confirmations_for_eth_event = 10
+chain_id = 270

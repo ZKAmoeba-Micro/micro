@@ -39,7 +39,7 @@ impl<W: MicroClient + Sync> EthWatch<W> {
             .expect("Operator private key is required for signing client");
         let eth_signer = PrivateKeySigner::new(operator_private_key);
         let address = eth_signer.get_address().await.unwrap();
-        let chain_id = L2ChainId::from(270);
+        let chain_id = L2ChainId::try_from(config.chain_id).unwrap();
         let signer = Signer::new(eth_signer, address, chain_id);
         let wallet: Wallet<PrivateKeySigner, micro::HttpClient> =
             Wallet::with_http_client(&config.rpc_url, signer).unwrap();

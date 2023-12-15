@@ -8,6 +8,7 @@ pub struct FriProverTaskApplyConfig {
     pub rpc_url: String,
     pub poll_duration_secs: u16,
     pub confirmations_for_eth_event: u64,
+    pub chain_id: u64,
 }
 
 impl FriProverTaskApplyConfig {
@@ -39,6 +40,7 @@ mod tests {
             rpc_url: "http://private-dns-for-server".to_string(),
             poll_duration_secs: 100,
             confirmations_for_eth_event: 10,
+            chain_id: 270,
         }
     }
 
@@ -48,6 +50,7 @@ mod tests {
             FRI_PROVER_TASK_APPLY_RPC_URL="http://private-dns-for-server"
             FRI_PROVER_TASK_APPLY_POLL_DURATION_SECS="100"
             FRI_PROVER_TASK_APPLY_CONFIRMATIONS_FOR_ETH_EVENT="10"
+            FRI_PROVER_TASK_APPLY_CHAIN_ID="270"
 
         "#;
         let mut lock = MUTEX.lock();
