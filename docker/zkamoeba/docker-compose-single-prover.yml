@@ -1,0 +1,146 @@
+version: "3.2"
+services:
+  postgres:
+    image: "postgres:14"
+    ports:
+      - "5432:5432"
+    expose:
+      - 5432
+    volumes:
+      - ./volumes/postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    healthcheck:
+      test: ["CMD", "pg_isready"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+
+  ext-node:
+    image: "zkamoeba/external-node:latest"
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "3060:3060"
+      - "3061:3061"
+    volumes:
+      - ./db/ext-node:/db/ext-node
+    env_file:
+      - ./testnet.env
+      - ./custom.env
+
+  object-store:
+    image: "zkamoeba/object_store:latest"
+    ports:
+      - "8000:8000"
+    expose:
+      - 8000
+    volumes:
+      - ./artifacts:/artifacts
+
+  gateway:
+    image: "zkamoeba/prover-fri-gateway:latest"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - ./testnet.env
+      - ./custom.env
+
+  witness-generator-basic:
+    image: "zkamoeba/witness-generator:latest"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./setup-data:/usr/src/setup-data
+    env_file:
+      - ./testnet.env
+    command: --round=basic_circuits
+
+  witness-generator-leaf:
+    image: "zkamoeba/witness-generator:latest"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./setup-data:/usr/src/setup-data
+    env_file:
+      - ./testnet.env
+    command: --round=leaf_aggregation
+
+  witness-generator-node:
+    image: "zkamoeba/witness-generator:latest"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./setup-data:/usr/src/setup-data
+    env_file:
+      - ./testnet.env
+    command: --round=node_aggregation
+
+  witness-generator-scheduler:
+    image: "zkamoeba/witness-generator:latest"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./setup-data:/usr/src/setup-data
+    env_file:
+      - ./testnet.env
+    command: --round=scheduler
+
+  witness-vector-generator:
+    image: "zkamoeba/witness-vector-generator:latest"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./setup-data:/usr/src/setup-data
+    env_file:
+      - ./testnet.env
+    deploy:
+      mode: replicated
+      replicas: 5
+
+  proof-fri-compressor:
+    image: "zkamoeba/proof-fri-compressor:latest"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./setup-data:/usr/src/setup-data
+    env_file:
+      - ./testnet.env
+
+  prover-gpu-fri:
+    image: "zkamoeba/prover-gpu-fri:latest"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [gpu]
+    ports:
+      - "4000:4000"
+    expose:
+      - 4000
+    volumes:
+      - ./setup-data:/usr/src/setup-data
+    env_file:
+      - ./testnet.env
+
+  task-apply:
+    image: "zkamoeba/prover-fri-task-apply:latest"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - ./testnet.env
+      - ./custom.env
