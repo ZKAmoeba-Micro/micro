@@ -3,11 +3,6 @@ use std::future::Future;
 
 use anyhow::Context as _;
 use local_ip_address::local_ip;
-use prometheus_exporter::PrometheusExporterConfig;
-use tokio::{
-    sync::{oneshot, watch::Receiver},
-    task::JoinHandle,
-};
 use micro_config::configs::{
     fri_prover_group::FriProverGroupConfig, FriProverConfig, PostgresConfig, ProverGroupConfig,
 };
@@ -25,6 +20,11 @@ use micro_types::{
     proofs::{GpuProverInstanceStatus, SocketAddress},
 };
 use micro_utils::wait_for_tasks::wait_for_tasks;
+use prometheus_exporter::PrometheusExporterConfig;
+use tokio::{
+    sync::{oneshot, watch::Receiver},
+    task::JoinHandle,
+};
 
 mod gpu_prover_job_processor;
 mod metrics;
@@ -208,9 +208,9 @@ async fn get_prover_tasks(
     use std::sync::Arc;
 
     use gpu_prover_job_processor::gpu_prover;
+    use micro_prover_fri_types::queue::FixedSizeQueue;
     use socket_listener::gpu_socket_listener;
     use tokio::sync::Mutex;
-    use micro_prover_fri_types::queue::FixedSizeQueue;
 
     let setup_load_mode =
         gpu_prover::load_setup_data_cache(&prover_config).context("load_setup_data_cache()")?;

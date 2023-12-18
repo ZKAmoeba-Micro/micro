@@ -253,8 +253,8 @@ Error: Genesis is not needed (either Postgres DB or tree's Rocks DB is not empty
 ```
 
 **Description**. This means that your bytecode config file has an empty entry: `"bytecode": "0x"`. This happens because
-your `micro-2-dev/etc/system-contracts/package.json`'s dependency on `"@zkamoeba/hardhat-micro-solc"` is outdated.
-We don't expect this error to happen as we've updated to latest version which fixes the problem.
+your `micro-2-dev/etc/system-contracts/package.json`'s dependency on `"@zkamoeba/hardhat-micro-solc"` is outdated. We
+don't expect this error to happen as we've updated to latest version which fixes the problem.
 
 **Solution**. Update your dependency and reinit:
 
@@ -304,8 +304,8 @@ Error: Child process exited with code 1
 ```
 
 **Description**. This means that your bytecode config file has an empty entry: `"bytecode": "0x"`. This happens because
-your `micro-2-dev/contracts/micro/package.json`'s dependency on `"@zkamoeba/hardhat-micro-solc"` is outdated. We
-don't expect this error to happen as we've updated to latest version which fixes the problem.
+your `micro-2-dev/contracts/micro/package.json`'s dependency on `"@zkamoeba/hardhat-micro-solc"` is outdated. We don't
+expect this error to happen as we've updated to latest version which fixes the problem.
 
 **Solution**. Update your dependency and reinit:
 

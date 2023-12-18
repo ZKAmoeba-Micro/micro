@@ -4,16 +4,15 @@ use futures::{
     channel::{mpsc, oneshot},
     StreamExt,
 };
-use micro_dal::ConnectionPool;
-use micro_web3_decl::error::Web3Error;
-use tokio::sync::watch;
-
 use micro_config::configs::{api::Web3JsonRpcConfig, eth_sender::SenderConfig};
+use micro_dal::ConnectionPool;
 use micro_eth_signer::{EthereumSigner, PrivateKeySigner, TransactionParameters};
 use micro_types::{
     api, l2::L2Tx, transaction_request::CallRequest, L2ChainId, EIP_1559_TX_TYPE, H256, U256,
     USED_BOOTLOADER_MEMORY_BYTES,
 };
+use micro_web3_decl::error::Web3Error;
+use tokio::sync::watch;
 
 use self::caller::Data;
 use crate::{

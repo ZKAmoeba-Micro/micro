@@ -1,6 +1,3 @@
-use zkevm_test_harness::{
-    boojum::field::goldilocks::GoldilocksField, witness::full_block_artifact::BlockBasicCircuits,
-};
 use micro_object_store::{
     serialize_using_bincode, AggregationsKey, Bucket, ClosedFormInputKey, FriCircuitKey,
     ObjectStore, StoredObject,
@@ -12,8 +9,7 @@ use micro_prover_fri_types::{
             gadgets::recursion::recursive_tree_hasher::CircuitGoldilocksPoseidon2Sponge,
         },
         circuit_definitions::{
-            base_layer::MicroBaseLayerClosedFormInput,
-            recursion_layer::MicroRecursiveLayerCircuit,
+            base_layer::MicroBaseLayerClosedFormInput, recursion_layer::MicroRecursiveLayerCircuit,
         },
         encodings::recursion_request::RecursionQueueSimulator,
         zkevm_circuits::scheduler::input::SchedulerCircuitInstanceWitness,
@@ -23,6 +19,9 @@ use micro_prover_fri_types::{
 };
 use micro_system_constants::USED_BOOTLOADER_MEMORY_BYTES;
 use micro_types::{proofs::AggregationRound, L1BatchNumber, U256};
+use zkevm_test_harness::{
+    boojum::field::goldilocks::GoldilocksField, witness::full_block_artifact::BlockBasicCircuits,
+};
 
 pub fn expand_bootloader_contents(packed: &[(usize, U256)]) -> Vec<u8> {
     let mut result = vec![0u8; USED_BOOTLOADER_MEMORY_BYTES];

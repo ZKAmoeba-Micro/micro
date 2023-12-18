@@ -477,15 +477,7 @@ async function cancelUpgrade(
         console.log(`Cancel upgrade with hash: ${proposalHash}`);
         let cancelUpgradeCalldata = micro.interface.encodeFunctionData('cancelUpgradeProposal', [proposalHash]);
         if (execute) {
-            await sendTransaction(
-                cancelUpgradeCalldata,
-                privateKey,
-                l1rpc,
-                microAddress,
-                environment,
-                gasPrice,
-                nonce
-            );
+            await sendTransaction(cancelUpgradeCalldata, privateKey, l1rpc, microAddress, environment, gasPrice, nonce);
         } else {
             console.log(`Cancel upgrade calldata: ${cancelUpgradeCalldata}`);
         }

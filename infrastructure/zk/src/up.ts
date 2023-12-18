@@ -6,28 +6,30 @@ import fs from 'fs';
 // Make sure that the volumes exists before starting the containers.
 function createVolumes() {
     fs.mkdirSync(`${process.env.MICRO_HOME}/volumes/lotus`, { recursive: true });
-    fs.mkdirSync(`${process.env.MICRO_HOME}/volumes/prysm/beacon`, { recursive: true });
-    fs.mkdirSync(`${process.env.MICRO_HOME}/volumes/prysm/validator`, { recursive: true });
-    fs.mkdirSync(`${process.env.MICRO_HOME}/volumes/postgres`, { recursive: true });
+    // fs.mkdirSync(`${process.env.MICRO_HOME}/volumes/prysm/beacon`, { recursive: true });
+    // fs.mkdirSync(`${process.env.MICRO_HOME}/volumes/prysm/validator`, { recursive: true });
+    fs.mkdirSync(`${process.env.MICRO_HOME}/volumes/postgres`, {
+        recursive: true
+    });
 
-    fs.copyFileSync(
-        `${process.env.MICRO_HOME}/docker/prysm/config.yml`,
-        `${process.env.MICRO_HOME}/volumes/prysm/config.yml`
-    );
+    // fs.copyFileSync(
+    //     `${process.env.MICRO_HOME}/docker/prysm/config.yml`,
+    //     `${process.env.MICRO_HOME}/volumes/prysm/config.yml`
+    // );
 
-    fs.copyFileSync(
-        `${process.env.MICRO_HOME}/docker/geth/jwtsecret`,
-        `${process.env.MICRO_HOME}/volumes/geth/jwtsecret`
-    );
-    fs.copyFileSync(
-        `${process.env.MICRO_HOME}/docker/geth/password.sec`,
-        `${process.env.MICRO_HOME}/volumes/geth/password.sec`
-    );
-    fs.mkdirSync(`${process.env.MICRO_HOME}/volumes/geth/keystore`, { recursive: true });
-    fs.copyFileSync(
-        `${process.env.MICRO_HOME}/docker/geth/keystore/UTC--2019-04-06T21-13-27.692266000Z--8a91dc2d28b689474298d91899f0c1baf62cb85b`,
-        `${process.env.MICRO_HOME}/volumes/geth/keystore/UTC--2019-04-06T21-13-27.692266000Z--8a91dc2d28b689474298d91899f0c1baf62cb85b`
-    );
+    // fs.copyFileSync(
+    //     `${process.env.MICRO_HOME}/docker/geth/jwtsecret`,
+    //     `${process.env.MICRO_HOME}/volumes/geth/jwtsecret`
+    // );
+    // fs.copyFileSync(
+    //     `${process.env.MICRO_HOME}/docker/geth/password.sec`,
+    //     `${process.env.MICRO_HOME}/volumes/geth/password.sec`
+    // );
+    // fs.mkdirSync(`${process.env.MICRO_HOME}/volumes/geth/keystore`, { recursive: true });
+    // fs.copyFileSync(
+    //     `${process.env.MICRO_HOME}/docker/geth/keystore/UTC--2019-04-06T21-13-27.692266000Z--8a91dc2d28b689474298d91899f0c1baf62cb85b`,
+    //     `${process.env.MICRO_HOME}/volumes/geth/keystore/UTC--2019-04-06T21-13-27.692266000Z--8a91dc2d28b689474298d91899f0c1baf62cb85b`
+    // );
 }
 
 export async function up(composeFile?: string) {

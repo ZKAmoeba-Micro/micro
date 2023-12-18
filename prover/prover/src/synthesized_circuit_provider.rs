@@ -3,11 +3,11 @@ use std::{
     sync::Arc,
 };
 
+use micro_dal::ConnectionPool;
+use micro_types::proofs::SocketAddress;
 use prover_service::RemoteSynthesizer;
 use queues::{Buffer, IsQueue};
 use tokio::{runtime::Handle, sync::Mutex};
-use micro_dal::ConnectionPool;
-use micro_types::proofs::SocketAddress;
 
 use crate::metrics::METRICS;
 

@@ -6,8 +6,8 @@ This page is specific to our cryptography. For a general introduction, please re
 As a ZK rollup, we want everything to be verified by cryptography and secured by Ethereum. The power of ZK allows for
 transaction compression, reducing fees for users while inheriting the same security.
 
-ZK Proofs allow a verifier to easily check whether a prover has done a computation correctly. For micro, the prover
-will prove the correct execution of micro’s EVM, and a smart contract on Ethereum will verify the proof is correct.
+ZK Proofs allow a verifier to easily check whether a prover has done a computation correctly. For micro, the prover will
+prove the correct execution of micro’s EVM, and a smart contract on Ethereum will verify the proof is correct.
 
 In more detail, there are several steps.
 

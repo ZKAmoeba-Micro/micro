@@ -2,8 +2,6 @@ use std::time::Instant;
 
 use anyhow::Context as _;
 use async_trait::async_trait;
-use tokio::task::JoinHandle;
-use zkevm_test_harness::proof_wrapper_utils::{wrap_proof, WrapperConfig};
 use micro_dal::ConnectionPool;
 use micro_object_store::ObjectStore;
 use micro_prover_fri_types::{
@@ -29,6 +27,8 @@ use micro_types::{
     L1BatchNumber,
 };
 use micro_vk_setup_data_server_fri::{get_recursive_layer_vk_for_circuit_type, get_snark_vk};
+use tokio::task::JoinHandle;
+use zkevm_test_harness::proof_wrapper_utils::{wrap_proof, WrapperConfig};
 
 use crate::metrics::METRICS;
 

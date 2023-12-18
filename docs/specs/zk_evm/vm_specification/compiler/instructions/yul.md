@@ -17,10 +17,10 @@ LLVM IR codegen references:
 
 ## [dataoffset](https://docs.soliditylang.org/en/latest/yul.html#datasize-dataoffset-datacopy)
 
-Unlike on EVM, on MicroVM target this instruction has nothing to do with the offset. Instead, it returns the bytecode hash
-of the contract referenced by the Yul object identifier. Since our compiler translates instructions without analyzing
-the surrounding context, it is not possible to get the bytecode hash from anywhere else in [datacopy](#datacopy). For
-more information, see
+Unlike on EVM, on MicroVM target this instruction has nothing to do with the offset. Instead, it returns the bytecode
+hash of the contract referenced by the Yul object identifier. Since our compiler translates instructions without
+analyzing the surrounding context, it is not possible to get the bytecode hash from anywhere else in
+[datacopy](#datacopy). For more information, see
 [CREATE](https://github.com/code-423n4/2023-10-micro/blob/main/docs/VM%20Section/How%20compiler%20works/instructions/evm/create.md).
 
 LLVM IR codegen references:
@@ -83,8 +83,8 @@ Is a Yul optimizer hint which is not used by our compiler. Instead, its only arg
 
 ## [verbatim](https://docs.soliditylang.org/en/latest/yul.html#verbatim)
 
-Unlike on EVM, on MicroVM target this instruction has nothing to do with inserting of EVM bytecode. Instead, it is used to
-implement
+Unlike on EVM, on MicroVM target this instruction has nothing to do with inserting of EVM bytecode. Instead, it is used
+to implement
 [MicroVM Yul extensions](https://github.com/code-423n4/2023-10-micro/blob/main/docs/VM%20Section/How%20compiler%20works/instructions/extensions/verbatim.md)
 available in the system mode. In order to compile a Yul contract with `zksolc`, both Yul and system mode must be enabled
 (`zksolc --yul --system-mode ...`).

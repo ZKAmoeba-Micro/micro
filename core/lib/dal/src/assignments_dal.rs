@@ -1,10 +1,11 @@
-use crate::instrument::InstrumentExt;
-use crate::time_utils::pg_interval_from_duration;
-use crate::{SqlxError, StorageProcessor};
+use std::{str::FromStr, time::Duration};
+
 use micro_types::{Address, L1BatchNumber, MiniblockNumber, H256};
-use std::str::FromStr;
-use std::time::Duration;
 use strum::{Display, EnumString};
+
+use crate::{
+    instrument::InstrumentExt, time_utils::pg_interval_from_duration, SqlxError, StorageProcessor,
+};
 #[derive(Debug)]
 pub struct AssignmentsDal<'a, 'c> {
     pub(crate) storage: &'a mut StorageProcessor<'c>,

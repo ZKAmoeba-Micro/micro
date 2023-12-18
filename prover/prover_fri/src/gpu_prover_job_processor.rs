@@ -3,8 +3,6 @@ pub mod gpu_prover {
     use std::{collections::HashMap, sync::Arc, time::Instant};
 
     use anyhow::Context as _;
-    use shivini::{gpu_prove_from_external_witness_data, ProverContext};
-    use tokio::task::JoinHandle;
     use micro_config::configs::{fri_prover_group::FriProverGroupConfig, FriProverConfig};
     use micro_dal::ConnectionPool;
     use micro_env_config::FromEnv;
@@ -30,6 +28,8 @@ pub mod gpu_prover {
     use micro_vk_setup_data_server_fri::{
         get_setup_data_for_circuit_type, GoldilocksGpuProverSetupData,
     };
+    use shivini::{gpu_prove_from_external_witness_data, ProverContext};
+    use tokio::task::JoinHandle;
 
     use crate::{
         metrics::METRICS,

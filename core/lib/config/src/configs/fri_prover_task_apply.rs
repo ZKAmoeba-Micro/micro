@@ -1,6 +1,7 @@
+use std::time::Duration;
+
 use micro_basic_types::H256;
 use serde::Deserialize;
-use std::time::Duration;
 
 #[derive(Debug, Deserialize, Clone, PartialEq)]
 pub struct FriProverTaskApplyConfig {

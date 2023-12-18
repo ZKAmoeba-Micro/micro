@@ -7,7 +7,7 @@ import { getZksolcUrl, saltFromUrl } from '@zkamoeba/hardhat-micro-solc';
 import { getCompilersDir } from 'hardhat/internal/util/global-dir';
 import path from 'path';
 
-const COMPILER_VERSION = '1.3.18';
+const COMPILER_VERSION = '1.3.14';
 const IS_COMPILER_PRE_RELEASE = false;
 
 async function compilerLocation(): Promise<string> {

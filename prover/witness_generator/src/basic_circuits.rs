@@ -7,19 +7,6 @@ use std::{
 
 use anyhow::Context as _;
 use async_trait::async_trait;
-use multivm::vm_latest::{
-    constants::MAX_CYCLES_FOR_TX, HistoryDisabled, StorageOracle as VmStorageOracle,
-};
-use rand::Rng;
-use serde::{Deserialize, Serialize};
-use zkevm_test_harness::{
-    geometry_config::get_geometry_config,
-    toolset::GeometryConfig,
-    witness::full_block_artifact::{
-        BlockBasicCircuits, BlockBasicCircuitsPublicCompactFormsWitnesses,
-        BlockBasicCircuitsPublicInputs,
-    },
-};
 use micro_config::configs::FriWitnessGeneratorConfig;
 use micro_dal::{fri_witness_generator_dal::FriWitnessJobStatus, ConnectionPool};
 use micro_object_store::{
@@ -47,6 +34,19 @@ use micro_types::{
     Address, L1BatchNumber, BOOTLOADER_ADDRESS, H256, U256,
 };
 use micro_utils::{bytes_to_chunks, h256_to_u256, u256_to_h256};
+use multivm::vm_latest::{
+    constants::MAX_CYCLES_FOR_TX, HistoryDisabled, StorageOracle as VmStorageOracle,
+};
+use rand::Rng;
+use serde::{Deserialize, Serialize};
+use zkevm_test_harness::{
+    geometry_config::get_geometry_config,
+    toolset::GeometryConfig,
+    witness::full_block_artifact::{
+        BlockBasicCircuits, BlockBasicCircuitsPublicCompactFormsWitnesses,
+        BlockBasicCircuitsPublicInputs,
+    },
+};
 
 use crate::{
     metrics::WITNESS_GENERATOR_METRICS,

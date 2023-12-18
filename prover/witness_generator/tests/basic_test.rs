@@ -1,6 +1,5 @@
 use std::time::Instant;
 
-use serde::Serialize;
 use micro_config::ObjectStoreConfig;
 use micro_env_config::FromEnv;
 use micro_object_store::{AggregationsKey, FriCircuitKey, ObjectStoreFactory};
@@ -18,6 +17,7 @@ use micro_witness_generator::{
     scheduler::SchedulerWitnessGenerator,
     utils::AggregationWrapper,
 };
+use serde::Serialize;
 
 fn compare_serialized<T: Serialize>(expected: &T, actual: &T) {
     let serialized_expected = bincode::serialize(expected).unwrap();

@@ -1,7 +1,7 @@
 # Account abstraction
 
-One of the other important features of micro is the support of account abstraction. It is highly recommended to read
-the documentation on our AA protocol here:
+One of the other important features of micro is the support of account abstraction. It is highly recommended to read the
+documentation on our AA protocol here:
 [https://micro.micro.io/docs/reference/concepts/account-abstraction.html#introduction](https://micro.micro.io/docs/reference/concepts/account-abstraction.html#introduction)
 
 ### Account versioning

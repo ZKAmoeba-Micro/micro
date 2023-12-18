@@ -399,8 +399,6 @@ pub async fn initialize_components(
             &contracts_config,
         );
 
-
-
         if components.contains(&Component::HttpApi) {
             storage_caches = Some(
                 build_storage_caches(configs, &replica_connection_pool, &mut task_futures)

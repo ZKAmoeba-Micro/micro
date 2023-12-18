@@ -29,8 +29,9 @@ The main part (and the main cost) of the micro is the proving system. In order t
 running a little bit different virtual machine (zkEVM) - that has a slightly different set of opcodes, and also contains
 a bunch of registers. More details on this will be written in the future articles.
 
-Having a different VM means that we must have a separate compiler [zk-solc](https://github.com/ZKAmoeba-Micro/zksolc-bin) -
-as the bytecode that is produced by this compiler has to use the zkEVM specific opcodes.
+Having a different VM means that we must have a separate compiler
+[zk-solc](https://github.com/ZKAmoeba-Micro/zksolc-bin) - as the bytecode that is produced by this compiler has to use
+the zkEVM specific opcodes.
 
 While having a separate compiler introduces a bunch of challenges (for example, we need a custom
 [hardhat plugins](https://github.com/ZKAmoeba-Micro/hardhat-micro) ), it brings a bunch of benefits too: for example it
@@ -71,8 +72,8 @@ override getDeployTransaction(..) {
 ```
 
 Also `ContractDeployer` adding a special prefix for all the new contract addresses. This means that contract addesses
-WILL be different on `micro` and Ethereum (and also leaves us the possibility of adding Ethereum addresses in the
-future if needed).
+WILL be different on `micro` and Ethereum (and also leaves us the possibility of adding Ethereum addresses in the future
+if needed).
 
 You can look for `CREATE2_PREFIX` and `CREATE_PREFIX` in the code.
 

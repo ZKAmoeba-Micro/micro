@@ -32,8 +32,8 @@ then the diamond will be frozen forever.
 The diamond proxy pattern is very flexible and extendable. For now, it allows splitting implementation contracts by
 their logical meaning, removes the limit of bytecode size per contract and implements security features such as
 freezing. In the future, it can also be viewed as [EIP-6900](https://eips.ethereum.org/EIPS/eip-6900) for
-[zkStack](https://blog.zkamoeba.io/introducing-the-zk-stack-c24240c2532a), where each hyperchain can implement a
-sub-set of allowed implementation contracts.
+[zkStack](https://blog.zkamoeba.io/introducing-the-zk-stack-c24240c2532a), where each hyperchain can implement a sub-set
+of allowed implementation contracts.
 
 ### GettersFacet
 
@@ -241,10 +241,10 @@ The diagram below outlines the complete journey from the initiation of an operat
 
 ## ValidatorTimelock
 
-An intermediate smart contract between the validator EOA account and the micro smart contract. Its primary purpose is
-to provide a trustless means of delaying batch execution without modifying the main micro contract. micro actively
-monitors the chain activity and reacts to any suspicious activity by freezing the chain. This allows time for
-investigation and mitigation before resuming normal operations.
+An intermediate smart contract between the validator EOA account and the micro smart contract. Its primary purpose is to
+provide a trustless means of delaying batch execution without modifying the main micro contract. micro actively monitors
+the chain activity and reacts to any suspicious activity by freezing the chain. This allows time for investigation and
+mitigation before resuming normal operations.
 
 It is a temporary solution to prevent any significant impact of the validator hot key leakage, while the network is in
 the Alpha stage.
@@ -256,9 +256,8 @@ When the validator calls `commitBatches`, the same calldata will be propagated t
 through `call` where it invokes the `ExecutorFacet` through `delegatecall`), and also a timestamp is assigned to these
 batches to track the time these batches are committed by the validator to enforce a delay between committing and
 execution of batches. Then, the validator can prove the already committed batches regardless of the mentioned timestamp,
-and again the same calldata (related to the `proveBatches` function) will be propagated to the micro contract. After
-the `delay` is elapsed, the validator is allowed to call `executeBatches` to propagate the same calldata to micro
-contract.
+and again the same calldata (related to the `proveBatches` function) will be propagated to the micro contract. After the
+`delay` is elapsed, the validator is allowed to call `executeBatches` to propagate the same calldata to micro contract.
 
 The owner of the ValidatorTimelock contract is the same as the owner of the Governance contract - Zkamoeba multisig.
 

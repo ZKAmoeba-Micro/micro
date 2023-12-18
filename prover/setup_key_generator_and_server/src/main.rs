@@ -3,12 +3,12 @@
 use std::{env, fs::File};
 
 use anyhow::Context as _;
+use micro_setup_key_server::{get_circuits_for_vk, get_setup_key_write_file_path};
 use structopt::StructOpt;
 use zkevm_test_harness::{
     abstract_micro_circuit::concrete_circuits::MicroCircuit, bellman::bn256::Bn256,
     witness::oracle::VmWitnessOracle,
 };
-use micro_setup_key_server::{get_circuits_for_vk, get_setup_key_write_file_path};
 
 #[cfg(feature = "gpu")]
 #[derive(Debug, StructOpt)]

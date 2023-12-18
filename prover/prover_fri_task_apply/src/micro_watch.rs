@@ -1,23 +1,17 @@
 use std::time::{Duration, Instant};
 
-use micro_config::constants::DEPOSIT_ADDRESS;
+use micro::{signer::Signer, wallet::Wallet};
+use micro_config::{configs::FriProverTaskApplyConfig, constants::DEPOSIT_ADDRESS};
 use micro_contracts::sys_deposit_contract;
-
-use tokio::sync::watch;
-
 use micro_eth_signer::{EthereumSigner, PrivateKeySigner};
-
-use micro::signer::Signer;
-use micro::wallet::Wallet;
-
 use micro_types::{
     ethabi::{Contract, Token},
     l2::new_batch::NewBatch,
     web3::types::{BlockNumber as Web3BlockNumber, Log},
     L2ChainId,
 };
+use tokio::sync::watch;
 
-use micro_config::configs::FriProverTaskApplyConfig;
 // Local deps
 use crate::client::RETRY_LIMIT;
 use crate::client::{Error, MicroClient};

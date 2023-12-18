@@ -15,12 +15,12 @@ use micro_types::{
     witness_block_state::WitnessBlockState, Address, L1BatchNumber, L2ChainId, MiniblockNumber,
     ProtocolVersionId, Transaction, U256,
 };
+// TODO (SMA-1206): use seconds instead of milliseconds.
+use micro_utils::time::millis_since_epoch;
 use multivm::{
     interface::{FinishedL1Batch, L1BatchEnv, SystemEnv},
     vm_latest::utils::fee::derive_base_fee_and_gas_per_pubdata,
 };
-// TODO (SMA-1206): use seconds instead of milliseconds.
-use micro_utils::time::millis_since_epoch;
 
 use crate::{
     l1_gas_price::L1GasPriceProvider,

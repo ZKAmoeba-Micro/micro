@@ -1,7 +1,6 @@
 use std::sync::Arc;
 
 use anyhow::Context as _;
-use serde::Serialize;
 use micro_config::{configs::FriProverConfig, ObjectStoreConfig};
 use micro_env_config::FromEnv;
 use micro_object_store::{bincode, FriCircuitKey, ObjectStoreFactory};
@@ -9,6 +8,7 @@ use micro_prover_fri::prover_job_processor::Prover;
 use micro_prover_fri_types::{CircuitWrapper, ProverJob, ProverServiceDataKey};
 use micro_types::{proofs::AggregationRound, L1BatchNumber};
 use micro_vk_setup_data_server_fri::generate_cpu_base_layer_setup_data;
+use serde::Serialize;
 
 fn compare_serialized<T: Serialize>(expected: &T, actual: &T) {
     let serialized_expected = bincode::serialize(expected).unwrap();

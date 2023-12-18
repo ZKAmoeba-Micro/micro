@@ -2,9 +2,6 @@ use std::{env, future::Future, sync::Arc, time::Instant};
 
 use anyhow::Context as _;
 use local_ip_address::local_ip;
-use prometheus_exporter::PrometheusExporterConfig;
-use queues::Buffer;
-use tokio::sync::{oneshot, Mutex};
 use micro_config::{
     configs::{
         api::PrometheusConfig, prover_group::ProverGroupConfig, AlertsConfig, ObjectStoreConfig,
@@ -17,6 +14,9 @@ use micro_object_store::ObjectStoreFactory;
 use micro_prover_utils::region_fetcher::{get_region, get_zone};
 use micro_types::proofs::{GpuProverInstanceStatus, SocketAddress};
 use micro_utils::wait_for_tasks::wait_for_tasks;
+use prometheus_exporter::PrometheusExporterConfig;
+use queues::Buffer;
+use tokio::sync::{oneshot, Mutex};
 
 use crate::{
     artifact_provider::ProverArtifactProvider, metrics::METRICS, prover::ProverReporter,

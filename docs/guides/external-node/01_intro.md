@@ -12,9 +12,9 @@ This documentation explains the basics of the micro External Node.
 ## What is the external node
 
 The external node (herein EN) is a read-replica of the main (centralized) node that can be run by external parties. It
-functions by fetching data from the micro API and re-applying transactions locally, starting from the genesis block.
-The EN shares most of its codebase with the main node. Consequently, when it re-applies transactions, it does so exactly
-as the main node did in the past.
+functions by fetching data from the micro API and re-applying transactions locally, starting from the genesis block. The
+EN shares most of its codebase with the main node. Consequently, when it re-applies transactions, it does so exactly as
+the main node did in the past.
 
 In Ethereum terms, the current state of the EN represents an archive node, providing access to the entire history of the
 blockchain.

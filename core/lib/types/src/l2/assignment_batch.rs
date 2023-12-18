@@ -1,12 +1,13 @@
-use crate::l2::event_map::EventMapBuilder;
-use crate::{api::Log, Address, U256};
+use std::convert::TryFrom;
+
 use micro_basic_types::{
     ethabi::{decode, ParamType},
     H256,
 };
 use micro_contracts::sys_deposit_contract;
 use serde::{Deserialize, Serialize};
-use std::convert::TryFrom;
+
+use crate::{api::Log, l2::event_map::EventMapBuilder, Address, U256};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AssignmentBatch {

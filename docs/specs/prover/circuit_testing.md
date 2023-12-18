@@ -1,8 +1,8 @@
 # Circuit testing
 
 This page explains unit tests for circuits. Specifically, it goes through a unit test of
-[ecrecover](https://github.com/ZKAmoeba-Micro/micro-zkevm_circuits/blob/main/src/ecrecover/mod.rs#L796). The tests for other
-circuits are very similar.
+[ecrecover](https://github.com/ZKAmoeba-Micro/micro-zkevm_circuits/blob/main/src/ecrecover/mod.rs#L796). The tests for
+other circuits are very similar.
 
 Many of the tests for different circuits are nearly identical, for example:
 

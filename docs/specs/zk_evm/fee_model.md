@@ -16,9 +16,9 @@ micro, being a zkRollup is required to prove every operation with zero knowledge
 
 ### `gas_per_pubdata_limit`
 
-As already mentioned, the transactions on micro depend on volatile L1 gas costs to publish the pubdata for batch,
-verify proofs, etc. For this reason, micro-specific EIP712 transactions contain the `gas_per_pubdata_limit` field in
-them, denoting the maximum price in _gas_ that the operator \*\*can charge from users for a single byte of pubdata.
+As already mentioned, the transactions on micro depend on volatile L1 gas costs to publish the pubdata for batch, verify
+proofs, etc. For this reason, micro-specific EIP712 transactions contain the `gas_per_pubdata_limit` field in them,
+denoting the maximum price in _gas_ that the operator \*\*can charge from users for a single byte of pubdata.
 
 For Ethereum transactions (which do not contain this field), it is enforced that the operator will not use a value
 larger value than a certain constant.

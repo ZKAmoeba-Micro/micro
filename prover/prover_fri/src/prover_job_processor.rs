@@ -1,8 +1,6 @@
 use std::{collections::HashMap, sync::Arc, time::Instant};
 
 use anyhow::Context as _;
-use tokio::task::JoinHandle;
-use zkevm_test_harness::prover_utils::{prove_base_layer_circuit, prove_recursion_layer_circuit};
 use micro_config::configs::{fri_prover_group::FriProverGroupConfig, FriProverConfig};
 use micro_dal::ConnectionPool;
 use micro_env_config::FromEnv;
@@ -28,6 +26,8 @@ use micro_types::{basic_fri_types::CircuitIdRoundTuple, protocol_version::L1Veri
 use micro_vk_setup_data_server_fri::{
     get_cpu_setup_data_for_circuit_type, GoldilocksProverSetupData,
 };
+use tokio::task::JoinHandle;
+use zkevm_test_harness::prover_utils::{prove_base_layer_circuit, prove_recursion_layer_circuit};
 
 use crate::{
     metrics::{CircuitLabels, Layer, METRICS},

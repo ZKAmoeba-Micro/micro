@@ -3,6 +3,13 @@ pub mod gpu_socket_listener {
     use std::{net::SocketAddr, time::Instant};
 
     use anyhow::Context as _;
+    use micro_dal::ConnectionPool;
+    use micro_object_store::bincode;
+    use micro_prover_fri_types::{CircuitWrapper, ProverServiceDataKey, WitnessVectorArtifacts};
+    use micro_types::proofs::{AggregationRound, GpuProverInstanceStatus, SocketAddress};
+    use micro_vk_setup_data_server_fri::{
+        get_finalization_hints, get_round_for_recursive_circuit_type,
+    };
     use shivini::synthesis_utils::{
         init_base_layer_cs_for_repeated_proving, init_recursive_layer_cs_for_repeated_proving,
     };
@@ -10,13 +17,6 @@ pub mod gpu_socket_listener {
         io::copy,
         net::{TcpListener, TcpStream},
         sync::watch,
-    };
-    use micro_dal::ConnectionPool;
-    use micro_object_store::bincode;
-    use micro_prover_fri_types::{CircuitWrapper, ProverServiceDataKey, WitnessVectorArtifacts};
-    use micro_types::proofs::{AggregationRound, GpuProverInstanceStatus, SocketAddress};
-    use micro_vk_setup_data_server_fri::{
-        get_finalization_hints, get_round_for_recursive_circuit_type,
     };
 
     use crate::{

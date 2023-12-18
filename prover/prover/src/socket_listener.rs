@@ -4,13 +4,13 @@ use std::{
 };
 
 use anyhow::Context as _;
+use micro_dal::ConnectionPool;
+use micro_types::proofs::{GpuProverInstanceStatus, SocketAddress};
 use queues::IsQueue;
 use tokio::{
     io::copy,
     net::{TcpListener, TcpStream},
 };
-use micro_dal::ConnectionPool;
-use micro_types::proofs::{GpuProverInstanceStatus, SocketAddress};
 
 use crate::synthesized_circuit_provider::SharedAssemblyQueue;
 

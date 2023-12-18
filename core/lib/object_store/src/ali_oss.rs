@@ -1,11 +1,10 @@
 //! Aliyun OSS-based [`ObjectStore`] implementation.
 
-use async_trait::async_trait;
-use oss_rust_sdk::async_object::*;
-use oss_rust_sdk::oss::OSS;
-use serde::{Deserialize, Serialize};
-
 use std::{collections::HashMap, fmt, fs, future::Future, time::Duration};
+
+use async_trait::async_trait;
+use oss_rust_sdk::{async_object::*, oss::OSS};
+use serde::{Deserialize, Serialize};
 
 use crate::raw::{Bucket, ObjectStore, ObjectStoreError};
 

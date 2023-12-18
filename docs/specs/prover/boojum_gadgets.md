@@ -2,9 +2,9 @@
 
 Boojum gadgets are low-level implementations of tools for constraint systems. They consist of various types: curves,
 hash functions, lookup tables, and different circuit types. These gadgets are mostly a reference from
-[franklin-crypto](https://github.com/ZKAmoeba-Micro/franklin-crypto), with additional hash functions added. These gadgets
-have been changed to use the Goldilocks field (order 2^64 - 2^32 + 1), which is much smaller than bn256. This allows us
-to reduce the proof system.
+[franklin-crypto](https://github.com/ZKAmoeba-Micro/franklin-crypto), with additional hash functions added. These
+gadgets have been changed to use the Goldilocks field (order 2^64 - 2^32 + 1), which is much smaller than bn256. This
+allows us to reduce the proof system.
 
 ## Circuits types
 

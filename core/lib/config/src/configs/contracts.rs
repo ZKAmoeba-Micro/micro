@@ -1,7 +1,7 @@
 // External uses
-use serde::Deserialize;
 // Workspace uses
 use micro_basic_types::{Address, H256};
+use serde::Deserialize;
 #[derive(Debug, Deserialize, Clone, PartialEq)]
 #[serde(rename_all = "lowercase")]
 pub enum ProverAtGenesis {

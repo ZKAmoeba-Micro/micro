@@ -1,12 +1,10 @@
 use std::fmt::Debug;
 
-use micro_eth_client::{types::Error as EthClientError, EthInterface};
-
 use micro_config::constants::DEPOSIT_ADDRESS;
 use micro_contracts::sys_deposit_contract;
-
-use micro_types::l2::new_batch::NEW_BATCH;
+use micro_eth_client::{types::Error as EthClientError, EthInterface};
 use micro_types::{
+    l2::new_batch::NEW_BATCH,
     web3::{
         self,
         types::{BlockNumber, FilterBuilder, Log},

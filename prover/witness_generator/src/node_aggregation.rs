@@ -2,9 +2,6 @@ use std::time::Instant;
 
 use anyhow::Context as _;
 use async_trait::async_trait;
-use zkevm_test_harness::witness::recursive_aggregation::{
-    compute_node_vk_commitment, create_node_witnesses,
-};
 use micro_config::configs::FriWitnessGeneratorConfig;
 use micro_dal::ConnectionPool;
 use micro_object_store::{AggregationsKey, ObjectStore, ObjectStoreFactory};
@@ -28,6 +25,9 @@ use micro_types::{
 };
 use micro_vk_setup_data_server_fri::{
     get_recursive_layer_vk_for_circuit_type, utils::get_leaf_vk_params,
+};
+use zkevm_test_harness::witness::recursive_aggregation::{
+    compute_node_vk_commitment, create_node_witnesses,
 };
 
 use crate::{

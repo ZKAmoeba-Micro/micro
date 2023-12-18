@@ -2,9 +2,6 @@ use std::time::Instant;
 
 use anyhow::Context as _;
 use async_trait::async_trait;
-use zkevm_test_harness::witness::recursive_aggregation::{
-    compute_leaf_params, create_leaf_witnesses,
-};
 use micro_config::configs::FriWitnessGeneratorConfig;
 use micro_dal::ConnectionPool;
 use micro_object_store::{ClosedFormInputKey, ObjectStore, ObjectStoreFactory};
@@ -13,8 +10,7 @@ use micro_prover_fri_types::{
         boojum::field::goldilocks::GoldilocksField,
         circuit_definitions::{
             base_layer::{
-                MicroBaseLayerClosedFormInput, MicroBaseLayerProof,
-                MicroBaseLayerVerificationKey,
+                MicroBaseLayerClosedFormInput, MicroBaseLayerProof, MicroBaseLayerVerificationKey,
             },
             recursion_layer::MicroRecursiveLayerCircuit,
         },
@@ -32,6 +28,9 @@ use micro_types::{
 };
 use micro_vk_setup_data_server_fri::{
     get_base_layer_vk_for_circuit_type, get_recursive_layer_vk_for_circuit_type,
+};
+use zkevm_test_harness::witness::recursive_aggregation::{
+    compute_leaf_params, create_leaf_witnesses,
 };
 
 use crate::{

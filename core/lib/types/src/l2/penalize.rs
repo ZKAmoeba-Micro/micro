@@ -1,10 +1,11 @@
-use crate::l2::event_map::EventMapBuilder;
-use crate::{api::Log, Address, U256};
+use std::convert::TryFrom;
+
 use micro_basic_types::H256;
 use micro_contracts::sys_deposit_contract;
 use micro_utils::{h256_to_account_address, h256_to_u256};
 use serde::{Deserialize, Serialize};
-use std::convert::TryFrom;
+
+use crate::{api::Log, l2::event_map::EventMapBuilder, Address, U256};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Penalize {
     pub prover: Address,

@@ -8,10 +8,7 @@ const MIGRATED_TABLE: &str = "storage_logs";
 const NOT_MIGRATED_TABLE: &str = "storage_logs_backup";
 
 #[derive(Debug, Parser)]
-#[command(
-    author = "Zkamoeba",
-    about = "Consistency checker for the migration"
-)]
+#[command(author = "Zkamoeba", about = "Consistency checker for the migration")]
 struct Cli {
     /// Miniblock number to start check from.
     #[arg(long)]

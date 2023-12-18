@@ -3,8 +3,8 @@
 ### System Contract
 
 This instruction is handled by a System Contract called
-[Keccak256](https://github.com/ZKAmoeba-Micro/micro-system-contracts/blob/main/contracts/precompiles/Keccak256.yul), which is
-a wrapper around the MicroVM precompile.
+[Keccak256](https://github.com/ZKAmoeba-Micro/micro-system-contracts/blob/main/contracts/precompiles/Keccak256.yul),
+which is a wrapper around the MicroVM precompile.
 
 On how the System Contract is called, see
 [this section](https://github.com/code-423n4/2023-10-micro/blob/main/docs/VM%20Section/How%20compiler%20works/system_contracts.md).

@@ -1,13 +1,13 @@
 use anyhow::Context as _;
-use prometheus_exporter::PrometheusExporterConfig;
-use reqwest::Client;
-use tokio::sync::{oneshot, watch};
 use micro_config::configs::{FriProverGatewayConfig, PostgresConfig};
 use micro_dal::ConnectionPool;
 use micro_env_config::{object_store::ProverObjectStoreConfig, FromEnv};
 use micro_object_store::ObjectStoreFactory;
 use micro_types::prover_server_api::{ProofGenerationDataRequest, SubmitProofRequest};
 use micro_utils::wait_for_tasks::wait_for_tasks;
+use prometheus_exporter::PrometheusExporterConfig;
+use reqwest::Client;
+use tokio::sync::{oneshot, watch};
 
 use crate::api_data_fetcher::{PeriodicApiStruct, PROOF_GENERATION_DATA_PATH, SUBMIT_PROOF_PATH};
 

@@ -2,7 +2,6 @@ use std::time::{Duration, Instant};
 
 use anyhow::Context as _;
 use async_trait::async_trait;
-use tokio::{task::JoinHandle, time::sleep};
 use micro_config::configs::FriWitnessVectorGeneratorConfig;
 use micro_dal::ConnectionPool;
 use micro_object_store::ObjectStore;
@@ -20,6 +19,7 @@ use micro_types::{
     protocol_version::L1VerifierConfig,
 };
 use micro_vk_setup_data_server_fri::get_finalization_hints;
+use tokio::{task::JoinHandle, time::sleep};
 
 use crate::metrics::METRICS;
 

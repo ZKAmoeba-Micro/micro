@@ -1,10 +1,10 @@
 use async_trait::async_trait;
-
 use micro_dal::fri_proof_compressor_dal::ProofCompressionJobStatus;
-use micro_types::aggregated_operations::L1BatchProofForL1;
-use micro_types::prover_server_api::{SubmitProofRequest, SubmitProofResponse};
-use micro_types::L1BatchNumber;
-use micro_types::PackedEthSignature;
+use micro_types::{
+    aggregated_operations::L1BatchProofForL1,
+    prover_server_api::{SubmitProofRequest, SubmitProofResponse},
+    L1BatchNumber, PackedEthSignature,
+};
 
 use crate::api_data_fetcher::{PeriodicApi, PeriodicApiStruct};
 

@@ -20,9 +20,9 @@ revealing the actual information.
 
 ### Constraint
 
-A constraint is a rule or restriction that a specific operation or set of operations must follow. micro uses
-constraints to verify the validity of certain operations, and in the generation of proofs. Constraints can be missing,
-causing bugs, or there could be too many constraints, leading to restricted operations.
+A constraint is a rule or restriction that a specific operation or set of operations must follow. micro uses constraints
+to verify the validity of certain operations, and in the generation of proofs. Constraints can be missing, causing bugs,
+or there could be too many constraints, leading to restricted operations.
 
 ### Constraint degree
 

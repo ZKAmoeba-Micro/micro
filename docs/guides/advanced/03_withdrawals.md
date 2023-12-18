@@ -84,8 +84,8 @@ list here
 This is the place where we specify that `bootloader` is at address 0x8001, `NonceHolder` at 0x8003 etc.
 
 This brings us to
-[L2EthToken.sol](https://github.com/ZKAmoeba-Micro/micro-system-contracts/blob/main/contracts/L2EthToken.sol) that has the
-implementation of the L2 Eth.
+[L2EthToken.sol](https://github.com/ZKAmoeba-Micro/micro-system-contracts/blob/main/contracts/L2EthToken.sol) that has
+the implementation of the L2 Eth.
 
 When we look inside, we can see:
 
@@ -122,8 +122,8 @@ be different on your local node - see previous tutorial for more info) .
 And inside, all three methods above belong to
 [Executor.sol](https://github.com/ZKAmoeba-Micro/micro-contracts/blob/main/ethereum/contracts/micro/facets/Executor.sol)
 facet and you can look at
-[README](https://github.com/ZKAmoeba-Micro/micro-contracts/blob/main/docs/Overview.md#executorfacet) to see the details of
-what each method does.
+[README](https://github.com/ZKAmoeba-Micro/micro-contracts/blob/main/docs/Overview.md#executorfacet) to see the details
+of what each method does.
 
 The short description is:
 

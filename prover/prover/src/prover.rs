@@ -1,6 +1,10 @@
 use std::{env, time::Duration};
 
 use anyhow::Context as _;
+use micro_config::{PostgresConfig, ProverConfig};
+use micro_dal::{ConnectionPool, StorageProcessor};
+use micro_object_store::{Bucket, ObjectStore, ObjectStoreFactory};
+use micro_types::proofs::ProverJobMetadata;
 use prover_service::{
     JobReporter,
     JobResult::{self, Failure, ProofGenerated},
@@ -9,10 +13,6 @@ use tokio::runtime::Handle;
 use zkevm_test_harness::{
     abstract_micro_circuit::concrete_circuits::MicroProof, pairing::bn256::Bn256,
 };
-use micro_config::{PostgresConfig, ProverConfig};
-use micro_dal::{ConnectionPool, StorageProcessor};
-use micro_object_store::{Bucket, ObjectStore, ObjectStoreFactory};
-use micro_types::proofs::ProverJobMetadata;
 
 use crate::metrics::METRICS;
 

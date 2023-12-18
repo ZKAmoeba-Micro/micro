@@ -144,8 +144,7 @@ version 1.4.0.
 [bellman cuda repo]: https://github.com/ZKAmoeba-Micro/micro-bellman-cuda
 [example ecrecover circuit]:
   https://github.com/ZKAmoeba-Micro/sync_vm/blob/683ade0bbb445f3e2ceb82dd3f4346a0c5d16a78/src/glue/ecrecover_circuit/mod.rs#L157
-[micro core witness]:
-  https://github.com/ZKAmoeba-Micro/micro/blob/main/core/lib/micro_core/src/witness_generator/mod.rs
+[micro core witness]: https://github.com/ZKAmoeba-Micro/micro/blob/main/core/lib/micro_core/src/witness_generator/mod.rs
 [separate witness binary]: https://github.com/ZKAmoeba-Micro/micro/blob/main/prover/witness_generator/src/main.rs
 [zkevm_test_harness witness]:
   https://github.com/ZKAmoeba-Micro/zkevm_test_harness/blob/0c17bc7baa4e0b64634d414942ef4200d8613bbd/src/external_calls.rs#L575

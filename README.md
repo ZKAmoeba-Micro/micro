@@ -4,8 +4,8 @@
 
 micro is a layer 2 rollup that uses zero-knowledge proofs to scale Ethereum without compromising on security or
 decentralization. Since it's EVM compatible (Solidity/Vyper), 99% of Ethereum projects can redeploy without refactoring
-or re-auditing a single line of code. micro also uses an LLVM-based compiler that will eventually let developers
-write smart contracts in C++, Rust and other popular languages.
+or re-auditing a single line of code. micro also uses an LLVM-based compiler that will eventually let developers write
+smart contracts in C++, Rust and other popular languages.
 
 ## Knowledge Index
 
@@ -18,7 +18,7 @@ The following questions will be answered by the following resources:
 | How can I run the project?                              | [launch.md](docs/guides/launch.md)             |
 | What is the logical project structure and architecture? | [architecture.md](docs/guides/architecture.md) |
 | Where can I find protocol specs?                        | [specs](docs/specs/README.md)                  |
-| Where can I find developer docs?                        | [docs](https://v2-docs.micro.io/dev/)         |
+| Where can I find developer docs?                        | [docs](https://v2-docs.micro.io/dev/)          |
 
 ## Policies
 
@@ -42,7 +42,7 @@ at your option.
 
 ## Disclaimer
 
-micro has been through lots of testing and audits. Although it is live, it is still in alpha state and will go
-through more audits and bug bounty programs. We would love to hear our community's thoughts and suggestions about it! It
-is important to state that forking it now can potentially lead to missing important security updates, critical features,
+micro has been through lots of testing and audits. Although it is live, it is still in alpha state and will go through
+more audits and bug bounty programs. We would love to hear our community's thoughts and suggestions about it! It is
+important to state that forking it now can potentially lead to missing important security updates, critical features,
 and performance improvements.

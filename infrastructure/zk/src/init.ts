@@ -21,26 +21,29 @@ export async function init(initArgs: InitArgs = DEFAULT_ARGS) {
     const { skipSubmodulesCheckout, skipEnvSetup, testTokens, governorPrivateKeyArgs, deployerL2ContractInput } =
         initArgs;
 
-    if (!process.env.CI && !skipEnvSetup) {
-        await announced('Pulling images', docker.pull());
-        await announced('Checking environment', checkEnv());
-        await announced('Checking git hooks', env.gitHooks());
-        await announced('Setting up containers', up());
-    }
-    if (!skipSubmodulesCheckout) {
-        await announced('Checkout system-contracts submodule', submoduleUpdate());
-    }
+    // if (!process.env.CI && !skipEnvSetup) {
+    //     await announced('Pulling images', docker.pull());
+    //     await announced('Checking environment', checkEnv());
+    //     await announced('Checking git hooks', env.gitHooks());
+    //     await announced('Setting up containers', up());
+    // }
+    // if (!skipSubmodulesCheckout) {
+    //     await announced('Checkout system-contracts submodule', submoduleUpdate());
+    // }
 
-    await announced('Compiling JS packages', run.yarn());
-    await announced('Compile l2 contracts', compiler.compileAll());
-    await announced('Drop postgres db', db.drop());
-    await announced('Setup postgres db', db.setup());
-    await announced('Clean rocksdb', clean('db'));
-    await announced('Clean backups', clean('backups'));
-    await announced('Building contracts', contract.build());
-    if (testTokens.deploy) {
-        await announced('Deploying localhost ERC20 tokens', run.deployERC20('dev', '', '', '', testTokens.args));
-    }
+    //   await announced("Compiling JS packages", run.yarn());
+    //   await announced("Compile l2 contracts", compiler.compileAll());
+    //   await announced("Drop postgres db", db.drop());
+    //   await announced("Setup postgres db", db.setup());
+    //   await announced("Clean rocksdb", clean("db"));
+    //   await announced("Clean backups", clean("backups"));
+    //   await announced("Building contracts", contract.build());
+    //   if (testTokens.deploy) {
+    //     await announced(
+    //       "Deploying localhost ERC20 tokens",
+    //       run.deployERC20("dev", "", "", "", testTokens.args)
+    //     );
+    //   }
     await announced('Deploying L1 verifier', contract.deployVerifier([]));
     await announced('Reloading env', env.reload());
     await announced('Running server genesis setup', server.genesisFromSources());
@@ -162,7 +165,11 @@ const DEFAULT_ARGS: InitArgs = {
     skipSubmodulesCheckout: false,
     skipEnvSetup: false,
     governorPrivateKeyArgs: [],
-    deployerL2ContractInput: { args: [], includePaymaster: true, includeL2WETH: true },
+    deployerL2ContractInput: {
+        args: [],
+        includePaymaster: true,
+        includeL2WETH: true
+    },
     testTokens: { deploy: true, args: [] }
 };
 
@@ -175,7 +182,11 @@ export const initCommand = new Command('init')
             skipSubmodulesCheckout: cmd.skipSubmodulesCheckout,
             skipEnvSetup: cmd.skipEnvSetup,
             governorPrivateKeyArgs: [],
-            deployerL2ContractInput: { args: [], includePaymaster: true, includeL2WETH: true },
+            deployerL2ContractInput: {
+                args: [],
+                includePaymaster: true,
+                includeL2WETH: true
+            },
             testTokens: { deploy: true, args: [] }
         };
         await init(initArgs);

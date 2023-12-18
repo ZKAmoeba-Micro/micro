@@ -1,15 +1,10 @@
 use anyhow::Context as _;
-
-use tokio::{sync::oneshot, sync::watch};
-
 use micro_config::configs::FriProverTaskApplyConfig;
-
-use micro_utils::wait_for_tasks::wait_for_tasks;
-
-use crate::client::MicroHttpQueryClient;
-use crate::micro_watch::EthWatch;
-
 use micro_eth_client::clients::http::QueryClient;
+use micro_utils::wait_for_tasks::wait_for_tasks;
+use tokio::sync::{oneshot, watch};
+
+use crate::{client::MicroHttpQueryClient, micro_watch::EthWatch};
 
 mod client;
 mod micro_watch;

@@ -1,11 +1,11 @@
-use async_trait::async_trait;
-use reqwest::Client;
-
 use std::{
     fmt::{self, Debug},
     future::Future,
     time::Duration,
 };
+
+use async_trait::async_trait;
+use reqwest::Client;
 
 use crate::raw::{Bucket, ObjectStore, ObjectStoreError};
 

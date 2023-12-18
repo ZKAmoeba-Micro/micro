@@ -1,9 +1,6 @@
 #![feature(generic_const_exprs)]
 
 use anyhow::Context as _;
-use prometheus_exporter::PrometheusExporterConfig;
-use structopt::StructOpt;
-use tokio::sync::{oneshot, watch};
 use micro_config::configs::{
     fri_prover_group::FriProverGroupConfig, FriProverConfig, FriWitnessVectorGeneratorConfig,
     PostgresConfig, ProverGroupConfig,
@@ -16,6 +13,9 @@ use micro_prover_utils::region_fetcher::get_zone;
 use micro_queued_job_processor::JobProcessor;
 use micro_utils::wait_for_tasks::wait_for_tasks;
 use micro_vk_setup_data_server_fri::commitment_utils::get_cached_commitments;
+use prometheus_exporter::PrometheusExporterConfig;
+use structopt::StructOpt;
+use tokio::sync::{oneshot, watch};
 
 use crate::generator::WitnessVectorGenerator;
 

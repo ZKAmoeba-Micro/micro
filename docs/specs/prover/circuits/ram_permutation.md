@@ -36,10 +36,11 @@ pub struct RamPermutationFSMInputOutput<F: SmallField> {
 
 ## Main circuit logic
 
-The circuit starts [here](https://github.com/ZKAmoeba-Micro/micro-zkevm_circuits/blob/main/src/ram_permutation/mod.rs#L30).
-This function allocate PI inputs that call the inner function, where all the main logic is implemented. In the end, it
-forms the fsm output and compute PI commitment. The main purpose of this circuit is enforcing that memory queries are
-executed correctly.
+The circuit starts
+[here](https://github.com/ZKAmoeba-Micro/micro-zkevm_circuits/blob/main/src/ram_permutation/mod.rs#L30). This function
+allocate PI inputs that call the inner function, where all the main logic is implemented. In the end, it forms the fsm
+output and compute PI commitment. The main purpose of this circuit is enforcing that memory queries are executed
+correctly.
 
 ### [First part](https://github.com/ZKAmoeba-Micro/micro-zkevm_circuits/blob/main/src/ram_permutation/mod.rs#L43)
 

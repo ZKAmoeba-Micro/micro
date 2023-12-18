@@ -1,11 +1,11 @@
 use std::time::Duration;
 
 use async_trait::async_trait;
+use micro_dal::ConnectionPool;
+use micro_object_store::ObjectStore;
 use reqwest::Client;
 use serde::{de::DeserializeOwned, Serialize};
 use tokio::{sync::watch, time::sleep};
-use micro_dal::ConnectionPool;
-use micro_object_store::ObjectStore;
 
 use crate::metrics::METRICS;
 

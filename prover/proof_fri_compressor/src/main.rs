@@ -1,15 +1,15 @@
 use std::{env, time::Duration};
 
 use anyhow::Context as _;
-use prometheus_exporter::PrometheusExporterConfig;
-use structopt::StructOpt;
-use tokio::sync::{oneshot, watch};
 use micro_config::configs::{FriProofCompressorConfig, PostgresConfig};
 use micro_dal::ConnectionPool;
 use micro_env_config::{object_store::ProverObjectStoreConfig, FromEnv};
 use micro_object_store::ObjectStoreFactory;
 use micro_queued_job_processor::JobProcessor;
 use micro_utils::wait_for_tasks::wait_for_tasks;
+use prometheus_exporter::PrometheusExporterConfig;
+use structopt::StructOpt;
+use tokio::sync::{oneshot, watch};
 
 use crate::compressor::ProofCompressor;
 

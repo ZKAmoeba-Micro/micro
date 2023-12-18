@@ -26,9 +26,9 @@ use micro_types::{
     MiniblockNumber, StorageKey, StorageLog, StorageLogQuery, StorageValue, Transaction, VmEvent,
     CURRENT_VIRTUAL_BLOCK_INFO_POSITION, H256, SYSTEM_CONTEXT_ADDRESS,
 };
-use multivm::interface::{FinishedL1Batch, L1BatchEnv};
 // TODO (SMA-1206): use seconds instead of milliseconds.
 use micro_utils::{h256_to_u256, time::millis_since_epoch, u256_to_h256};
+use multivm::interface::{FinishedL1Batch, L1BatchEnv};
 
 use crate::{
     metrics::{BlockStage, MiniblockStage, APP_METRICS},

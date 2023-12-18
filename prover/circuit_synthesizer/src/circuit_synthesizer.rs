@@ -5,16 +5,6 @@ use std::{
 
 use anyhow::Context as _;
 use local_ip_address::local_ip;
-use prover_service::{
-    prover::{Prover, ProvingAssembly},
-    remote_synth::serialize_job,
-};
-use tokio::{task::JoinHandle, time::sleep};
-use zkevm_test_harness::{
-    abstract_micro_circuit::concrete_circuits::MicroCircuit,
-    bellman::plonk::better_better_cs::cs::Circuit, pairing::bn256::Bn256,
-    witness::oracle::VmWitnessOracle,
-};
 use micro_config::{
     configs::{prover_group::ProverGroupConfig, CircuitSynthesizerConfig},
     ProverConfigs,
@@ -31,6 +21,16 @@ use micro_queued_job_processor::{async_trait, JobProcessor};
 use micro_types::{
     proofs::{GpuProverInstanceStatus, SocketAddress},
     protocol_version::L1VerifierConfig,
+};
+use prover_service::{
+    prover::{Prover, ProvingAssembly},
+    remote_synth::serialize_job,
+};
+use tokio::{task::JoinHandle, time::sleep};
+use zkevm_test_harness::{
+    abstract_micro_circuit::concrete_circuits::MicroCircuit,
+    bellman::plonk::better_better_cs::cs::Circuit, pairing::bn256::Bn256,
+    witness::oracle::VmWitnessOracle,
 };
 
 use crate::metrics::METRICS;

@@ -1,7 +1,4 @@
 use anyhow::Context as _;
-use prometheus_exporter::PrometheusExporterConfig;
-use structopt::StructOpt;
-use tokio::sync::{oneshot, watch};
 use micro_config::configs::{
     AlertsConfig, CircuitSynthesizerConfig, ObjectStoreConfig, PostgresConfig, ProverGroupConfig,
 };
@@ -11,6 +8,9 @@ use micro_object_store::ObjectStoreFactory;
 use micro_queued_job_processor::JobProcessor;
 use micro_utils::wait_for_tasks::wait_for_tasks;
 use micro_verification_key_server::get_cached_commitments;
+use prometheus_exporter::PrometheusExporterConfig;
+use structopt::StructOpt;
+use tokio::sync::{oneshot, watch};
 
 use crate::circuit_synthesizer::CircuitSynthesizer;
 

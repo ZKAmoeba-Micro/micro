@@ -767,9 +767,7 @@ async function configDemoHyperchain(cmd: Command) {
     wrapEnvModify('ETH_SENDER_SENDER_PROOF_SENDING_MODE', 'SkipEveryProof');
     wrapEnvModify('ETH_SENDER_SENDER_L1_BATCH_MIN_AGE_BEFORE_EXECUTE_SECONDS', '20');
 
-    const richWalletsRaw = await fetch(
-        'https://raw.githubusercontent.com/zkamoeba/local-setup/main/rich-wallets.json'
-    );
+    const richWalletsRaw = await fetch('https://raw.githubusercontent.com/zkamoeba/local-setup/main/rich-wallets.json');
 
     const richWallets = await richWalletsRaw.json();
 

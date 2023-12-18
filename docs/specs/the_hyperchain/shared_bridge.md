@@ -77,8 +77,8 @@ be able to leverage them when available).
 - `BridgehubMailbox` routes messages to the Diamond proxy’s Mailbox facet based on chainID
 
   - Same as the current zkEVM
-    [Mailbox](https://github.com/ZKAmoeba-Micro/micro-contracts/blob/main/ethereum/contracts/micro/facets/Mailbox.sol), just
-    with chainId,
+    [Mailbox](https://github.com/ZKAmoeba-Micro/micro-contracts/blob/main/ethereum/contracts/micro/facets/Mailbox.sol),
+    just with chainId,
   - Ether needs to be deposited and withdrawn from here.
   - This is where L2 transactions can be requested.
 

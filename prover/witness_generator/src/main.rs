@@ -3,9 +3,6 @@
 use std::time::Instant;
 
 use anyhow::{anyhow, Context as _};
-use prometheus_exporter::PrometheusExporterConfig;
-use structopt::StructOpt;
-use tokio::sync::watch;
 use micro_config::{
     configs::{FriWitnessGeneratorConfig, PostgresConfig, PrometheusConfig},
     ObjectStoreConfig,
@@ -18,6 +15,9 @@ use micro_queued_job_processor::JobProcessor;
 use micro_types::{proofs::AggregationRound, web3::futures::StreamExt};
 use micro_utils::wait_for_tasks::wait_for_tasks;
 use micro_vk_setup_data_server_fri::commitment_utils::get_cached_commitments;
+use prometheus_exporter::PrometheusExporterConfig;
+use structopt::StructOpt;
+use tokio::sync::watch;
 
 use crate::{
     basic_circuits::BasicWitnessGenerator, leaf_aggregation::LeafAggregationWitnessGenerator,

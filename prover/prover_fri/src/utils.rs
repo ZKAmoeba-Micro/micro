@@ -2,8 +2,6 @@
 
 use std::{sync::Arc, time::Instant};
 
-use tokio::sync::Mutex;
-use zkevm_test_harness::prover_utils::{verify_base_layer_proof, verify_recursion_layer_proof};
 use micro_dal::StorageProcessor;
 use micro_object_store::ObjectStore;
 use micro_prover_fri_types::{
@@ -28,6 +26,8 @@ use micro_prover_fri_types::{
 };
 use micro_prover_fri_utils::get_base_layer_circuit_id_for_recursive_layer;
 use micro_types::{basic_fri_types::CircuitIdRoundTuple, proofs::AggregationRound, L1BatchNumber};
+use tokio::sync::Mutex;
+use zkevm_test_harness::prover_utils::{verify_base_layer_proof, verify_recursion_layer_proof};
 
 use crate::metrics::METRICS;
 

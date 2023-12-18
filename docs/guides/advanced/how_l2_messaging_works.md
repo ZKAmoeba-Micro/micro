@@ -74,8 +74,8 @@ Our VM features special opcodes designed to manage operations that aren't possib
 We could expand the language by introducing new Solidity opcodes, but that would require modifying the solc compiler,
 among other things. Hence, we've adopted a different strategy.
 
-To access these unique microVM opcodes, the Solidity code simply executes a call to a specific address (the full list can
-be seen [here][list_of_opcodes]). This call is compiled by the solc frontend, and then on the compiler backend, we
+To access these unique microVM opcodes, the Solidity code simply executes a call to a specific address (the full list
+can be seen [here][list_of_opcodes]). This call is compiled by the solc frontend, and then on the compiler backend, we
 intercept it and replace it with the correct microVM opcode call [here][opcode_catch_compiler].
 
 ```rust

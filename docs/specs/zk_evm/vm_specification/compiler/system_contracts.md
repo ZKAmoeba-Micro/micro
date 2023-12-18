@@ -21,8 +21,8 @@ Such storage contracts are accessed with static calls in order to retrieve value
 environmental entities: `CHAINID`, `DIFFICULTY`, `BLOCKHASH`, etc.
 
 One good example of such contract is
-[SystemContext](https://github.com/ZKAmoeba-Micro/micro-system-contracts/blob/main/contracts/SystemContext.sol) that provides
-the majority of the environmental data.
+[SystemContext](https://github.com/ZKAmoeba-Micro/micro-system-contracts/blob/main/contracts/SystemContext.sol) that
+provides the majority of the environmental data.
 
 Since EVM is not using external calls for these instructions, we must use [the auxiliary heap](#auxiliary-heap) for
 their calldata.
@@ -116,8 +116,8 @@ the heap memory allocator which remains a responsibility of
 [the high-level source code compilers](https://micro.micro.io/docs/tools/compiler-toolchain/overview.html#high-level-source-code-compilers)
 emitting the IRs.
 
-However, the are several cases where MicroVM needs to allocate memory on the heap and EVM does not. The auxiliary heap is
-used for these cases:
+However, the are several cases where MicroVM needs to allocate memory on the heap and EVM does not. The auxiliary heap
+is used for these cases:
 
 1. [Returning immutables](https://micro.micro.io/docs/reference/architecture/differences-with-ethereum.html#setimmutable-loadimmutable)
    from the constructor.

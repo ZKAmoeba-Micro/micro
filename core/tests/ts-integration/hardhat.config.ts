@@ -4,14 +4,14 @@ import '@zkamoeba/hardhat-micro-vyper';
 
 export default {
     zksolc: {
-        version: '1.3.18',
+        version: '1.3.14',
         compilerSource: 'binary',
         settings: {
             isSystem: true
         }
     },
     zkvyper: {
-        version: '1.3.13',
+        version: '1.3.10',
         compilerSource: 'binary'
     },
     networks: {
@@ -20,9 +20,9 @@ export default {
         }
     },
     solidity: {
-        version: '0.8.23'
+        version: '0.8.21'
     },
     vyper: {
-        version: '0.3.10'
+        version: '0.3.9'
     }
 };

@@ -1,8 +1,9 @@
-use crate::{web3::types::Log, U256};
+use std::convert::TryFrom;
 
 use micro_utils::h256_to_u256;
 use serde::{Deserialize, Serialize};
-use std::convert::TryFrom;
+
+use crate::{web3::types::Log, U256};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct NewBatch {
