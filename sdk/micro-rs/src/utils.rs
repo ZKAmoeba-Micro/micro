@@ -1,8 +1,7 @@
 use std::str::FromStr;
 
-use num::BigUint;
-
 use micro_types::{transaction_request::PaymasterParams, Address, U256};
+use num::BigUint;
 
 use crate::web3::ethabi::{Contract, Token};
 

@@ -1,12 +1,11 @@
 //! Integration tests for object store.
 
-use tokio::fs;
-
 use micro_object_store::{Bucket, ObjectStoreFactory};
 use micro_types::{
     proofs::{PrepareBasicCircuitsJob, StorageLogMetadata},
     L1BatchNumber,
 };
+use tokio::fs;
 
 /// Tests compatibility of the `PrepareBasicCircuitsJob` serialization to the previously used
 /// one.

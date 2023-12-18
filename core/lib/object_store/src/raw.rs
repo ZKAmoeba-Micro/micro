@@ -1,13 +1,12 @@
-use anyhow::Context as _;
-use async_trait::async_trait;
-
 use std::{error, fmt, sync::Arc};
 
-use crate::ali_oss::AliyunOssStorage;
-use crate::http::HttpBackedObjectStore;
-use crate::{file::FileBackedObjectStore, gcs::GoogleCloudStorage, mock::MockStore};
-use micro_config::configs::object_store::ObjectStoreMode;
-use micro_config::ObjectStoreConfig;
+use async_trait::async_trait;
+use micro_config::configs::object_store::{ObjectStoreConfig, ObjectStoreMode};
+
+use crate::{
+    ali_oss::AliyunOssStorage, file::FileBackedObjectStore, gcs::GoogleCloudStorage,
+    http::HttpBackedObjectStore, mock::MockStore,
+};
 
 /// Bucket for [`ObjectStore`] in which objects can be placed.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -23,6 +22,7 @@ pub enum Bucket {
     NodeAggregationWitnessJobsFri,
     SchedulerWitnessJobsFri,
     ProofsFri,
+    StorageSnapshot,
 }
 
 impl Bucket {
@@ -38,6 +38,7 @@ impl Bucket {
             Self::NodeAggregationWitnessJobsFri => "node_aggregation_witness_jobs_fri",
             Self::SchedulerWitnessJobsFri => "scheduler_witness_jobs_fri",
             Self::ProofsFri => "proofs_fri",
+            Self::StorageSnapshot => "storage_logs_snapshots",
         }
     }
 }
@@ -117,6 +118,8 @@ pub trait ObjectStore: fmt::Debug + Send + Sync {
     ///
     /// Returns an error if removal fails.
     async fn remove_raw(&self, bucket: Bucket, key: &str) -> Result<(), ObjectStoreError>;
+
+    fn storage_prefix_raw(&self, bucket: Bucket) -> String;
 }
 
 #[async_trait]
@@ -136,6 +139,10 @@ impl<T: ObjectStore + ?Sized> ObjectStore for Arc<T> {
 
     async fn remove_raw(&self, bucket: Bucket, key: &str) -> Result<(), ObjectStoreError> {
         (**self).remove_raw(bucket, key).await
+    }
+
+    fn storage_prefix_raw(&self, bucket: Bucket) -> String {
+        (**self).storage_prefix_raw(bucket)
     }
 }
 
@@ -162,28 +169,6 @@ impl ObjectStoreFactory {
         Self {
             origin: ObjectStoreOrigin::Config(config),
         }
-    }
-
-    /// Creates an object store factory with the configuration taken from the environment.
-    ///
-    /// # Errors
-    ///
-    /// Invalid or missing configuration.
-    pub fn from_env() -> anyhow::Result<Self> {
-        Ok(Self::new(
-            ObjectStoreConfig::from_env().context("ObjectStoreConfig::from_env()")?,
-        ))
-    }
-
-    /// Creates an object store factory with the prover configuration taken from the environment.
-    ///
-    /// # Errors
-    ///
-    /// Invalid or missing configuration.
-    pub fn prover_from_env() -> anyhow::Result<Self> {
-        Ok(Self::new(
-            ObjectStoreConfig::prover_from_env().context("ObjectStoreConfig::prover_from_env()")?,
-        ))
     }
 
     /// Creates an object store factory with a mock in-memory store.

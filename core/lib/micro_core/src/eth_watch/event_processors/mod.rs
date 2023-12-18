@@ -1,7 +1,9 @@
-use crate::eth_watch::client::{Error, EthClient};
 use micro_dal::StorageProcessor;
 use micro_types::{web3::types::Log, H256};
 
+use crate::eth_watch::client::{Error, EthClient};
+
+pub mod governance_upgrades;
 pub mod priority_ops;
 pub mod upgrades;
 
@@ -16,5 +18,5 @@ pub trait EventProcessor<W: EthClient + Sync>: Send + std::fmt::Debug {
     ) -> Result<(), Error>;
 
     /// Relevant topic which defines what events to be processed
-    fn relevant_topic(&self) -> Vec<H256>;
+    fn relevant_topic(&self) -> H256;
 }

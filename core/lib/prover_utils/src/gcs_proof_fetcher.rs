@@ -1,6 +1,5 @@
 use micro_object_store::{ObjectStore, ObjectStoreError};
-use micro_types::aggregated_operations::L1BatchProofForL1;
-use micro_types::L1BatchNumber;
+use micro_types::{aggregated_operations::L1BatchProofForL1, L1BatchNumber};
 
 pub async fn load_wrapped_fri_proofs_for_range(
     from: L1BatchNumber,

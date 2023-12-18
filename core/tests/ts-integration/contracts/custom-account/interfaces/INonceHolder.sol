@@ -3,7 +3,7 @@
 pragma solidity ^0.8.0;
 
 /**
- *
+ * @author Zkamoeba
  * @dev Interface of the nonce holder contract -- a contract used by the system to ensure
  * that there is always a unique identifier for a transaction with a particular account (we call it nonce).
  * In other words, the pair of (address, nonce) should always be unique.

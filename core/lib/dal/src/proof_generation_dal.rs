@@ -1,10 +1,9 @@
 use std::time::Duration;
 
 use micro_types::L1BatchNumber;
-
-use crate::time_utils::pg_interval_from_duration;
-use crate::{SqlxError, StorageProcessor};
 use strum::{Display, EnumString};
+
+use crate::{time_utils::pg_interval_from_duration, SqlxError, StorageProcessor};
 
 #[derive(Debug)]
 pub struct ProofGenerationDal<'a, 'c> {
@@ -110,14 +109,35 @@ impl ProofGenerationDal<'_, '_> {
         .ok_or(sqlx::Error::RowNotFound)
     }
 
-    pub async fn get_batch_number_list(&mut self) -> Vec<L1BatchNumber> {
-        let result = sqlx::query!("SELECT l1_batch_number FROM proof_generation_details WHERE status = 'ready_to_be_proven' and l1_batch_number not in (select l1_batch_number from assignments where status ='assigned_not_certified') ORDER BY l1_batch_number ASC FOR UPDATE SKIP LOCKED")
-        .fetch_all(self.storage.conn())
+    pub async fn get_oldest_unpicked_batch(&mut self) -> Option<L1BatchNumber> {
+        let result: Option<L1BatchNumber> = sqlx::query!(
+            "SELECT l1_batch_number \
+             FROM proof_generation_details \
+             WHERE status = 'ready_to_be_proven' \
+             ORDER BY l1_batch_number ASC \
+             LIMIT 1",
+        )
+        .fetch_optional(self.storage.conn())
         .await
-        .unwrap();
+        .unwrap()
+        .map(|row| L1BatchNumber(row.l1_batch_number as u32));
+
         result
-            .into_iter()
-            .map(|row| L1BatchNumber(row.l1_batch_number as u32))
-            .collect()
+    }
+
+    pub async fn get_oldest_not_generated_batch(&mut self) -> Option<L1BatchNumber> {
+        let result: Option<L1BatchNumber> = sqlx::query!(
+            "SELECT l1_batch_number \
+             FROM proof_generation_details \
+             WHERE status NOT IN ('generated', 'skipped') \
+             ORDER BY l1_batch_number ASC \
+             LIMIT 1",
+        )
+        .fetch_optional(self.storage.conn())
+        .await
+        .unwrap()
+        .map(|row| L1BatchNumber(row.l1_batch_number as u32));
+
+        result
     }
 }

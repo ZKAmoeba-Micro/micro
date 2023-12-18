@@ -197,7 +197,7 @@ describe('Upgrade test', function () {
         ).wait();
 
         // Wait for server to process L1 event.
-        await utils.sleep(10);
+        await utils.sleep(30);
     });
 
     step('Check bootloader is updated on L2', async () => {
@@ -257,7 +257,7 @@ describe('Upgrade test', function () {
 
         // Run again.
         utils.background(
-            'cd $MICRO_HOME && cargo run --bin micro_server --release -- --components=api,tree,eth,data_fetcher,state_keeper &>> upgrade.log',
+            'cd $MICRO_HOME && cargo run --bin micro_server --release -- --components=api,tree,eth,data_fetcher,state_keeper &> upgrade.log',
             [null, logs, logs]
         );
         await utils.sleep(10);

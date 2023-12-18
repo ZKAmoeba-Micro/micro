@@ -8,7 +8,7 @@ const IMAGES = [
     'cross-external-nodes-checker',
     'contract-verifier',
     'prover-v2',
-    'lotus',
+    'geth',
     'local-node',
     'zk-environment',
     'circuit-synthesizer',
@@ -17,7 +17,8 @@ const IMAGES = [
     'prover-gpu-fri',
     'witness-vector-generator',
     'prover-fri-gateway',
-    'proof-fri-compressor'
+    'proof-fri-compressor',
+    'snapshots-creator'
 ];
 const UNIX_TIMESTAMP = Date.now();
 
@@ -25,18 +26,19 @@ async function dockerCommand(
     command: 'push' | 'build',
     image: string,
     customTag?: string,
-    publishPublic: boolean = false
+    dockerOrg: string = 'zkamoeba'
 ) {
     // Generating all tags for containers. We need 2 tags here: SHA and SHA+TS
     const { stdout: COMMIT_SHORT_SHA }: { stdout: string } = await utils.exec('git rev-parse --short HEAD');
+    // COMMIT_SHORT_SHA returns with newline, so we need to trim it
     const imageTagShaTS: string = process.env.IMAGE_TAG_SUFFIX
         ? process.env.IMAGE_TAG_SUFFIX
         : `${COMMIT_SHORT_SHA.trim()}-${UNIX_TIMESTAMP}`;
 
-    // we want alternative flow for rust image
+    // We want an alternative flow for Rust image
     if (image == 'rust') {
-        await dockerCommand(command, 'server-v2', customTag, publishPublic);
-        await dockerCommand(command, 'prover', customTag, publishPublic);
+        await dockerCommand(command, 'server-v2', customTag, dockerOrg);
+        await dockerCommand(command, 'prover', customTag, dockerOrg);
         return;
     }
     if (!IMAGES.includes(image)) {
@@ -48,14 +50,14 @@ async function dockerCommand(
     }
 
     const tagList = customTag ? [customTag] : defaultTagList(image, COMMIT_SHORT_SHA.trim(), imageTagShaTS);
+
     // Main build\push flow
-    // COMMIT_SHORT_SHA returns with newline, so we need to trim it
     switch (command) {
         case 'build':
-            await _build(image, tagList);
+            await _build(image, tagList, dockerOrg);
             break;
         case 'push':
-            await _push(image, tagList, publishPublic);
+            await _push(image, tagList);
             break;
         default:
             console.log(`Unknown command for docker ${command}.`);
@@ -77,7 +79,8 @@ function defaultTagList(image: string, imageTagSha: string, imageTagShaTS: strin
         'prover-gpu-fri',
         'witness-vector-generator',
         'prover-fri-gateway',
-        'proof-fri-compressor'
+        'proof-fri-compressor',
+        'snapshots-creator'
     ].includes(image)
         ? ['latest', 'latest2.0', `2.0-${imageTagSha}`, `${imageTagSha}`, `2.0-${imageTagShaTS}`, `${imageTagShaTS}`]
         : [`latest2.0`, 'latest'];
@@ -85,19 +88,20 @@ function defaultTagList(image: string, imageTagSha: string, imageTagShaTS: strin
     return tagList;
 }
 
-async function _build(image: string, tagList: string[]) {
+async function _build(image: string, tagList: string[], dockerOrg: string) {
     if (image === 'server-v2' || image === 'external-node' || image === 'prover') {
         await contract.build();
     }
+    let tagsToBuild = '';
 
-    const tagsToBuild = tagList.map((tag) => `-t matterlabs/${image}:${tag}`).join(' ');
     // generate list of tags for image - we want 3 tags (latest, SHA, SHA+TimeStamp) for listed components and only "latest" for everything else
+    tagsToBuild = tagList.map((tag) => `-t ${dockerOrg}/${image}:${tag}`).join(' ');
 
     // Conditionally add build argument if image is prover-v2
     let buildArgs = '';
     if (image === 'prover-v2') {
-        const eraBellmanCudaRelease = process.env.ERA_BELLMAN_CUDA_RELEASE;
-        buildArgs = `--build-arg ERA_BELLMAN_CUDA_RELEASE=${eraBellmanCudaRelease}`;
+        const eraBellmanCudaRelease = process.env.MICRO_BELLMAN_CUDA_RELEASE;
+        buildArgs = `--build-arg MICRO_BELLMAN_CUDA_RELEASE=${eraBellmanCudaRelease}`;
     }
 
     // HACK
@@ -112,24 +116,25 @@ async function _build(image: string, tagList: string[]) {
     await utils.spawn(buildCommand);
 }
 
-async function _push(image: string, tagList: string[], publishPublic: boolean = false) {
+async function _push(image: string, tagList: string[]) {
     // For development purposes, we want to use `2.0` tags for 2.0 images, just to not interfere with 1.x
 
     for (const tag of tagList) {
-        await utils.spawn(`docker push matterlabs/${image}:${tag}`);
+        await utils.spawn(`docker push zkamoeba/${image}:${tag}`);
         await utils.spawn(
-            `docker tag matterlabs/${image}:${tag} us-docker.pkg.dev/matterlabs-infra/matterlabs-docker/${image}:${tag}`
+            `docker tag zkamoeba/${image}:${tag} us-docker.pkg.dev/zkamoeba-infra/zkamoeba-docker/${image}:${tag}`
         );
-        await utils.spawn(`docker push us-docker.pkg.dev/matterlabs-infra/matterlabs-docker/${image}:${tag}`);
+        await utils.spawn(`docker push us-docker.pkg.dev/zkamoeba-infra/zkamoeba-docker/${image}:${tag}`);
 
         if (image == 'circuit-synthesizer') {
             await utils.spawn(
-                `docker tag us-docker.pkg.dev/matterlabs-infra/matterlabs-docker/${image}:${tag} asia-docker.pkg.dev/matterlabs-infra/matterlabs-docker/${image}:${tag}`
+                `docker tag us-docker.pkg.dev/zkamoeba-infra/zkamoeba-docker/${image}:${tag} asia-docker.pkg.dev/zkamoeba-infra/zkamoeba-docker/${image}:${tag}`
             );
-            await utils.spawn(`docker push asia-docker.pkg.dev/matterlabs-infra/matterlabs-docker/${image}:${tag}`);
-        }
-        if (image == 'external-node' && publishPublic) {
-            await utils.spawn(`docker push matterlabs/${image}-public:${tag}`);
+            await utils.spawn(
+                `docker tag us-docker.pkg.dev/zkamoeba-infra/zkamoeba-docker/${image}:${tag} europe-docker.pkg.dev/zkamoeba-infra/zkamoeba-docker/${image}:${tag}`
+            );
+            await utils.spawn(`docker push asia-docker.pkg.dev/zkamoeba-infra/zkamoeba-docker/${image}:${tag}`);
+            await utils.spawn(`docker push europe-docker.pkg.dev/zkamoeba-infra/zkamoeba-docker/${image}:${tag}`);
         }
     }
 }
@@ -138,17 +143,21 @@ export async function build(image: string, cmd: Command) {
     await dockerCommand('build', image, cmd.customTag);
 }
 
+export async function customBuildForHyperchain(image: string, dockerOrg: string) {
+    await dockerCommand('build', image, '', dockerOrg);
+}
+
 export async function push(image: string, cmd: Command) {
-    await dockerCommand('build', image, cmd.customTag, cmd.public);
-    await dockerCommand('push', image, cmd.customTag, cmd.public);
+    await dockerCommand('build', image, cmd.customTag);
+    await dockerCommand('push', image, cmd.customTag);
 }
 
 export async function restart(container: string) {
-    await utils.spawn(`docker-compose restart ${container}`);
+    await utils.spawn(`docker compose restart ${container}`);
 }
 
 export async function pull() {
-    await utils.spawn('docker-compose pull');
+    await utils.spawn('docker compose pull');
 }
 
 export const command = new Command('docker').description('docker management');
@@ -161,7 +170,6 @@ command
 command
     .command('push <image>')
     .option('--custom-tag <value>', 'Custom tag for image')
-    .option('--public', 'Publish image to the public repo')
     .description('build and push docker image')
     .action(push);
 command.command('pull').description('pull all containers').action(pull);

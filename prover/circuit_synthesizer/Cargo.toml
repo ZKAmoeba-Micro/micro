@@ -8,10 +8,13 @@ name = "micro_circuit_synthesizer"
 path = "src/main.rs"
 
 [dependencies]
+vise = { git = "https://github.com/ZKAmoeba-Micro/vise.git", branch = "main" }
+
 micro_dal = { path = "../../core/lib/dal" }
 micro_types = { path = "../../core/lib/types" }
 micro_queued_job_processor = { path = "../../core/lib/queued_job_processor" }
 micro_config = { path = "../../core/lib/config" }
+micro_env_config = { path = "../../core/lib/env_config" }
 micro_object_store = { path = "../../core/lib/object_store" }
 micro_utils = { path = "../../core/lib/utils" }
 micro_prover_fri_utils = { path = "../prover_fri_utils" }
@@ -33,5 +36,4 @@ tokio = { version = "1.23.0", features = ["full"] }
 futures = "0.3"
 ctrlc = { version = "3.1", features = ["termination"] }
 local-ip-address = "0.5.0"
-metrics = "0.21"
 tracing = "0.1"

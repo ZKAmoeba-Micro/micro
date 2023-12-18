@@ -1,17 +1,16 @@
 use anyhow::Context as _;
 use clap::{Parser, Subcommand};
-use tokio::io::{self, AsyncReadExt};
-
-use micro_config::{ContractsConfig, DBConfig, ETHClientConfig, ETHSenderConfig};
-use micro_dal::{connection::DbVariant, ConnectionPool};
-use micro_types::{L1BatchNumber, U256};
-
+use micro_config::{ContractsConfig, DBConfig, ETHClientConfig, ETHSenderConfig, PostgresConfig};
 use micro_core::block_reverter::{
     BlockReverter, BlockReverterEthConfig, BlockReverterFlags, L1ExecutedBatchesRevert,
 };
+use micro_dal::ConnectionPool;
+use micro_env_config::FromEnv;
+use micro_types::{L1BatchNumber, U256};
+use tokio::io::{self, AsyncReadExt};
 
 #[derive(Debug, Parser)]
-#[command(author = "", version, about = "Block revert utility", long_about = None)]
+#[command(author = "Zkamoeba", version, about = "Block revert utility", long_about = None)]
 struct Cli {
     #[command(subcommand)]
     command: Command,
@@ -32,7 +31,7 @@ enum Command {
         /// L1 batch number used to rollback to.
         #[arg(long)]
         l1_batch_number: u32,
-        /// Priority fee used for rollback ethereum transaction.
+        /// Priority fee used for rollback Ethereum transaction.
         // We operate only by priority fee because we want to use base fee from ethereum
         // and send transaction as soon as possible without any resend logic
         #[arg(long)]
@@ -91,12 +90,16 @@ async fn main() -> anyhow::Result<()> {
     let default_priority_fee_per_gas =
         U256::from(eth_sender.gas_adjuster.default_priority_fee_per_gas);
     let contracts = ContractsConfig::from_env().context("ContractsConfig::from_env()")?;
+    let postgres_config = PostgresConfig::from_env().context("PostgresConfig::from_env()")?;
     let config = BlockReverterEthConfig::new(eth_sender, contracts, eth_client.web3_url.clone());
 
-    let connection_pool = ConnectionPool::builder(DbVariant::Master)
-        .build()
-        .await
-        .context("failed to build a connection pool")?;
+    let connection_pool = ConnectionPool::builder(
+        postgres_config.master_url()?,
+        postgres_config.max_connections()?,
+    )
+    .build()
+    .await
+    .context("failed to build a connection pool")?;
     let mut block_reverter = BlockReverter::new(
         db_config.state_keeper_db_path,
         db_config.merkle_tree.path,

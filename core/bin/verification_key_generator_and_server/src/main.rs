@@ -1,10 +1,13 @@
-use micro_types::zkevm_test_harness::abstract_micro_circuit::concrete_circuits::MicroCircuit;
-use micro_types::zkevm_test_harness::bellman::bn256::Bn256;
-use micro_types::zkevm_test_harness::bellman::plonk::better_better_cs::cs::PlonkCsWidth4WithNextStepAndCustomGatesParams;
-use micro_types::zkevm_test_harness::witness::oracle::VmWitnessOracle;
+use std::{collections::HashSet, env};
+
+use micro_types::zkevm_test_harness::{
+    abstract_micro_circuit::concrete_circuits::MicroCircuit,
+    bellman::{
+        bn256::Bn256, plonk::better_better_cs::cs::PlonkCsWidth4WithNextStepAndCustomGatesParams,
+    },
+    witness::oracle::VmWitnessOracle,
+};
 use micro_verification_key_server::{get_circuits_for_vk, save_vk_for_circuit_type};
-use std::collections::HashSet;
-use std::env;
 
 /// Creates verification keys for the given circuit.
 fn main() {

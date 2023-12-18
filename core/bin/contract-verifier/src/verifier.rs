@@ -1,17 +1,17 @@
-use std::collections::HashMap;
-use std::env;
-use std::path::Path;
-use std::time::{Duration, Instant};
+use std::{
+    collections::HashMap,
+    env,
+    path::Path,
+    time::{Duration, Instant},
+};
 
 use anyhow::Context as _;
 use chrono::Utc;
 use ethabi::{Contract, Token};
 use lazy_static::lazy_static;
-use regex::Regex;
-use tokio::time;
-
 use micro_config::ContractVerifierConfig;
 use micro_dal::{ConnectionPool, StorageProcessor};
+use micro_env_config::FromEnv;
 use micro_queued_job_processor::{async_trait, JobProcessor};
 use micro_types::{
     contract_verification_api::{
@@ -20,12 +20,14 @@ use micro_types::{
     },
     Address,
 };
+use regex::Regex;
+use tokio::time;
 
-use crate::error::ContractVerifierError;
-use crate::zksolc_utils::{
-    Optimizer, Settings, Source, StandardJson, ZkSolc, ZkSolcInput, ZkSolcOutput,
+use crate::{
+    error::ContractVerifierError,
+    zksolc_utils::{Optimizer, Settings, Source, StandardJson, ZkSolc, ZkSolcInput, ZkSolcOutput},
+    zkvyper_utils::{ZkVyper, ZkVyperInput},
 };
-use crate::zkvyper_utils::{ZkVyper, ZkVyperInput};
 
 lazy_static! {
     static ref DEPLOYER_CONTRACT: Contract = micro_contracts::deployer_contract();
@@ -522,5 +524,13 @@ impl JobProcessor for ContractVerifier {
     ) -> anyhow::Result<()> {
         // Do nothing
         Ok(())
+    }
+
+    fn max_attempts(&self) -> u32 {
+        u32::MAX
+    }
+
+    async fn get_job_attempts(&self, _job_id: &Self::JobId) -> anyhow::Result<u32> {
+        Ok(1)
     }
 }

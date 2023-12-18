@@ -4,7 +4,7 @@
 
 The Protocol Upgrade Tool is a command-line utility that enables users to upgrade the protocol of a node. It is designed
 to be used in conjunction with the
-[protocol upgrade proposal](https://www.notion.so/matterlabs/Server-rolling-upgrade-mechanism-e4a57f8545e84c2c9edb4928b6e0f36b).
+[protocol upgrade proposal](https://www.notion.so/zkamoeba/Server-rolling-upgrade-mechanism-e4a57f8545e84c2c9edb4928b6e0f36b).
 
 ## Usage
 
@@ -80,8 +80,7 @@ $ zk f yarn start facets deploy \
 --micro-address <micro-address> \
 --environment <environment> \
 --executor \
---governance \
---diamond-cut \
+--admin \
 --getters \
 --mailbox
 ```
@@ -168,13 +167,12 @@ $ zk f yarn start l2-transaction force-deployment-calldata \
 To deploy a new verifier, use the following command:
 
 ```bash
-$ zk f yarn start crypto deploy-verifier
+$ zk f yarn start crypto deploy-verifier \
 --private-key <private-key> \
 --l1rpc <l1rpc> \
 --gas-price <gas-price> \
 --nonce <nonce> \
 --create2-address <create2-address> \
---micro-address <micro-address> \
 --environment <environment>
 ```
 
@@ -215,7 +213,8 @@ $ zk f yarn start transactions build-default \
 --l2-upgrader-address <l2UpgraderAddress> \
 --diamond-upgrade-proposal-id <diamondUpgradeProposalId> \
 --l1rpc <l1prc> \
---micro-address <microAddress>
+--micro-address <microAddress> \
+--use-new-governance
 ```
 
 To execute the `proposeTransparentUpgrade` transaction on L1, use the following command:
@@ -227,6 +226,7 @@ $ zk f yarn start transactions propose-upgrade \
 --gas-price <gas-price> \
 --nonce <nonce> \
 --micro-address <microAddress> \
+--new-governance <governanceAddress> \
 --environment <environment>
 ```
 
@@ -239,6 +239,7 @@ $ zk f yarn start transactions execute-upgrade \
 --gas-price <gas-price> \
 --nonce <nonce> \
 --micro-address <microAddress> \
+--new-governance <governanceAddress> \
 --environment <environment>
 ```
 
@@ -251,5 +252,6 @@ $ zk f yarn start transactions cancel-upgrade \
 --micro-address <microAddress> \
 --gas-price <gas-price> \
 --nonce <nonce> \
+--new-governance <governanceAddress> \
 --environment <environment>
 ```

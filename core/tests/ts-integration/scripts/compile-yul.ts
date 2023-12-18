@@ -1,12 +1,13 @@
 import * as hre from 'hardhat';
 import * as fs from 'fs';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { exec as _exec, spawn as _spawn } from 'child_process';
 
 import { getZksolcUrl, saltFromUrl } from '@zkamoeba/hardhat-micro-solc';
 import { getCompilersDir } from 'hardhat/internal/util/global-dir';
 import path from 'path';
 
-const COMPILER_VERSION = '1.3.14';
+const COMPILER_VERSION = '1.3.18';
 const IS_COMPILER_PRE_RELEASE = false;
 
 async function compilerLocation(): Promise<string> {

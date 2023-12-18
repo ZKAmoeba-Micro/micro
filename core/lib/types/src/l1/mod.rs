@@ -1,6 +1,5 @@
 //! Definition of micro network priority operations: operations initiated from the L1.
 
-use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
 
 use micro_basic_types::{
@@ -8,7 +7,9 @@ use micro_basic_types::{
     Address, L1BlockNumber, Log, PriorityOpId, H160, H256, U256,
 };
 use micro_utils::u256_to_account_address;
+use serde::{Deserialize, Serialize};
 
+use super::Transaction;
 use crate::{
     helpers::unix_timestamp_ms,
     l1::error::L1TxParseError,
@@ -17,8 +18,6 @@ use crate::{
     tx::Execute,
     ExecuteTransactionCommon, PRIORITY_OPERATION_L2_TX_TYPE, PROTOCOL_UPGRADE_TX_TYPE,
 };
-
-use super::Transaction;
 
 pub mod error;
 

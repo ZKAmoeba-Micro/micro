@@ -1,20 +1,22 @@
-use sqlx::types::chrono::NaiveDateTime;
-
 use micro_types::{
     api, Address, L2ChainId, MiniblockNumber, Transaction, ACCOUNT_CODE_STORAGE_ADDRESS,
     FAILED_CONTRACT_DEPLOYMENT_BYTECODE_HASH, H160, H256, U256, U64,
 };
 use micro_utils::{bigdecimal_to_u256, h256_to_account_address};
+use sqlx::types::chrono::NaiveDateTime;
 
-use crate::models::{
-    storage_block::{bind_block_where_sql_params, web3_block_where_sql},
-    storage_event::StorageWeb3Log,
-    storage_transaction::{
-        extract_web3_transaction, web3_transaction_select_sql, StorageTransaction,
-        StorageTransactionDetails,
+use crate::{
+    instrument::InstrumentExt,
+    models::{
+        storage_block::{bind_block_where_sql_params, web3_block_where_sql},
+        storage_event::StorageWeb3Log,
+        storage_transaction::{
+            extract_web3_transaction, web3_transaction_select_sql, StorageTransaction,
+            StorageTransactionDetails,
+        },
     },
+    SqlxError, StorageProcessor,
 };
-use crate::{instrument::InstrumentExt, SqlxError, StorageProcessor};
 
 #[derive(Debug)]
 pub struct TransactionsWeb3Dal<'a, 'c> {
@@ -353,9 +355,9 @@ impl TransactionsWeb3Dal<'_, '_> {
 
 #[cfg(test)]
 mod tests {
-    use db_test_macro::db_test;
     use micro_types::{
-        block::miniblock_hash, fee::TransactionExecutionMetrics, l2::L2Tx, ProtocolVersion,
+        block::MiniblockHasher, fee::TransactionExecutionMetrics, l2::L2Tx, ProtocolVersion,
+        ProtocolVersionId,
     };
 
     use super::*;
@@ -389,9 +391,10 @@ mod tests {
             .await;
     }
 
-    #[db_test(dal_crate)]
-    async fn getting_transaction(connection_pool: ConnectionPool) {
-        let mut conn = connection_pool.access_test_storage().await;
+    #[tokio::test]
+    async fn getting_transaction() {
+        let connection_pool = ConnectionPool::test_pool().await;
+        let mut conn = connection_pool.access_storage().await.unwrap();
         conn.protocol_versions_dal()
             .save_protocol_version_with_tx(ProtocolVersion::default())
             .await;
@@ -399,15 +402,12 @@ mod tests {
         let tx_hash = tx.hash();
         prepare_transaction(&mut conn, tx).await;
 
+        let block_hash = MiniblockHasher::new(MiniblockNumber(1), 0, H256::zero())
+            .finalize(ProtocolVersionId::latest());
         let block_ids = [
             api::BlockId::Number(api::BlockNumber::Latest),
             api::BlockId::Number(api::BlockNumber::Number(1.into())),
-            api::BlockId::Hash(miniblock_hash(
-                MiniblockNumber(1),
-                0,
-                H256::zero(),
-                H256::zero(),
-            )),
+            api::BlockId::Hash(block_hash),
         ];
         let transaction_ids = block_ids
             .iter()
@@ -454,9 +454,10 @@ mod tests {
         }
     }
 
-    #[db_test(dal_crate)]
-    async fn getting_miniblock_transactions(connection_pool: ConnectionPool) {
-        let mut conn = connection_pool.access_test_storage().await;
+    #[tokio::test]
+    async fn getting_miniblock_transactions() {
+        let connection_pool = ConnectionPool::test_pool().await;
+        let mut conn = connection_pool.access_storage().await.unwrap();
         conn.protocol_versions_dal()
             .save_protocol_version_with_tx(ProtocolVersion::default())
             .await;

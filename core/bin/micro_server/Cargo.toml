@@ -12,6 +12,7 @@ publish = false # We don't want to publish our binaries.
 
 [dependencies]
 micro_config = { path = "../../lib/config" }
+micro_env_config = { path = "../../lib/env_config" }
 micro_storage = { path = "../../lib/storage" }
 micro_utils = { path = "../../lib/utils" }
 micro_types = { path = "../../lib/types" }

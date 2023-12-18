@@ -1,6 +1,6 @@
 use codegen::serialize_proof;
 use micro_basic_types::ethabi::Uint;
-use micro_basic_types::{Address, H256};
+use micro_basic_types::{Address, H256, U256};
 
 use std::{fmt, ops, str::FromStr};
 
@@ -92,17 +92,28 @@ impl L1BatchProofForL1 {
         self.signature.signature_recover_signer(&signed_bytes)
     }
 
-    pub fn proof_input(&self) -> Token {
+    pub fn proof_input(&self, is_pre_boojum: bool) -> Token {
+        let aggregation_result_coords = if is_pre_boojum {
+            Token::Array(
+                self.aggregation_result_coords
+                    .iter()
+                    .map(|bytes| Token::Uint(U256::from_big_endian(bytes)))
+                    .collect(),
+            )
+        } else {
+            Token::Array(Vec::new())
+        };
+
         let (_inputs, proof) = serialize_proof(&self.scheduler_proof);
         Token::Tuple(vec![
-            Token::Array(vec![]),
+            aggregation_result_coords,
             Token::Array(proof.into_iter().map(Token::Uint).collect()),
         ])
     }
 
     fn encode(&self, l1_batch_number: L1BatchNumber) -> Vec<u8> {
         crate::ethabi::encode(&vec![
-            self.proof_input(),
+            self.proof_input(true),
             Token::Uint(l1_batch_number.0.into()),
         ])
     }
@@ -135,7 +146,13 @@ impl L1BatchProofOperation {
 
             let l1_batch_proof_for_l1 = self.proofs.first().unwrap();
 
-            let proof_input = l1_batch_proof_for_l1.proof_input();
+            let is_pre_boojum = self.l1_batches[0]
+                .header
+                .protocol_version
+                .unwrap()
+                .is_pre_boojum();
+
+            let proof_input = l1_batch_proof_for_l1.proof_input(is_pre_boojum);
             let prover_info = Token::Tuple(vec![
                 Token::Address(
                     l1_batch_proof_for_l1

@@ -1,12 +1,13 @@
-use async_trait::async_trait;
-use chrono::Utc;
-
 use std::fmt;
 
+use async_trait::async_trait;
+use chrono::Utc;
 use micro_dal::StorageProcessor;
-use micro_types::commitment::L1BatchWithMetadata;
-use micro_types::{aggregated_operations::AggregatedActionType, L1BatchNumber};
+use micro_types::{
+    aggregated_operations::AggregatedActionType, commitment::L1BatchWithMetadata, L1BatchNumber,
+};
 
+use super::metrics::METRICS;
 use crate::gas_tracker::agg_l1_batch_base_cost;
 
 #[async_trait]
@@ -58,12 +59,7 @@ impl L1BatchPublishCriterion for NumberCriterion {
                 self.op,
                 first..=result.0
             );
-            metrics::counter!(
-                "server.eth_sender.block_aggregation_reason",
-                1,
-                "type" => "number",
-                "op" => self.op.as_str()
-            );
+            METRICS.block_aggregation_reason[&(self.op, "number").into()].inc();
             Some(result)
         } else {
             None
@@ -114,12 +110,7 @@ impl L1BatchPublishCriterion for TimestampDeadlineCriterion {
                 self.op,
                 first_l1_batch.header.number.0..=result.0
             );
-            metrics::counter!(
-                "server.eth_sender.block_aggregation_reason",
-                1,
-                "type" => "timestamp",
-                "op" => self.op.as_str()
-            );
+            METRICS.block_aggregation_reason[&(self.op, "timestamp").into()].inc();
             Some(result)
         } else {
             None
@@ -130,11 +121,11 @@ impl L1BatchPublishCriterion for TimestampDeadlineCriterion {
 #[derive(Debug)]
 pub struct GasCriterion {
     pub op: AggregatedActionType,
-    pub gas_limit: u64,
+    pub gas_limit: u32,
 }
 
 impl GasCriterion {
-    pub fn new(op: AggregatedActionType, gas_limit: u64) -> GasCriterion {
+    pub fn new(op: AggregatedActionType, gas_limit: u32) -> GasCriterion {
         GasCriterion { op, gas_limit }
     }
 
@@ -142,7 +133,7 @@ impl GasCriterion {
         &self,
         storage: &mut StorageProcessor<'_>,
         batch_number: L1BatchNumber,
-    ) -> u64 {
+    ) -> u32 {
         storage
             .blocks_dal()
             .get_l1_batches_predicted_gas(batch_number..=batch_number, self.op)
@@ -169,7 +160,7 @@ impl L1BatchPublishCriterion for GasCriterion {
             "Config max gas cost for operations is too low"
         );
         // We're not sure our predictions are accurate, so it's safer to lower the gas limit by 10%
-        let mut gas_left = (self.gas_limit as f64 * 0.9).round() as u64 - base_cost;
+        let mut gas_left = (self.gas_limit as f64 * 0.9).round() as u32 - base_cost;
 
         let mut last_l1_batch = None;
         for (index, l1_batch) in consecutive_l1_batches.iter().enumerate() {
@@ -196,12 +187,7 @@ impl L1BatchPublishCriterion for GasCriterion {
                 self.op,
                 first_l1_batch_number..=last_l1_batch.0
             );
-            metrics::counter!(
-                "server.eth_sender.block_aggregation_reason",
-                1,
-                "type" => "gas",
-                "op" => self.op.as_str()
-            );
+            METRICS.block_aggregation_reason[&(self.op, "gas").into()].inc();
         }
         last_l1_batch
     }
@@ -247,12 +233,7 @@ impl L1BatchPublishCriterion for DataSizeCriterion {
                     self.op,
                     first_l1_batch_number..=output.0
                 );
-                metrics::counter!(
-                    "server.eth_sender.block_aggregation_reason",
-                    1,
-                    "type" => "data_size",
-                    "op" => self.op.as_str()
-                );
+                METRICS.block_aggregation_reason[&(self.op, "data_size").into()].inc();
                 return Some(output);
             }
             data_size_left -= l1_batch.l1_commit_data_size();

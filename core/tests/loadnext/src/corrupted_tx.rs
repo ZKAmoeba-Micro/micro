@@ -1,13 +1,13 @@
 use async_trait::async_trait;
-
 use micro::signer::Signer;
-use micro_eth_signer::{error::SignerError, EthereumSigner};
-use micro_types::{Address, EIP712TypedStructure, Eip712Domain, PackedEthSignature, H256};
+use micro_eth_signer::{
+    error::SignerError, raw_ethereum_tx::TransactionParameters, EthereumSigner,
+};
+use micro_types::{
+    fee::Fee, l2::L2Tx, Address, EIP712TypedStructure, Eip712Domain, PackedEthSignature, H256,
+};
 
 use crate::command::IncorrectnessModifier;
-use micro_eth_signer::raw_ethereum_tx::TransactionParameters;
-use micro_types::fee::Fee;
-use micro_types::l2::L2Tx;
 
 /// Trait that exists solely to extend the signed micro transaction interface, providing the ability
 /// to modify transaction in a way that will make it invalid.
@@ -94,13 +94,13 @@ impl EthereumSigner for CorruptedSigner {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use micro_eth_signer::PrivateKeySigner;
-    use micro_types::fee::Fee;
-    use micro_types::L2ChainId;
     use micro_types::{
-        tokens::ETHEREUM_ADDRESS, tx::primitives::PackedEthSignature, Address, Nonce, H256,
+        fee::Fee, tokens::ETHEREUM_ADDRESS, tx::primitives::PackedEthSignature, Address, L2ChainId,
+        Nonce, H256,
     };
+
+    use super::*;
 
     const AMOUNT: u64 = 100;
     const FEE: u64 = 100;

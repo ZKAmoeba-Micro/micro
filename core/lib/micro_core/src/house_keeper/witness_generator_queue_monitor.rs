@@ -2,9 +2,8 @@ use std::collections::HashMap;
 
 use async_trait::async_trait;
 use micro_dal::ConnectionPool;
-use micro_types::proofs::{AggregationRound, JobCountStatistics};
-
 use micro_prover_utils::periodic_job::PeriodicJob;
+use micro_types::proofs::{AggregationRound, JobCountStatistics};
 
 const WITNESS_GENERATOR_SERVICE_NAME: &str = "witness_generator";
 

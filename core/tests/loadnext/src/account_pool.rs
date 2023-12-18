@@ -1,12 +1,11 @@
 use std::{collections::VecDeque, convert::TryFrom, str::FromStr, sync::Arc, time::Duration};
 
-use once_cell::sync::OnceCell;
-use rand::Rng;
-use tokio::time::timeout;
-
 use micro::{signer::Signer, HttpClient, HttpClientBuilder, Wallet, ZksNamespaceClient};
 use micro_eth_signer::PrivateKeySigner;
 use micro_types::{tx::primitives::PackedEthSignature, Address, L2ChainId, H256};
+use once_cell::sync::OnceCell;
+use rand::Rng;
+use tokio::time::timeout;
 
 use crate::{
     config::LoadtestConfig,
@@ -76,7 +75,7 @@ pub struct TestWallet {
 }
 
 /// Pool of accounts to be used in the test.
-/// Each account is represented as `micro::Wallet` in order to provide convenient interface of interation with micro.
+/// Each account is represented as `micro::Wallet` in order to provide convenient interface of interaction with micro.
 #[derive(Debug)]
 pub struct AccountPool {
     /// Main wallet that will be used to initialize all the test wallets.

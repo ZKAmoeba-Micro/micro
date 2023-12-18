@@ -2,7 +2,7 @@ use micro_types::{api::en::SyncBlock, MiniblockNumber};
 use micro_web3_decl::error::Web3Error;
 
 use crate::{
-    api_server::{web3::backend_jsonrpc::error::internal_error, web3::state::RpcState},
+    api_server::web3::{backend_jsonrpc::error::internal_error, state::RpcState},
     l1_gas_price::L1GasPriceProvider,
 };
 

@@ -1,8 +1,15 @@
-use crate::commitment::SerializeCommitment;
-use crate::fee::TransactionExecutionMetrics;
-use crate::l2_to_l1_log::L2ToL1Log;
-use crate::writes::{InitialStorageWrite, RepeatedStorageWrite};
 use std::ops::{Add, AddAssign};
+
+use crate::{
+    commitment::SerializeCommitment,
+    fee::TransactionExecutionMetrics,
+    l2_to_l1_log::L2ToL1Log,
+    writes::{
+        InitialStorageWrite, RepeatedStorageWrite, BYTES_PER_DERIVED_KEY,
+        BYTES_PER_ENUMERATION_INDEX,
+    },
+    ProtocolVersionId,
+};
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq)]
 pub enum TxExecutionStatus {
@@ -24,6 +31,7 @@ impl TxExecutionStatus {
 pub struct DeduplicatedWritesMetrics {
     pub initial_storage_writes: usize,
     pub repeated_storage_writes: usize,
+    pub total_updated_values_size: usize,
 }
 
 impl DeduplicatedWritesMetrics {
@@ -31,12 +39,19 @@ impl DeduplicatedWritesMetrics {
         Self {
             initial_storage_writes: tx_metrics.initial_storage_writes,
             repeated_storage_writes: tx_metrics.repeated_storage_writes,
+            total_updated_values_size: tx_metrics.total_updated_values_size,
         }
     }
 
-    pub fn size(&self) -> usize {
-        self.initial_storage_writes * InitialStorageWrite::SERIALIZED_SIZE
-            + self.repeated_storage_writes * RepeatedStorageWrite::SERIALIZED_SIZE
+    pub fn size(&self, protocol_version: ProtocolVersionId) -> usize {
+        if protocol_version.is_pre_boojum() {
+            self.initial_storage_writes * InitialStorageWrite::SERIALIZED_SIZE
+                + self.repeated_storage_writes * RepeatedStorageWrite::SERIALIZED_SIZE
+        } else {
+            self.total_updated_values_size
+                + (BYTES_PER_DERIVED_KEY as usize) * self.initial_storage_writes
+                + (BYTES_PER_ENUMERATION_INDEX as usize) * self.repeated_storage_writes
+        }
     }
 }
 
@@ -53,6 +68,7 @@ pub struct ExecutionMetrics {
     pub total_log_queries: usize,
     pub cycles_used: u32,
     pub computational_gas_used: u32,
+    pub pubdata_published: u32,
 }
 
 impl ExecutionMetrics {
@@ -69,6 +85,7 @@ impl ExecutionMetrics {
             total_log_queries: tx_metrics.total_log_queries,
             cycles_used: tx_metrics.cycles_used,
             computational_gas_used: tx_metrics.computational_gas_used,
+            pubdata_published: tx_metrics.pubdata_published,
         }
     }
 
@@ -76,8 +93,10 @@ impl ExecutionMetrics {
         self.l2_to_l1_logs * L2ToL1Log::SERIALIZED_SIZE
             + self.l2_l1_long_messages
             + self.published_bytecode_bytes
-            // TODO: refactor this constant
-            // It represents the need to store the length's of messages as well as bytecodes
+            // TODO(PLA-648): refactor this constant
+            // It represents the need to store the length's of messages as well as bytecodes. 
+            // It works due to the fact that each bytecode/L2->L1 long message is accompanied by a corresponding
+            // user L2->L1 log.  
             + self.l2_to_l1_logs * 4
     }
 }
@@ -99,6 +118,7 @@ impl Add for ExecutionMetrics {
             total_log_queries: self.total_log_queries + other.total_log_queries,
             cycles_used: self.cycles_used + other.cycles_used,
             computational_gas_used: self.computational_gas_used + other.computational_gas_used,
+            pubdata_published: self.pubdata_published + other.pubdata_published,
         }
     }
 }

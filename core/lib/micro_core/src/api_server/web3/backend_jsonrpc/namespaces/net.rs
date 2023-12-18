@@ -1,13 +1,7 @@
-// Built-in uses
-
-// External uses
 use jsonrpc_core::Result;
 use jsonrpc_derive::rpc;
-
-// Workspace uses
 use micro_types::U256;
 
-// Local uses
 use crate::web3::namespaces::NetNamespace;
 
 #[rpc]

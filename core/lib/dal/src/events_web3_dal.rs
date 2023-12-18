@@ -1,14 +1,11 @@
-use sqlx::Row;
-
 use micro_types::{
-    api::{GetEventLogsFilter, Log},
+    api::{GetLogsFilter, Log},
     Address, MiniblockNumber, H256,
 };
+use sqlx::Row;
 
 use crate::{
-    instrument::InstrumentExt,
-    models::{storage_block::web3_block_number_to_sql, storage_event::StorageWeb3Log},
-    SqlxError, StorageProcessor,
+    instrument::InstrumentExt, models::storage_event::StorageWeb3Log, SqlxError, StorageProcessor,
 };
 
 #[derive(Debug)]
@@ -21,7 +18,7 @@ impl EventsWeb3Dal<'_, '_> {
     /// Used to determine if there is more than `offset` logs that satisfies filter.
     pub async fn get_log_block_number(
         &mut self,
-        filter: &GetEventLogsFilter,
+        filter: &GetLogsFilter,
         offset: usize,
     ) -> Result<Option<MiniblockNumber>, SqlxError> {
         {
@@ -40,16 +37,11 @@ impl EventsWeb3Dal<'_, '_> {
 
             let mut query = sqlx::query(&query);
 
-            if !filter.log_filter.addresses.is_empty() {
-                let addresses: Vec<_> = filter
-                    .log_filter
-                    .addresses
-                    .iter()
-                    .map(Address::as_bytes)
-                    .collect();
+            if !filter.addresses.is_empty() {
+                let addresses: Vec<_> = filter.addresses.iter().map(Address::as_bytes).collect();
                 query = query.bind(addresses);
             }
-            for (_, topics) in &filter.log_filter.topics {
+            for (_, topics) in &filter.topics {
                 let topics: Vec<_> = topics.iter().map(H256::as_bytes).collect();
                 query = query.bind(topics);
             }
@@ -70,7 +62,7 @@ impl EventsWeb3Dal<'_, '_> {
     #[allow(clippy::type_complexity)]
     pub async fn get_logs(
         &mut self,
-        filter: GetEventLogsFilter,
+        filter: GetLogsFilter,
         limit: usize,
     ) -> Result<Vec<Log>, SqlxError> {
         {
@@ -97,24 +89,13 @@ impl EventsWeb3Dal<'_, '_> {
             );
 
             let mut query = sqlx::query_as(&query);
-            if !filter.log_filter.addresses.is_empty() {
-                let addresses: Vec<_> = filter
-                    .log_filter
-                    .addresses
-                    .iter()
-                    .map(Address::as_bytes)
-                    .collect();
+            if !filter.addresses.is_empty() {
+                let addresses: Vec<_> = filter.addresses.iter().map(Address::as_bytes).collect();
                 query = query.bind(addresses);
             }
-            for (_, topics) in &filter.log_filter.topics {
+            for (_, topics) in &filter.topics {
                 let topics: Vec<_> = topics.iter().map(H256::as_bytes).collect();
                 query = query.bind(topics);
-            }
-            if !filter.event_names.is_empty() {
-                for topic1 in &filter.event_names {
-                    let event_names: Vec<_> = topic1.iter().map(H256::as_bytes).collect();
-                    query = query.bind(event_names);
-                }
             }
             query = query.bind(limit as i32);
 
@@ -130,41 +111,22 @@ impl EventsWeb3Dal<'_, '_> {
         }
     }
 
-    fn build_get_logs_where_clause(&self, filter: &GetEventLogsFilter) -> (String, u8) {
+    fn build_get_logs_where_clause(&self, filter: &GetLogsFilter) -> (String, u8) {
         let mut arg_index = 1;
 
-        let mut where_sql = format!(
-            "(miniblock_number >= {})",
-            filter.log_filter.from_block.0 as i64
-        );
+        let mut where_sql = format!("(miniblock_number >= {})", filter.from_block.0 as i64);
 
-        if let Some(to_block) = filter.log_filter.to_block {
-            let block_sql = web3_block_number_to_sql(to_block);
-            where_sql += &format!(" AND (miniblock_number <= {})", block_sql);
-        }
-        if !filter.log_filter.addresses.is_empty() {
+        where_sql += &format!(" AND (miniblock_number <= {})", filter.to_block.0 as i64);
+
+        if !filter.addresses.is_empty() {
             where_sql += &format!(" AND (address = ANY(${}))", arg_index);
             arg_index += 1;
         }
-        for (topic_index, _) in filter.log_filter.topics.iter() {
+        for (topic_index, _) in filter.topics.iter() {
             where_sql += &format!(" AND (topic{} = ANY(${}))", topic_index, arg_index);
             arg_index += 1;
         }
 
-        if !filter.event_names.is_empty() {
-            let mut event_sql = format!(" AND (");
-            for _ in filter.event_names.iter() {
-                event_sql += &format!(" topic1 = ANY(${})", arg_index);
-                event_sql += &format!(" or ");
-                arg_index += 1;
-            }
-            match event_sql.rfind("o") {
-                Some(pos) => event_sql.truncate(pos),
-                None => tracing::info!("Substring not found event_sql:{}", &event_sql),
-            }
-            event_sql += &format!(" )");
-            where_sql += &event_sql;
-        }
         (where_sql, arg_index)
     }
 
@@ -205,34 +167,25 @@ impl EventsWeb3Dal<'_, '_> {
 
 #[cfg(test)]
 mod tests {
-    use db_test_macro::db_test;
-    use micro_types::api::{BlockNumber, GetLogsFilter};
     use micro_types::{Address, H256};
 
     use super::*;
     use crate::connection::ConnectionPool;
 
-    #[db_test(dal_crate)]
-    async fn test_build_get_logs_where_clause(connection_pool: ConnectionPool) {
-        let storage = &mut connection_pool.access_test_storage().await;
+    #[tokio::test]
+    async fn test_build_get_logs_where_clause() {
+        let connection_pool = ConnectionPool::test_pool().await;
+        let storage = &mut connection_pool.access_storage().await.unwrap();
         let events_web3_dal = EventsWeb3Dal { storage };
-        let log_filter = GetLogsFilter {
+        let filter = GetLogsFilter {
             from_block: MiniblockNumber(100),
-            to_block: Some(BlockNumber::Number(200.into())),
+            to_block: MiniblockNumber(200),
             addresses: vec![Address::from_low_u64_be(123)],
             topics: vec![(0, vec![H256::from_low_u64_be(456)])],
         };
 
-        let filter = GetEventLogsFilter {
-            log_filter: log_filter,
-            event_names: vec![
-                vec![H256::from_low_u64_be(456)],
-                vec![H256::from_low_u64_be(456)],
-            ],
-        };
-
-        let expected_sql = "(miniblock_number >= 100) AND (miniblock_number <= 200) AND (address = ANY($1)) AND (topic0 = ANY($2)) AND ( topic1=ANY($3) or topic1=ANY($4) )";
-        let expected_arg_index = 5;
+        let expected_sql = "(miniblock_number >= 100) AND (miniblock_number <= 200) AND (address = ANY($1)) AND (topic0 = ANY($2))";
+        let expected_arg_index = 3;
 
         let (actual_sql, actual_arg_index) = events_web3_dal.build_get_logs_where_clause(&filter);
 

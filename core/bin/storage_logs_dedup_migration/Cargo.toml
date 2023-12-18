@@ -16,4 +16,6 @@ path = "src/consistency.rs"
 tokio = { version = "1" }
 micro_dal = { path = "../../lib/dal" }
 micro_types = { path = "../../lib/types" }
+micro_config = { path = "../../lib/config" }
+micro_env_config = { path = "../../lib/env_config" }
 clap = { version = "4.2.4", features = ["derive"] }

@@ -1,6 +1,3 @@
-use anyhow::Context as _;
-use async_trait::async_trait;
-
 use std::{
     cmp,
     collections::HashMap,
@@ -8,16 +5,19 @@ use std::{
     time::{Duration, Instant},
 };
 
-use vm::{utils::fee::derive_base_fee_and_gas_per_pubdata, FinishedL1Batch, L1BatchEnv, SystemEnv};
-
+use async_trait::async_trait;
 use micro_config::configs::chain::StateKeeperConfig;
 use micro_dal::ConnectionPool;
 use micro_mempool::L2TxFilter;
-use micro_object_store::ObjectStoreFactory;
+use micro_object_store::ObjectStore;
 use micro_types::{
     block::MiniblockHeader, protocol_version::ProtocolUpgradeTx,
     witness_block_state::WitnessBlockState, Address, L1BatchNumber, L2ChainId, MiniblockNumber,
     ProtocolVersionId, Transaction, U256,
+};
+use multivm::{
+    interface::{FinishedL1Batch, L1BatchEnv, SystemEnv},
+    vm_latest::utils::fee::derive_base_fee_and_gas_per_pubdata,
 };
 // TODO (SMA-1206): use seconds instead of milliseconds.
 use micro_utils::time::millis_since_epoch;
@@ -28,15 +28,15 @@ use crate::{
         extractors,
         io::{
             common::{l1_batch_params, load_pending_batch, poll_iters},
-            MiniblockSealerHandle, PendingBatchData, StateKeeperIO,
+            MiniblockParams, MiniblockSealerHandle, PendingBatchData, StateKeeperIO,
         },
         mempool_actor::l2_tx_filter,
+        metrics::KEEPER_METRICS,
+        seal_criteria::{IoSealCriteria, TimeoutSealer},
         updates::UpdatesManager,
         MempoolGuard,
     },
 };
-
-use super::MiniblockParams;
 
 /// Mempool-based IO for the state keeper.
 /// Receives transactions from the database through the mempool filtering logic.
@@ -46,6 +46,8 @@ use super::MiniblockParams;
 pub(crate) struct MempoolIO<G> {
     mempool: MempoolGuard,
     pool: ConnectionPool,
+    object_store: Box<dyn ObjectStore>,
+    timeout_sealer: TimeoutSealer,
     filter: L2TxFilter,
     current_miniblock_number: MiniblockNumber,
     miniblock_sealer_handle: MiniblockSealerHandle,
@@ -63,8 +65,25 @@ pub(crate) struct MempoolIO<G> {
     virtual_blocks_per_miniblock: u32,
 }
 
+impl<G> IoSealCriteria for MempoolIO<G>
+where
+    G: L1GasPriceProvider + 'static + Send + Sync,
+{
+    fn should_seal_l1_batch_unconditionally(&mut self, manager: &UpdatesManager) -> bool {
+        self.timeout_sealer
+            .should_seal_l1_batch_unconditionally(manager)
+    }
+
+    fn should_seal_miniblock(&mut self, manager: &UpdatesManager) -> bool {
+        self.timeout_sealer.should_seal_miniblock(manager)
+    }
+}
+
 #[async_trait]
-impl<G: L1GasPriceProvider + 'static + Send + Sync> StateKeeperIO for MempoolIO<G> {
+impl<G> StateKeeperIO for MempoolIO<G>
+where
+    G: L1GasPriceProvider + 'static + Send + Sync,
+{
     fn current_l1_batch_number(&self) -> L1BatchNumber {
         self.current_l1_batch_number
     }
@@ -157,24 +176,7 @@ impl<G: L1GasPriceProvider + 'static + Send + Sync> StateKeeperIO for MempoolIO<
                 .protocol_versions_dal()
                 .base_system_contracts_by_timestamp(current_timestamp)
                 .await;
-            // let mut operator_address = self.fee_account;
-            // let node_list = self
-            //     .system_contract_caller
-            //     .deposit_node_list()
-            //     .await
-            //     .unwrap();
-            // if !node_list.is_empty() {
-            //     let block_number = U256::from(self.current_l1_batch_number.0);
-            //     let len = node_list.len();
-            //     let len: U256 = U256::from(len);
-            //     let (_, mod_result) = block_number.add(prev_l1_batch_hash).div_mod(len);
-            //     operator_address = node_list.get(mod_result.as_usize()).unwrap().node_address;
-            // }
-            // tracing::info!(
-            //     "new_batch  #{} fee_account  #{}",
-            //     self.current_l1_batch_number.0,
-            //     operator_address
-            // );
+
             return Some(l1_batch_params(
                 self.current_l1_batch_number,
                 self.fee_account,
@@ -219,12 +221,9 @@ impl<G: L1GasPriceProvider + 'static + Send + Sync> StateKeeperIO for MempoolIO<
 
     async fn wait_for_next_tx(&mut self, max_wait: Duration) -> Option<Transaction> {
         for _ in 0..poll_iters(self.delay_interval, max_wait) {
-            let started_at = Instant::now();
+            let get_latency = KEEPER_METRICS.get_tx_from_mempool.start();
             let res = self.mempool.next_transaction(&self.filter);
-            metrics::histogram!(
-                "server.state_keeper.get_tx_from_mempool",
-                started_at.elapsed(),
-            );
+            get_latency.observe();
             if let Some(res) = res {
                 return Some(res);
             } else {
@@ -258,7 +257,7 @@ impl<G: L1GasPriceProvider + 'static + Send + Sync> StateKeeperIO for MempoolIO<
             .access_storage_tagged("state_keeper")
             .await
             .unwrap();
-        metrics::increment_counter!("server.state_keeper.rejected_transactions");
+        KEEPER_METRICS.rejected_transactions.inc();
         tracing::warn!(
             "transaction {} is rejected with error {}",
             rejected.hash(),
@@ -275,6 +274,8 @@ impl<G: L1GasPriceProvider + 'static + Send + Sync> StateKeeperIO for MempoolIO<
             self.current_l1_batch_number,
             self.current_miniblock_number,
             self.l2_erc20_bridge_addr,
+            None,
+            false,
         );
         self.miniblock_sealer_handle.submit(command).await;
         self.current_miniblock_number += 1;
@@ -298,12 +299,8 @@ impl<G: L1GasPriceProvider + 'static + Send + Sync> StateKeeperIO for MempoolIO<
         self.miniblock_sealer_handle.wait_for_all_commands().await;
 
         if let Some(witness_witness_block_state) = witness_block_state {
-            let object_store = ObjectStoreFactory::from_env()
-                .context("ObjectsStoreFactor::from_env()")?
-                .create_store()
-                .await;
-            let mut upload_successful_metric = 1.0;
-            match object_store
+            match self
+                .object_store
                 .put(self.current_l1_batch_number(), &witness_witness_block_state)
                 .await
             {
@@ -311,16 +308,11 @@ impl<G: L1GasPriceProvider + 'static + Send + Sync> StateKeeperIO for MempoolIO<
                     tracing::debug!("Successfully uploaded witness block start state to Object Store to path = '{path}'");
                 }
                 Err(e) => {
-                    upload_successful_metric = 0.0;
                     tracing::error!(
                         "Failed to upload witness block start state to Object Store: {e:?}"
                     );
                 }
             }
-            metrics::histogram!(
-                "mempool.witness_block_start_upload_success",
-                upload_successful_metric
-            );
         }
 
         let pool = self.pool.clone();
@@ -333,6 +325,7 @@ impl<G: L1GasPriceProvider + 'static + Send + Sync> StateKeeperIO for MempoolIO<
                 l1_batch_env,
                 finished_batch,
                 self.l2_erc20_bridge_addr,
+                None,
             )
             .await;
         self.current_miniblock_number += 1; // Due to fictive miniblock being sealed.
@@ -412,6 +405,7 @@ impl<G: L1GasPriceProvider> MempoolIO<G> {
     #[allow(clippy::too_many_arguments)]
     pub(in crate::state_keeper) async fn new(
         mempool: MempoolGuard,
+        object_store: Box<dyn ObjectStore>,
         miniblock_sealer_handle: MiniblockSealerHandle,
         l1_gas_price_provider: Arc<G>,
         pool: ConnectionPool,
@@ -446,7 +440,9 @@ impl<G: L1GasPriceProvider> MempoolIO<G> {
 
         Self {
             mempool,
+            object_store,
             pool,
+            timeout_sealer: TimeoutSealer::new(config),
             filter: L2TxFilter::default(),
             // ^ Will be initialized properly on the first newly opened batch
             current_l1_batch_number: last_sealed_l1_batch_header.number + 1,
@@ -469,7 +465,7 @@ impl<G: L1GasPriceProvider> MempoolIO<G> {
             "Getting previous L1 batch hash for L1 batch #{}",
             self.current_l1_batch_number
         );
-        let stage_started_at: Instant = Instant::now();
+        let wait_latency = KEEPER_METRICS.wait_for_prev_hash_time.start();
 
         let mut storage = self
             .pool
@@ -480,10 +476,7 @@ impl<G: L1GasPriceProvider> MempoolIO<G> {
             extractors::wait_for_prev_l1_batch_params(&mut storage, self.current_l1_batch_number)
                 .await;
 
-        metrics::histogram!(
-            "server.state_keeper.wait_for_prev_hash_time",
-            stage_started_at.elapsed()
-        );
+        wait_latency.observe();
         tracing::info!(
             "Got previous L1 batch hash: {batch_hash:0>64x} for L1 batch #{}",
             self.current_l1_batch_number
@@ -492,8 +485,7 @@ impl<G: L1GasPriceProvider> MempoolIO<G> {
     }
 
     async fn load_previous_miniblock_header(&self) -> MiniblockHeader {
-        let stage_started_at: Instant = Instant::now();
-
+        let load_latency = KEEPER_METRICS.load_previous_miniblock_header.start();
         let mut storage = self
             .pool
             .access_storage_tagged("state_keeper")
@@ -505,11 +497,7 @@ impl<G: L1GasPriceProvider> MempoolIO<G> {
             .await
             .unwrap()
             .expect("Previous miniblock must be sealed and header saved to DB");
-
-        metrics::histogram!(
-            "server.state_keeper.load_previous_miniblock_header",
-            stage_started_at.elapsed()
-        );
+        load_latency.observe();
         miniblock_header
     }
 
@@ -523,7 +511,6 @@ impl<G: L1GasPriceProvider> MempoolIO<G> {
         if first_in_batch || miniblock_number % self.virtual_blocks_interval == 0 {
             return self.virtual_blocks_per_miniblock;
         }
-
         0
     }
 }
@@ -538,9 +525,8 @@ impl<G: L1GasPriceProvider> MempoolIO<G> {
 
 #[cfg(test)]
 mod tests {
-    use tokio::time::timeout_at;
-
     use micro_utils::time::seconds_since_epoch;
+    use tokio::time::timeout_at;
 
     use super::*;
 

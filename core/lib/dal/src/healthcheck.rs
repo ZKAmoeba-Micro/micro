@@ -1,19 +1,19 @@
-use serde::Serialize;
-use sqlx::PgPool;
-
 use micro_health_check::{async_trait, CheckHealth, Health, HealthStatus};
+use serde::Serialize;
 
 use crate::ConnectionPool;
 
 #[derive(Debug, Serialize)]
 struct ConnectionPoolHealthDetails {
     pool_size: u32,
+    max_size: u32,
 }
 
 impl ConnectionPoolHealthDetails {
-    async fn new(pool: &PgPool) -> Self {
+    fn new(pool: &ConnectionPool) -> Self {
         Self {
-            pool_size: pool.size(),
+            pool_size: pool.inner.size(),
+            max_size: pool.max_size(),
         }
     }
 }
@@ -40,14 +40,9 @@ impl CheckHealth for ConnectionPoolHealthCheck {
 
     async fn check_health(&self) -> Health {
         // This check is rather feeble, plan to make reliable here:
-        // https://linear.app/matterlabs/issue/PLA-255/revamp-db-connection-health-check
+        // https://linear.app/zkamoeba/issue/PLA-255/revamp-db-connection-health-check
         self.connection_pool.access_storage().await.unwrap();
-
-        let mut health = Health::from(HealthStatus::Ready);
-        if let ConnectionPool::Real(pool) = &self.connection_pool {
-            let details = ConnectionPoolHealthDetails::new(pool).await;
-            health = health.with_details(details);
-        }
-        health
+        let details = ConnectionPoolHealthDetails::new(&self.connection_pool);
+        Health::from(HealthStatus::Ready).with_details(details)
     }
 }

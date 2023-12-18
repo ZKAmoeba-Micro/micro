@@ -27,7 +27,7 @@ services:
       - SCCACHE_GCS_RW_MODE=READ_WRITE
       - CI=1
       - GITHUB_WORKSPACE=$GITHUB_WORKSPACE
-    # We set CUDAARCHS for l4 gpu's
+      # We set CUDAARCHS for l4 gpu's
       - CUDAARCHS=89
     # We need to forward all nvidia-devices, as due to bug with cgroups and nvidia-container-runtime (https://github.com/NVIDIA/libnvidia-container/issues/176#issuecomment-1159454366), cgroups are disabled and thou GPU isn't properly forwarded to dind
     devices:
@@ -43,7 +43,7 @@ services:
       resources:
         reservations:
           devices:
-            - capabilities: [gpu]
+            - capabilities: [ gpu ]
   postgres:
     image: "postgres:14"
     ports:

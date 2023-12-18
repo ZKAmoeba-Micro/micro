@@ -1,3 +1,5 @@
+use micro_types::ProtocolVersionId;
+
 use crate::{
     gas_tracker::new_block_gas_count,
     state_keeper::seal_criteria::{SealCriterion, SealData, SealResolution, StateKeeperConfig},
@@ -20,11 +22,12 @@ impl SealCriterion for GasCriterion {
         _tx_count: usize,
         block_data: &SealData,
         tx_data: &SealData,
+        _protocol_version_id: ProtocolVersionId,
     ) -> SealResolution {
         let tx_bound =
-            (config.max_single_tx_gas as f64 * config.reject_tx_at_gas_percentage).round() as u64;
+            (config.max_single_tx_gas as f64 * config.reject_tx_at_gas_percentage).round() as u32;
         let block_bound =
-            (config.max_single_tx_gas as f64 * config.close_block_at_gas_percentage).round() as u64;
+            (config.max_single_tx_gas as f64 * config.close_block_at_gas_percentage).round() as u32;
 
         if (tx_data.gas_count + new_block_gas_count()).any_field_greater_than(tx_bound) {
             SealResolution::Unexecutable("Transaction requires too much gas".into())
@@ -53,7 +56,14 @@ mod tests {
 
     #[test]
     fn test_gas_seal_criterion() {
-        let config = StateKeeperConfig::from_env().unwrap();
+        // Create an empty config and only setup fields relevant for the test.
+        let config = StateKeeperConfig {
+            max_single_tx_gas: 6000000,
+            reject_tx_at_gas_percentage: 0.95,
+            close_block_at_gas_percentage: 0.95,
+            ..Default::default()
+        };
+
         let criterion = GasCriterion;
 
         // Empty block should fit into gas criterion.
@@ -67,6 +77,7 @@ mod tests {
                 ..SealData::default()
             },
             &SealData::default(),
+            ProtocolVersionId::latest(),
         );
         assert_eq!(empty_block_resolution, SealResolution::NoSeal);
 
@@ -88,6 +99,7 @@ mod tests {
                 gas_count: tx_gas,
                 ..SealData::default()
             },
+            ProtocolVersionId::latest(),
         );
         assert_eq!(
             huge_transaction_resolution,
@@ -96,7 +108,7 @@ mod tests {
 
         // Check criterion workflow
         let reject_tx_bound =
-            (config.max_single_tx_gas as f64 * config.reject_tx_at_gas_percentage).round() as u64;
+            (config.max_single_tx_gas as f64 * config.reject_tx_at_gas_percentage).round() as u32;
         let tx_gas = BlockGasCount {
             commit: reject_tx_bound - empty_block_gas.commit,
             prove: reject_tx_bound - empty_block_gas.prove,
@@ -114,6 +126,7 @@ mod tests {
                 gas_count: tx_gas,
                 ..SealData::default()
             },
+            ProtocolVersionId::latest(),
         );
         assert_eq!(resolution_after_first_tx, SealResolution::NoSeal);
 
@@ -129,6 +142,7 @@ mod tests {
                 gas_count: tx_gas,
                 ..SealData::default()
             },
+            ProtocolVersionId::latest(),
         );
         assert_eq!(resolution_after_second_tx, SealResolution::ExcludeAndSeal);
 
@@ -139,7 +153,7 @@ mod tests {
             execute: reject_tx_bound - empty_block_gas.execute - 1,
         };
         let close_bound =
-            (config.max_single_tx_gas as f64 * config.close_block_at_gas_percentage).round() as u64;
+            (config.max_single_tx_gas as f64 * config.close_block_at_gas_percentage).round() as u32;
         let block_gas = BlockGasCount {
             commit: close_bound + 1,
             prove: close_bound + 1,
@@ -157,6 +171,7 @@ mod tests {
                 gas_count: tx_gas,
                 ..SealData::default()
             },
+            ProtocolVersionId::latest(),
         );
         assert_eq!(resolution_after_first_tx, SealResolution::IncludeAndSeal);
     }

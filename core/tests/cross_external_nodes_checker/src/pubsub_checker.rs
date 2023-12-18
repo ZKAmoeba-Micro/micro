@@ -1,8 +1,9 @@
-use crate::{
-    config::CheckerConfig,
-    divergence::{Divergence, DivergenceDetails},
-    helpers::{compare_json, ExponentialBackoff},
+use std::{
+    collections::HashMap,
+    sync::Arc,
+    time::{Duration, Instant},
 };
+
 use anyhow::Context as _;
 use micro_types::{web3::types::U64, MiniblockNumber};
 use micro_utils::wait_for_tasks::wait_for_tasks;
@@ -17,15 +18,16 @@ use micro_web3_decl::{
     },
     types::{BlockHeader, PubSubResult},
 };
-use std::{
-    collections::HashMap,
-    sync::Arc,
-    time::{Duration, Instant},
-};
 use tokio::{
     select, spawn,
     sync::{watch::Receiver, Mutex as TokioMutex},
     time::timeout,
+};
+
+use crate::{
+    config::CheckerConfig,
+    divergence::{Divergence, DivergenceDetails},
+    helpers::{compare_json, ExponentialBackoff},
 };
 
 const MAX_RETRIES: u32 = 6;

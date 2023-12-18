@@ -4,13 +4,13 @@
 //! as well as contracts/SystemConfig.json
 //!
 
+use micro_types::{ethabi::Address, IntrinsicSystemGasConstants, U256};
+use multivm::vm_latest::constants::BOOTLOADER_TX_ENCODING_SPACE;
+
 use crate::utils::{
     execute_internal_transfer_test, execute_user_txs_in_test_gas_vm, get_l1_tx, get_l1_txs,
-    get_l2_txs,
+    get_l2_txs, metrics_from_txs, TransactionGenerator,
 };
-use crate::utils::{metrics_from_txs, TransactionGenerator};
-use micro_types::{ethabi::Address, IntrinsicSystemGasConstants, U256};
-use vm::constants::BOOTLOADER_TX_ENCODING_SPACE;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub(crate) struct VmSpentResourcesResult {

@@ -4,7 +4,11 @@
   "main": "index.js",
   "license": "MIT",
   "devDependencies": {
-    "@zkamoeba/hardhat-micro-solc": "^0.4.2",
-    "hardhat": "=2.12.4"
+    "@zkamoeba/hardhat-micro-deploy": "^0.6.1",
+    "@zkamoeba/hardhat-micro-solc": "0.4.2",
+    "hardhat": "=2.16.0"
+  },
+  "scripts": {
+      "build": "hardhat compile"
   }
 }

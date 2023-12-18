@@ -1,7 +1,7 @@
+use std::{fs::File, io::BufWriter};
+
 use bincode::serialize_into;
 use micro_verification_key_server::get_vk_for_circuit_type;
-use std::fs::File;
-use std::io::BufWriter;
 use structopt::StructOpt;
 
 #[derive(Debug, StructOpt)]

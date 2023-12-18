@@ -1,23 +1,22 @@
 use micro_eth_signer::EthereumSigner;
-use micro_types::transaction_request::CallRequest;
 use micro_types::{
     api::{BlockIdVariant, BlockNumber, TransactionRequest},
     l2::L2Tx,
     tokens::ETHEREUM_ADDRESS,
+    transaction_request::CallRequest,
     Address, Bytes, Eip712Domain, U256,
 };
-
 use micro_web3_decl::{
     jsonrpsee::http_client::{HttpClient, HttpClientBuilder},
     namespaces::{EthNamespaceClient, NetNamespaceClient, Web3NamespaceClient, ZksNamespaceClient},
 };
 
-use crate::web3::contract::tokens::Tokenizable;
 use crate::{
     error::ClientError,
     ethereum::{ierc20_contract, EthereumProvider},
     operations::*,
     signer::Signer,
+    web3::contract::tokens::Tokenizable,
 };
 
 #[derive(Debug)]

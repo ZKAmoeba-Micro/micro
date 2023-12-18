@@ -5,7 +5,7 @@ pragma solidity ^0.8.0;
 import {BOOTLOADER_FORMAL_ADDRESS} from "./Constants.sol";
 
 /**
- *
+ * @author Zkamoeba
  * @notice Contract that stores some of the context variables, that may be either
  * block-scoped, tx-scoped or system-wide.
  */

@@ -1,6 +1,6 @@
 use chrono::{DateTime, Utc};
 use micro_basic_types::Address;
-pub use micro_config::constants::ETHEREUM_ADDRESS;
+pub use micro_system_constants::ETHEREUM_ADDRESS;
 use micro_utils::UnsignedRatioSerializeAsDecimal;
 use num::{rational::Ratio, BigUint};
 use serde::{Deserialize, Serialize};
@@ -41,13 +41,5 @@ impl TokenMetadata {
 pub struct TokenPrice {
     #[serde(with = "UnsignedRatioSerializeAsDecimal")]
     pub usd_price: Ratio<BigUint>,
-    pub last_updated: DateTime<Utc>,
-}
-
-/// Token price known to the micro network.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct TokenMarketVolume {
-    #[serde(with = "UnsignedRatioSerializeAsDecimal")]
-    pub market_volume: Ratio<BigUint>,
     pub last_updated: DateTime<Utc>,
 }

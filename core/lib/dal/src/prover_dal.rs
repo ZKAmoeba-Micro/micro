@@ -1,5 +1,3 @@
-use sqlx::Error;
-
 use std::{
     collections::HashMap,
     convert::{TryFrom, TryInto},
@@ -8,16 +6,13 @@ use std::{
 };
 
 use micro_types::{
-    aggregated_operations::L1BatchProofForL1,
     proofs::{
         AggregationRound, JobCountStatistics, JobExtendedStatistics, ProverJobInfo,
         ProverJobMetadata,
     },
-    zkevm_test_harness::{
-        abstract_micro_circuit::concrete_circuits::MicroProof, bellman::bn256::Bn256,
-    },
-    L1BatchNumber, PackedEthSignature, ProtocolVersionId,
+    L1BatchNumber, ProtocolVersionId,
 };
+use sqlx::Error;
 
 use crate::{
     instrument::InstrumentExt,
@@ -246,7 +241,7 @@ impl ProverDal<'_, '_> {
             sqlx::query!(
                 "
                 UPDATE prover_jobs
-                SET status = 'queued', attempts = attempts + 1, updated_at = now(), processing_started_at = now()
+                SET status = 'queued', updated_at = now(), processing_started_at = now()
                 WHERE (status = 'in_progress' AND  processing_started_at <= now() - $1::interval AND attempts < $2)
                 OR (status = 'in_gpu_proof' AND  processing_started_at <= now() - $1::interval AND attempts < $2)
                 OR (status = 'failed' AND attempts < $2)
@@ -264,50 +259,6 @@ impl ProverDal<'_, '_> {
         }
     }
 
-    // For each block in the provided range it returns a tuple:
-    // (aggregation_coords; scheduler_proof)
-    pub async fn get_final_proofs_for_blocks(
-        &mut self,
-        from_block: L1BatchNumber,
-        to_block: L1BatchNumber,
-    ) -> Vec<L1BatchProofForL1> {
-        {
-            sqlx::query!(
-                "SELECT prover_jobs.result as proof, scheduler_witness_jobs.aggregation_result_coords
-                FROM prover_jobs
-                INNER JOIN scheduler_witness_jobs
-                ON prover_jobs.l1_batch_number = scheduler_witness_jobs.l1_batch_number
-                WHERE prover_jobs.l1_batch_number >= $1 AND prover_jobs.l1_batch_number <= $2
-                AND prover_jobs.aggregation_round = 3
-                AND prover_jobs.status = 'successful'
-                ",
-                from_block.0 as i32,
-                to_block.0 as i32
-            )
-                .fetch_all(self.storage.conn())
-                .await
-                .unwrap()
-                .into_iter()
-                .map(|row| {
-                    let deserialized_proof = bincode::deserialize::<MicroProof<Bn256>>(
-                        &row.proof
-                            .expect("prove_job with `successful` status has no result"),
-                    ).expect("cannot deserialize proof");
-                    let deserialized_aggregation_result_coords = bincode::deserialize::<[[u8; 32]; 4]>(
-                        &row.aggregation_result_coords
-                            .expect("scheduler_witness_job with `successful` status has no aggregation_result_coords"),
-                    ).expect("cannot deserialize proof");
-                    L1BatchProofForL1 {
-                        aggregation_result_coords: deserialized_aggregation_result_coords,
-                        scheduler_proof: MicroProof::into_proof(deserialized_proof),
-                        signature: PackedEthSignature::default(),
-                        time_taken: 0,
-                    }
-                })
-                .collect()
-        }
-    }
-
     pub async fn get_prover_jobs_stats_per_circuit(
         &mut self,
     ) -> HashMap<String, JobCountStatistics> {
@@ -316,6 +267,7 @@ impl ProverDal<'_, '_> {
                 r#"
                 SELECT COUNT(*) as "count!", circuit_type as "circuit_type!", status as "status!"
                 FROM prover_jobs
+                WHERE status <> 'skipped' and status <> 'successful' 
                 GROUP BY circuit_type, status
                 "#
             )
@@ -565,7 +517,7 @@ impl ProverDal<'_, '_> {
             let job_ids = sqlx::query!(
                 r#"
                     SELECT id, circuit_input_blob_url FROM prover_jobs
-                    WHERE status='successful' AND is_blob_cleaned=FALSE
+                    WHERE status='successful'
                     AND circuit_input_blob_url is NOT NULL
                     AND updated_at < NOW() - INTERVAL '30 days'
                     LIMIT $1;
@@ -579,22 +531,6 @@ impl ProverDal<'_, '_> {
                 .into_iter()
                 .map(|row| (row.id, row.circuit_input_blob_url.unwrap()))
                 .collect()
-        }
-    }
-
-    pub async fn mark_gcs_blobs_as_cleaned(&mut self, ids: Vec<i64>) {
-        {
-            sqlx::query!(
-                r#"
-                UPDATE prover_jobs
-                SET is_blob_cleaned=TRUE
-                WHERE id = ANY($1);
-            "#,
-                &ids[..]
-            )
-            .execute(self.storage.conn())
-            .await
-            .unwrap();
         }
     }
 

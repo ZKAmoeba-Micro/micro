@@ -1,8 +1,6 @@
-use micro_types::fee::Fee;
-use micro_types::l2::L2Tx;
-use micro_types::{Address, Nonce, Transaction, U256};
-use std::cmp::Ordering;
-use std::collections::HashMap;
+use std::{cmp::Ordering, collections::HashMap};
+
+use micro_types::{fee::Fee, l2::L2Tx, Address, Nonce, Transaction, U256};
 
 /// Pending mempool transactions of account
 #[derive(Debug)]

@@ -93,6 +93,10 @@ impl ObjectStore for HttpBackedObjectStore {
         .await?;
         Ok(())
     }
+
+    fn storage_prefix_raw(&self, bucket: Bucket) -> String {
+        format!("{}/{}", self.base_url, bucket)
+    }
 }
 
 #[cfg(test)]

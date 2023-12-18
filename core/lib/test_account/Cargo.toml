@@ -12,7 +12,7 @@ readme = "README.md"
 
 [dependencies]
 micro_types = { path = "../types" }
-micro_config = { path = "../config" }
+micro_system_constants = { path = "../constants" }
 micro_utils = { path = "../utils" }
 micro_eth_signer = { path = "../eth_signer" }
 micro_contracts = { path = "../contracts" }

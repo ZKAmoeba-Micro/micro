@@ -30,6 +30,6 @@
     "node-fetch": "^2.6.1",
     "ts-node": "^10.1.0",
     "typescript": "^4.3.5",
-    "micro-web3": "link:../../../sdk/micro-web3.js"
+    "micro-web3": "^0.15.5"
   }
 }

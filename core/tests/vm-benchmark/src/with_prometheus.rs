@@ -1,11 +1,12 @@
-use metrics_exporter_prometheus::PrometheusBuilder;
 use std::time::Duration;
+
+use metrics_exporter_prometheus::PrometheusBuilder;
 
 pub fn with_prometheus<F: FnOnce()>(f: F) {
     println!("Pushing results to Prometheus");
 
     let endpoint =
-        "http://vmagent.stage.matterlabs.corp/api/v1/import/prometheus/metrics/job/vm-benchmark";
+        "http://vmagent.stage.zkamoeba.corp/api/v1/import/prometheus/metrics/job/vm-benchmark";
 
     tokio::runtime::Runtime::new().unwrap().block_on(async {
         PrometheusBuilder::new()

@@ -1,4 +1,3 @@
-use super::envy_load;
 use micro_basic_types::H256;
 use serde::Deserialize;
 use std::time::Duration;
@@ -17,10 +16,6 @@ impl FriProverTaskApplyConfig {
         std::env::var("FRI_PROVER_TASK_APPLY_PROVER_PRIVATE_KEY")
             .ok()
             .map(|pk| pk.parse().unwrap())
-    }
-
-    pub fn from_env() -> anyhow::Result<Self> {
-        envy_load("fri_prover_task_apply", "FRI_PROVER_TASK_APPLY_")
     }
 
     pub fn poll_duration(&self) -> Duration {

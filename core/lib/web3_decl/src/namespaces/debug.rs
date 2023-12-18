@@ -1,8 +1,10 @@
-use crate::types::H256;
 use jsonrpsee::{core::RpcResult, proc_macros::rpc};
+use micro_types::{
+    api::{BlockId, BlockNumber, DebugCall, ResultDebugCall, TracerConfig},
+    transaction_request::CallRequest,
+};
 
-use micro_types::api::{BlockId, BlockNumber, DebugCall, ResultDebugCall, TracerConfig};
-use micro_types::transaction_request::CallRequest;
+use crate::types::H256;
 
 #[cfg_attr(
     all(feature = "client", feature = "server"),

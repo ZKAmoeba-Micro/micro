@@ -6,12 +6,11 @@ use std::{
     time::Duration,
 };
 
-use tokio::sync::watch::Receiver;
-
 use micro_web3_decl::{
     jsonrpsee::http_client::{HttpClient, HttpClientBuilder},
     namespaces::ZksNamespaceClient,
 };
+use tokio::sync::watch::Receiver;
 
 use super::L1GasPriceProvider;
 

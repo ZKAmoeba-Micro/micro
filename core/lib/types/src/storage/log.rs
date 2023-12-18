@@ -1,9 +1,8 @@
-use serde::{Deserialize, Serialize};
-
 use std::mem;
 
 use micro_basic_types::AccountTreeId;
 use micro_utils::u256_to_h256;
+use serde::{Deserialize, Serialize};
 use zk_evm::aux_structures::{LogQuery, Timestamp};
 
 use crate::{StorageKey, StorageValue, U256};

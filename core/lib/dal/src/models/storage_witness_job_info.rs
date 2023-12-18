@@ -1,11 +1,13 @@
-use micro_types::proofs::{
-    AggregationRound, JobPosition, WitnessJobInfo, WitnessJobStatus, WitnessJobStatusFailed,
-    WitnessJobStatusSuccessful,
+use std::{convert::TryFrom, str::FromStr};
+
+use micro_types::{
+    proofs::{
+        AggregationRound, JobPosition, WitnessJobInfo, WitnessJobStatus, WitnessJobStatusFailed,
+        WitnessJobStatusSuccessful,
+    },
+    L1BatchNumber,
 };
-use micro_types::L1BatchNumber;
 use sqlx::types::chrono::{DateTime, NaiveDateTime, NaiveTime, Utc};
-use std::convert::TryFrom;
-use std::str::FromStr;
 
 #[derive(sqlx::FromRow)]
 pub struct StorageWitnessJobInfo {

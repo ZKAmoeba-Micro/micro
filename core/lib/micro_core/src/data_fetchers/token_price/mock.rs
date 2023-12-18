@@ -8,9 +8,8 @@ use micro_types::{
 };
 use num::{rational::Ratio, BigUint};
 
-use crate::data_fetchers::error::ApiFetchError;
-
 use super::FetcherImpl;
+use crate::data_fetchers::error::ApiFetchError;
 
 #[derive(Debug, Default, Clone)]
 pub struct MockPriceFetcher;

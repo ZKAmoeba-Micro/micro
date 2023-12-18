@@ -1,8 +1,10 @@
-use micro_config::constants::ethereum::MAX_GAS_PER_PUBDATA_BYTE;
+use std::{cell::RefCell, rc::Rc};
+
 use micro_contracts::{deployer_contract, BaseSystemContracts};
 use micro_state::{InMemoryStorage, StorageView};
+use micro_system_constants::ethereum::MAX_GAS_PER_PUBDATA_BYTE;
 use micro_types::{
-    block::legacy_miniblock_hash,
+    block::MiniblockHasher,
     ethabi::{encode, Token},
     fee::Fee,
     helpers::unix_timestamp_ms,
@@ -12,12 +14,13 @@ use micro_types::{
     ProtocolVersionId, Transaction, CONTRACT_DEPLOYER_ADDRESS, H256, U256,
 };
 use micro_utils::bytecode::hash_bytecode;
-use once_cell::sync::Lazy;
-use std::{cell::RefCell, rc::Rc};
-use vm::{
-    constants::BLOCK_GAS_LIMIT, HistoryEnabled, L2BlockEnv, TxExecutionMode, Vm, VmExecutionMode,
-    VmExecutionResultAndLogs,
+use multivm::{
+    interface::{
+        L2BlockEnv, TxExecutionMode, VmExecutionMode, VmExecutionResultAndLogs, VmInterface,
+    },
+    vm_latest::{constants::BLOCK_GAS_LIMIT, HistoryEnabled, Vm},
 };
+use once_cell::sync::Lazy;
 
 /// Bytecodes have consist of an odd number of 32 byte words
 /// This function "fixes" bytecodes of wrong length by cutting off their end.
@@ -62,7 +65,7 @@ impl BenchmarkingVm {
         let timestamp = unix_timestamp_ms();
 
         Self(Vm::new(
-            vm::L1BatchEnv {
+            multivm::interface::L1BatchEnv {
                 previous_batch_hash: None,
                 number: L1BatchNumber(1),
                 timestamp,
@@ -73,11 +76,11 @@ impl BenchmarkingVm {
                 first_l2_block: L2BlockEnv {
                     number: 1,
                     timestamp,
-                    prev_block_hash: legacy_miniblock_hash(MiniblockNumber(0)),
+                    prev_block_hash: MiniblockHasher::legacy_hash(MiniblockNumber(0)),
                     max_virtual_blocks_to_create: 100,
                 },
             },
-            vm::SystemEnv {
+            multivm::interface::SystemEnv {
                 zk_porter_available: false,
                 version: ProtocolVersionId::latest(),
                 base_system_smart_contracts: SYSTEM_CONTRACTS.clone(),
@@ -87,7 +90,6 @@ impl BenchmarkingVm {
                 chain_id: L2ChainId::from(270),
             },
             Rc::new(RefCell::new(StorageView::new(&*STORAGE))),
-            HistoryEnabled,
         ))
     }
 
@@ -134,8 +136,9 @@ pub fn get_deploy_tx(code: &[u8]) -> Transaction {
 
 #[cfg(test)]
 mod tests {
-    use crate::*;
     use micro_contracts::read_bytecode;
+
+    use crate::*;
 
     #[test]
     fn can_deploy_contract() {
@@ -145,6 +148,9 @@ mod tests {
         let mut vm = BenchmarkingVm::new();
         let res = vm.run_transaction(&get_deploy_tx(&test_contract));
 
-        assert!(matches!(res.result, vm::ExecutionResult::Success { .. }));
+        assert!(matches!(
+            res.result,
+            multivm::interface::ExecutionResult::Success { .. }
+        ));
     }
 }

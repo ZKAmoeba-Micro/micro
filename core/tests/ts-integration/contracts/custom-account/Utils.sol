@@ -2,7 +2,7 @@
 pragma solidity >=0.8.0;
 
 /**
- *
+ * @author Zkamoeba
  * @dev Common utilities used in micro system contracts
  */
 library Utils {

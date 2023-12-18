@@ -1,26 +1,23 @@
+use std::env;
+
+pub use circuit_definitions;
+use circuit_definitions::{
+    aux_definitions::witness_oracle::VmWitnessOracle,
+    boojum::{cs::implementations::witness::WitnessVec, field::goldilocks::GoldilocksField},
+    circuit_definitions::{
+        base_layer::{MicroBaseLayerCircuit, MicroBaseLayerProof},
+        recursion_layer::{MicroRecursionLayerProof, MicroRecursiveLayerCircuit},
+    },
+    zkevm_circuits::scheduler::block_header::BlockAuxilaryOutputWitness,
+    MicroDefaultRoundFunction,
+};
+use micro_object_store::{serialize_using_bincode, Bucket, FriCircuitKey, StoredObject};
+use micro_types::{proofs::AggregationRound, L1BatchNumber};
+
 pub mod queue;
 
-use std::env;
-pub use circuit_definitions;
-
-use circuit_definitions::aux_definitions::witness_oracle::VmWitnessOracle;
-use circuit_definitions::boojum::cs::implementations::witness::WitnessVec;
-use circuit_definitions::boojum::field::goldilocks::GoldilocksField;
-use circuit_definitions::circuit_definitions::base_layer::MicroBaseLayerCircuit;
-use circuit_definitions::circuit_definitions::base_layer::MicroBaseLayerProof;
-use circuit_definitions::circuit_definitions::recursion_layer::MicroRecursionLayerProof;
-use circuit_definitions::circuit_definitions::recursion_layer::MicroRecursiveLayerCircuit;
-use circuit_definitions::zkevm_circuits::scheduler::block_header::BlockAuxilaryOutputWitness;
-use circuit_definitions::MicroDefaultRoundFunction;
-
-use micro_object_store::serialize_using_bincode;
-use micro_object_store::Bucket;
-use micro_object_store::FriCircuitKey;
-use micro_object_store::StoredObject;
-use micro_types::proofs::AggregationRound;
-use micro_types::L1BatchNumber;
-
 #[derive(serde::Serialize, serde::Deserialize, Clone)]
+#[allow(clippy::large_enum_variant)]
 pub enum CircuitWrapper {
     Base(
         MicroBaseLayerCircuit<
@@ -118,7 +115,6 @@ impl ProverServiceDataKey {
     }
 }
 
-
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct AuxOutputWitnessWrapper(pub BlockAuxilaryOutputWitness<GoldilocksField>);
 
@@ -134,6 +130,5 @@ impl StoredObject for AuxOutputWitnessWrapper {
 }
 
 pub fn get_current_pod_name() -> String {
-    env::var("POD_NAME")
-        .unwrap_or("UNKNOWN_POD".to_owned())
+    env::var("POD_NAME").unwrap_or("UNKNOWN_POD".to_owned())
 }

@@ -15,7 +15,7 @@ micro_state = { path = "../../lib/state" }
 micro_types = { path = "../../lib/types" }
 micro_utils = { path = "../../lib/utils" }
 micro_contracts = { path = "../../lib/contracts" }
-vm = { path = "../../lib/vm" }
+multivm = { path = "../../lib/multivm" }
 
 codegen = "0.2.0"
 

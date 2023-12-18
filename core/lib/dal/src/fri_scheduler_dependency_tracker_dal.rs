@@ -1,5 +1,6 @@
-use crate::StorageProcessor;
 use micro_types::L1BatchNumber;
+
+use crate::StorageProcessor;
 
 #[derive(Debug)]
 pub struct FriSchedulerDependencyTrackerDal<'a, 'c> {

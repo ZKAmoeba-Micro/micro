@@ -1,0 +1,5 @@
+{
+  "us": "gs://zkamoeba-setup-data-us/5e22273-gpu/",
+  "europe": "gs://zkamoeba-setup-data-europe/5e22273-gpu/",
+  "asia": "gs://zkamoeba-setup-data-asia/5e22273-gpu/"
+}

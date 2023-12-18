@@ -1,8 +1,8 @@
-use micro_types::proofs::{GpuProverInstanceStatus, SocketAddress};
 use std::time::Duration;
 
-use crate::time_utils::pg_interval_from_duration;
-use crate::StorageProcessor;
+use micro_types::proofs::{GpuProverInstanceStatus, SocketAddress};
+
+use crate::{time_utils::pg_interval_from_duration, StorageProcessor};
 
 #[derive(Debug)]
 pub struct FriGpuProverQueueDal<'a, 'c> {

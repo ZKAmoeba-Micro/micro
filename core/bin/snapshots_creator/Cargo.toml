@@ -1,0 +1,30 @@
+[package]
+name = "snapshots_creator"
+version = "0.1.0"
+edition = "2021"
+authors = []
+homepage = "https://micro.io/"
+repository = "https://github.com/ZKAmoeba-Micro/micro"
+license = "MIT OR Apache-2.0"
+keywords = ["blockchain", "micro"]
+categories = ["cryptography"]
+publish = false                                        # We don't want to publish our binaries.
+
+[dependencies]
+vise = { git = "https://github.com/ZKAmoeba-Micro/vise.git", branch = "main" }
+prometheus_exporter = { path = "../../lib/prometheus_exporter" }
+micro_config = { path = "../../lib/config" }
+micro_dal = { path = "../../lib/dal" }
+micro_env_config = { path = "../../lib/env_config" }
+micro_utils = { path = "../../lib/utils" }
+micro_types = { path = "../../lib/types" }
+micro_object_store = { path = "../../lib/object_store" }
+vlog = { path = "../../lib/vlog" }
+
+anyhow = "1.0"
+tokio = { version = "1", features = ["full"] }
+tracing = "0.1"
+futures = "0.3"
+
+[dev-dependencies]
+rand = "0.8"

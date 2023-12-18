@@ -1,5 +1,5 @@
 ARG PROVER_IMAGE
-FROM us-docker.pkg.dev/matterlabs-infra/matterlabs-docker/prover-gpu-fri:2.0-$PROVER_IMAGE as prover
+FROM us-docker.pkg.dev/zkamoeba-infra/zkamoeba-docker/prover-gpu-fri:2.0-$PROVER_IMAGE as prover
 
 FROM nvidia/cuda:12.2.0-runtime-ubuntu22.04 as app
 

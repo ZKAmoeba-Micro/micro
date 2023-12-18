@@ -1,9 +1,9 @@
 use std::collections::hash_map::{Entry, HashMap};
 
 use clap::Parser;
-
-use micro_dal::connection::DbVariant;
+use micro_config::PostgresConfig;
 use micro_dal::ConnectionPool;
+use micro_env_config::FromEnv;
 use micro_types::{MiniblockNumber, H256};
 
 /// When the threshold is reached then the migration is blocked on vacuuming.
@@ -11,7 +11,7 @@ const UNVACUUMED_ROWS_THRESHOLD: usize = 2_000_000;
 
 #[derive(Debug, Parser)]
 #[command(
-    author = "",
+    author = "Zkamoeba",
     about = "Migration that deduplicates rows in storage_logs DB table"
 )]
 struct Cli {
@@ -45,8 +45,9 @@ impl StateCache {
 
 #[tokio::main]
 async fn main() {
+    let config = PostgresConfig::from_env().unwrap();
     let opt = Cli::parse();
-    let pool = ConnectionPool::singleton(DbVariant::Master)
+    let pool = ConnectionPool::singleton(config.master_url().unwrap())
         .build()
         .await
         .unwrap();

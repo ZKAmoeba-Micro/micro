@@ -1,6 +1,5 @@
 use async_trait::async_trait;
 use micro_dal::ConnectionPool;
-
 use micro_prover_utils::periodic_job::PeriodicJob;
 
 #[derive(Debug)]

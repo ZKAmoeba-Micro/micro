@@ -1,24 +1,25 @@
-use async_trait::async_trait;
-
 use std::{fmt, sync::Arc};
 
+use async_trait::async_trait;
 use micro_config::{ContractsConfig, ETHClientConfig, ETHSenderConfig};
 use micro_contracts::micro_contract;
 use micro_eth_signer::{raw_ethereum_tx::TransactionParameters, EthereumSigner, PrivateKeySigner};
-use micro_types::web3::{
-    self,
-    contract::{
-        tokens::{Detokenize, Tokenize},
-        Options,
+use micro_types::{
+    web3::{
+        self,
+        contract::{
+            tokens::{Detokenize, Tokenize},
+            Options,
+        },
+        ethabi,
+        transports::Http,
+        types::{
+            Address, Block, BlockId, BlockNumber, Filter, Log, Transaction, TransactionReceipt,
+            H160, H256, U256, U64,
+        },
     },
-    ethabi,
-    transports::Http,
-    types::{
-        Address, Block, BlockId, BlockNumber, Filter, Log, Transaction, TransactionReceipt, H160,
-        H256, U256, U64,
-    },
+    L1ChainId, PackedEthSignature, EIP_1559_TX_TYPE,
 };
-use micro_types::{L1ChainId, PackedEthSignature, EIP_1559_TX_TYPE};
 
 use super::{query::QueryClient, Method, LATENCIES};
 use crate::{
@@ -213,7 +214,7 @@ impl<S: EthereumSigner> EthInterface for SigningClient<S> {
 
     async fn block(
         &self,
-        block_id: String,
+        block_id: BlockId,
         component: &'static str,
     ) -> Result<Option<Block<H256>>, Error> {
         self.query_client.block(block_id, component).await

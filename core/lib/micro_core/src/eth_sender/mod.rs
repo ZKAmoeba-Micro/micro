@@ -1,13 +1,15 @@
 mod aggregator;
-mod publish_criterion;
-
 mod error;
 mod eth_tx_aggregator;
 mod eth_tx_manager;
-mod grafana_metrics;
+mod metrics;
 mod micro_functions;
+mod publish_criterion;
 
-pub use aggregator::Aggregator;
-pub use error::ETHSenderError;
-pub use eth_tx_aggregator::EthTxAggregator;
-pub use eth_tx_manager::EthTxManager;
+#[cfg(test)]
+mod tests;
+
+pub use self::{
+    aggregator::Aggregator, error::ETHSenderError, eth_tx_aggregator::EthTxAggregator,
+    eth_tx_manager::EthTxManager,
+};

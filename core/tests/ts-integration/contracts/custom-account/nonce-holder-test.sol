@@ -11,7 +11,7 @@ import './interfaces/IContractDeployer.sol';
 import './SystemContractsCaller.sol';
 
 /**
-*
+* @author Zkamoeba
 * @dev Dummy account used for tests that accepts any transaction.
 */
 contract NonceHolderTest is IAccount {

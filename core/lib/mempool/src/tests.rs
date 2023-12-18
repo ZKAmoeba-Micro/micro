@@ -1,12 +1,18 @@
+use std::{
+    collections::{HashMap, HashSet},
+    iter::FromIterator,
+};
+
+use micro_types::{
+    fee::Fee,
+    helpers::unix_timestamp_ms,
+    l1::{OpProcessingType, PriorityQueueType},
+    l2::L2Tx,
+    Address, Execute, ExecuteTransactionCommon, L1TxCommonData, Nonce, PriorityOpId, Transaction,
+    H256, U256,
+};
+
 use crate::{mempool_store::MempoolStore, types::L2TxFilter};
-use micro_types::fee::Fee;
-use micro_types::helpers::unix_timestamp_ms;
-use micro_types::l1::{OpProcessingType, PriorityQueueType};
-use micro_types::l2::L2Tx;
-use micro_types::{Address, ExecuteTransactionCommon, L1TxCommonData, PriorityOpId, H256, U256};
-use micro_types::{Execute, Nonce, Transaction};
-use std::collections::{HashMap, HashSet};
-use std::iter::FromIterator;
 
 #[test]
 fn basic_flow() {

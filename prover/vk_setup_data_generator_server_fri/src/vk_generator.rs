@@ -1,22 +1,25 @@
 use anyhow::Context as _;
-use zkevm_test_harness::geometry_config::get_geometry_config;
-use zkevm_test_harness::prover_utils::{
-    create_base_layer_setup_data, create_recursive_layer_setup_data,
+use micro_prover_fri_types::{
+    circuit_definitions::{
+        boojum::worker::Worker,
+        circuit_definitions::{
+            base_layer::MicroBaseLayerVerificationKey,
+            recursion_layer::MicroRecursionLayerVerificationKey,
+        },
+        BASE_LAYER_CAP_SIZE, BASE_LAYER_FRI_LDE_FACTOR,
+    },
+    ProverServiceDataKey,
 };
-use micro_prover_fri_types::circuit_definitions::boojum::worker::Worker;
-use micro_prover_fri_types::circuit_definitions::circuit_definitions::base_layer::MicroBaseLayerVerificationKey;
-use micro_prover_fri_types::circuit_definitions::{
-    BASE_LAYER_CAP_SIZE, BASE_LAYER_FRI_LDE_FACTOR,
-};
-use micro_vk_setup_data_server_fri::utils::{get_basic_circuits, get_leaf_circuits, CYCLE_LIMIT};
+use micro_types::proofs::AggregationRound;
 use micro_vk_setup_data_server_fri::{
     get_round_for_recursive_circuit_type, save_base_layer_vk, save_finalization_hints,
     save_recursive_layer_vk,
+    utils::{get_basic_circuits, get_leaf_circuits, CYCLE_LIMIT},
 };
-
-use micro_prover_fri_types::circuit_definitions::circuit_definitions::recursion_layer::MicroRecursionLayerVerificationKey;
-use micro_prover_fri_types::ProverServiceDataKey;
-use micro_types::proofs::AggregationRound;
+use zkevm_test_harness::{
+    geometry_config::get_geometry_config,
+    prover_utils::{create_base_layer_setup_data, create_recursive_layer_setup_data},
+};
 
 #[allow(dead_code)]
 fn main() -> anyhow::Result<()> {
@@ -26,7 +29,9 @@ fn main() -> anyhow::Result<()> {
 
 pub fn generate_basic_circuit_vks() -> anyhow::Result<()> {
     let worker = Worker::new();
-    for circuit in get_basic_circuits(CYCLE_LIMIT, get_geometry_config()).context("get_basic_circuits()")? {
+    for circuit in
+        get_basic_circuits(CYCLE_LIMIT, get_geometry_config()).context("get_basic_circuits()")?
+    {
         let circuit_type = circuit.numeric_circuit_type();
         let (_, _, vk, _, _, _, finalization_hint) = create_base_layer_setup_data(
             circuit.clone(),
@@ -35,11 +40,9 @@ pub fn generate_basic_circuit_vks() -> anyhow::Result<()> {
             BASE_LAYER_CAP_SIZE,
         );
         let typed_vk = MicroBaseLayerVerificationKey::from_inner(circuit_type, vk);
-        save_base_layer_vk(typed_vk)
-            .context("save_base_layer_vk()")?;
+        save_base_layer_vk(typed_vk).context("save_base_layer_vk()")?;
         let key = ProverServiceDataKey::new(circuit_type, AggregationRound::BasicCircuits);
-        save_finalization_hints(key, &finalization_hint)
-            .context("save_finalization_hints()")?;
+        save_finalization_hints(key, &finalization_hint).context("save_finalization_hints()")?;
     }
     Ok(())
 }
@@ -58,14 +61,12 @@ pub fn generate_leaf_layer_vks() -> anyhow::Result<()> {
             );
 
         let typed_vk = MicroRecursionLayerVerificationKey::from_inner(circuit_type, vk.clone());
-        save_recursive_layer_vk(typed_vk)
-            .context("save_recursive_layer_vk()")?;
+        save_recursive_layer_vk(typed_vk).context("save_recursive_layer_vk()")?;
         let key = ProverServiceDataKey::new(
             circuit_type,
             get_round_for_recursive_circuit_type(circuit_type),
         );
-        save_finalization_hints(key, &finalization_hint)
-            .context("save_finalization_hints()")?;
+        save_finalization_hints(key, &finalization_hint).context("save_finalization_hints()")?;
     }
     Ok(())
 }

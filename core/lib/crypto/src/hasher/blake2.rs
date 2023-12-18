@@ -1,7 +1,7 @@
 use blake2::{Blake2s256, Digest};
+use micro_basic_types::H256;
 
 use crate::hasher::Hasher;
-use micro_basic_types::H256;
 
 #[derive(Default, Clone, Debug)]
 pub struct Blake2Hasher;

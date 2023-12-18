@@ -1,7 +1,7 @@
 [package]
 name = "micro_dal"
 version = "0.1.0"
-edition = "2018"
+edition = "2021"
 authors = []
 homepage = "https://www.zkamoeba.com/"
 repository = "https://github.com/ZKAmoeba-Micro/micro"
@@ -9,17 +9,25 @@ license = "MIT OR Apache-2.0"
 keywords = ["blockchain", "micro"]
 categories = ["cryptography"]
 
+links = "micro_dal_proto"
+
 [dependencies]
-vise = { git = "https://github.com/ZKAmoeba-Micro/vise.git", branch = "main"}
+vise = { git = "https://github.com/ZKAmoeba-Micro/vise.git", branch = "main" }
 micro_utils = { path = "../utils" }
-micro_config = { path = "../config" }
+micro_system_constants = { path = "../constants" }
 micro_contracts = { path = "../contracts" }
 micro_types = { path = "../types" }
 micro_health_check = { path = "../health_check" }
+micro_consensus_roles = { version = "0.1.0", git = "https://github.com/ZKAmoeba-Micro/micro-consensus.git", rev = "e98324ba59ec87335a7b825ed9f2021a6cf309e6" }
+micro_consensus_storage = { version = "0.1.0", git = "https://github.com/ZKAmoeba-Micro/micro-consensus.git", rev = "e98324ba59ec87335a7b825ed9f2021a6cf309e6" }
+micro_protobuf = { version = "0.1.0", git = "https://github.com/ZKAmoeba-Micro/micro-consensus.git", rev = "e98324ba59ec87335a7b825ed9f2021a6cf309e6" }
 
 itertools = "0.10.1"
 thiserror = "1.0"
 anyhow = "1.0"
+url = "2"
+prost = "0.12.1"
+rand = "0.8"
 tokio = { version = "1", features = ["full"] }
 sqlx = { version = "0.5.13", default-features = false, features = [
     "runtime-tokio-native-tls",
@@ -44,4 +52,6 @@ tracing = "0.1"
 
 [dev-dependencies]
 assert_matches = "1.5.0"
-db_test_macro = { path = "../db_test_macro" }
+
+[build-dependencies]
+micro_protobuf_build = { version = "0.1.0", git = "https://github.com/ZKAmoeba-Micro/micro-consensus.git", rev = "e98324ba59ec87335a7b825ed9f2021a6cf309e6" }

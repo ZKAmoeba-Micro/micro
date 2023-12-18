@@ -1,9 +1,7 @@
 use micro_eth_signer::EthereumSigner;
-
-use micro_types::l2::L2Tx;
 use micro_types::{
-    fee::Fee, tokens::ETHEREUM_ADDRESS, transaction_request::PaymasterParams, web3::ethabi,
-    Address, Nonce, L2_ETH_TOKEN_ADDRESS, U256,
+    fee::Fee, l2::L2Tx, tokens::ETHEREUM_ADDRESS, transaction_request::PaymasterParams,
+    web3::ethabi, Address, Nonce, L2_ETH_TOKEN_ADDRESS, U256,
 };
 
 use crate::{

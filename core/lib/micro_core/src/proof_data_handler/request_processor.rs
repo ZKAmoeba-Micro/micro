@@ -1,29 +1,27 @@
-use axum::extract::Path;
-use axum::response::Response;
-use axum::{http::StatusCode, response::IntoResponse, Json};
-use chrono::Utc;
+use std::{convert::TryFrom, sync::Arc};
+
+use axum::{
+    extract::Path,
+    http::StatusCode,
+    response::{IntoResponse, Response},
+    Json,
+};
 use micro_config::configs::{
     proof_data_handler::ProtocolVersionLoadingMode, ProofDataHandlerConfig,
 };
-use micro_dal::assignments_dal::ProverResultStatus;
-use micro_types::commitment::serialize_commitments;
-use micro_types::web3::signing::keccak256;
-use micro_types::PackedEthSignature;
-use micro_utils::u256_to_h256;
-use std::convert::TryFrom;
-use std::sync::Arc;
-
 use micro_dal::{ConnectionPool, SqlxError};
 use micro_object_store::{ObjectStore, ObjectStoreError};
-use micro_types::protocol_version::FriProtocolVersionId;
 use micro_types::{
-    protocol_version::L1VerifierConfig,
+    commitment::serialize_commitments,
+    protocol_version::{FriProtocolVersionId, L1VerifierConfig},
     prover_server_api::{
         ProofGenerationData, ProofGenerationDataRequest, ProofGenerationDataResponse,
         SubmitProofRequest, SubmitProofResponse,
     },
+    web3::signing::keccak256,
     L1BatchNumber, H256,
 };
+use micro_utils::u256_to_h256;
 
 #[derive(Clone)]
 pub(crate) struct RequestProcessor {
@@ -34,7 +32,6 @@ pub(crate) struct RequestProcessor {
 }
 
 pub(crate) enum RequestProcessorError {
-    NoPendingBatches,
     ObjectStore(ObjectStoreError),
     Sqlx(SqlxError),
     SignatureError,
@@ -44,10 +41,6 @@ pub(crate) enum RequestProcessorError {
 impl IntoResponse for RequestProcessorError {
     fn into_response(self) -> Response {
         let (status_code, message) = match self {
-            Self::NoPendingBatches => (
-                StatusCode::NOT_FOUND,
-                "No pending batches to process".to_owned(),
-            ),
             RequestProcessorError::ObjectStore(err) => {
                 tracing::error!("GCS error: {:?}", err);
                 (
@@ -210,37 +203,64 @@ impl RequestProcessor {
                 let events_queue_state_from_prover =
                     H256::from_slice(&proof.aggregation_result_coords[3]);
 
-                let header = storage
+                let l1_batch = storage
                     .blocks_dal()
-                    .get_l1_batch_header(l1_batch_number)
+                    .get_l1_batch_metadata(l1_batch_number)
                     .await
                     .unwrap()
-                    .expect("Proved block without a header");
-                let events_queue_state = header
-                    .events_queue_commitment
-                    .expect("No events_queue_commitment");
-                let bootloader_heap_initial_content = header
-                    .bootloader_initial_content_commitment
-                    .expect("No bootloader_initial_content_commitment");
-                let system_logs = serialize_commitments(&header.system_logs);
+                    .expect("Proved block without metadata");
+
+                let is_pre_boojum = l1_batch
+                    .header
+                    .protocol_version
+                    .map(|v| v.is_pre_boojum())
+                    .unwrap_or(true);
+                if !is_pre_boojum {
+                    let events_queue_state = l1_batch
+                        .metadata
+                        .events_queue_commitment
+                        .expect("No events_queue_commitment");
+                    let bootloader_heap_initial_content = l1_batch
+                        .metadata
+                        .bootloader_initial_content_commitment
+                        .expect("No bootloader_initial_content_commitment");
+
+                    if events_queue_state != events_queue_state_from_prover
+                        || bootloader_heap_initial_content
+                            != bootloader_heap_initial_content_from_prover
+                    {
+                        let server_values = format!("events_queue_state = {events_queue_state}, bootloader_heap_initial_content = {bootloader_heap_initial_content}");
+                        let prover_values = format!("events_queue_state = {events_queue_state_from_prover}, bootloader_heap_initial_content = {bootloader_heap_initial_content_from_prover}");
+                        panic!(
+                            "Auxilary output doesn't match, server values: {} prover values: {}",
+                            server_values, prover_values
+                        );
+                    }
+                }
+
+                let system_logs = serialize_commitments(&l1_batch.header.system_logs);
                 let system_logs_hash = H256(keccak256(&system_logs));
 
-                let state_diff_hash = header
-                    .system_logs
-                    .into_iter()
-                    .find(|elem| elem.key == u256_to_h256(2.into()))
-                    .expect("No state diff hash key")
-                    .value;
+                if !is_pre_boojum {
+                    let state_diff_hash = l1_batch
+                        .header
+                        .system_logs
+                        .into_iter()
+                        .find(|elem| elem.0.key == u256_to_h256(2.into()))
+                        .expect("No state diff hash key")
+                        .0
+                        .value;
 
-                if events_queue_state != events_queue_state_from_prover
-                    || bootloader_heap_initial_content
-                        != bootloader_heap_initial_content_from_prover
-                    || state_diff_hash != state_diff_hash_from_prover
-                    || system_logs_hash != system_logs_hash_from_prover
-                {
-                    let server_values = format!("{system_logs_hash} {state_diff_hash} {events_queue_state} {bootloader_heap_initial_content}");
-                    let prover_values = format!("{system_logs_hash_from_prover} {state_diff_hash_from_prover} {events_queue_state_from_prover} {bootloader_heap_initial_content_from_prover}");
-                    tracing::error!("Auxilary output doesn't match, server values: {server_values} prover values: {prover_values}");
+                    if state_diff_hash != state_diff_hash_from_prover
+                        || system_logs_hash != system_logs_hash_from_prover
+                    {
+                        let server_values = format!("system_logs_hash = {system_logs_hash}, state_diff_hash = {state_diff_hash}");
+                        let prover_values = format!("system_logs_hash = {system_logs_hash_from_prover}, state_diff_hash = {state_diff_hash_from_prover}");
+                        panic!(
+                            "Auxilary output doesn't match, server values: {} prover values: {}",
+                            server_values, prover_values
+                        );
+                    }
                 }
                 storage
                     .assignments_dal()
@@ -248,7 +268,7 @@ impl RequestProcessor {
                     .await
                     .map_err(RequestProcessorError::Sqlx)?;
             }
-            SubmitProofRequest::SkippedProofGeneration(signature) => {
+            SubmitProofRequest::SkippedProofGeneration => {
                 let signed_bytes =
                     PackedEthSignature::message_to_signed_bytes(&l1_batch_number.0.to_be_bytes());
                 let prover_addr = signature

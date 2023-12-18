@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use tokio::sync::RwLock;
 
 use micro_types::{
     api::{BlockId, Transaction, TransactionDetails, TransactionId, TransactionReceipt},
@@ -11,6 +10,7 @@ use micro_web3_decl::{
     namespaces::{EthNamespaceClient, ZksNamespaceClient},
     RpcResult,
 };
+use tokio::sync::RwLock;
 
 /// Used by external node to proxy transaction to the main node
 /// and store them while they're not synced back yet

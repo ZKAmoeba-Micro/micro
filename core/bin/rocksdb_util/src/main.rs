@@ -1,14 +1,14 @@
 use anyhow::Context as _;
 use clap::{Parser, Subcommand};
-
 use micro_config::DBConfig;
+use micro_env_config::FromEnv;
 use micro_storage::rocksdb::{
     backup::{BackupEngine, BackupEngineOptions, RestoreOptions},
     Env, Error, Options, DB,
 };
 
 #[derive(Debug, Parser)]
-#[command(author = "", version, about = "RocksDB management utility", long_about = None)]
+#[command(author = "Zkamoeba", version, about = "RocksDB management utility", long_about = None)]
 struct Cli {
     #[command(subcommand)]
     command: Command,
@@ -56,8 +56,9 @@ fn main() -> anyhow::Result<()> {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use tempfile::TempDir;
+
+    use super::*;
 
     #[test]
     fn backup_restore_workflow() {

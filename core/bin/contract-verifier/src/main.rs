@@ -1,13 +1,13 @@
 use std::cell::RefCell;
 
 use anyhow::Context as _;
-use micro_config::{configs::PrometheusConfig, ApiConfig, ContractVerifierConfig};
+use futures::{channel::mpsc, executor::block_on, SinkExt, StreamExt};
+use micro_config::{configs::PrometheusConfig, ApiConfig, ContractVerifierConfig, PostgresConfig};
 use micro_dal::ConnectionPool;
+use micro_env_config::FromEnv;
 use micro_queued_job_processor::JobProcessor;
 use micro_utils::wait_for_tasks::wait_for_tasks;
 use prometheus_exporter::PrometheusExporterConfig;
-
-use futures::{channel::mpsc, executor::block_on, SinkExt, StreamExt};
 use tokio::sync::watch;
 
 use crate::verifier::ContractVerifier;
@@ -111,11 +111,10 @@ async fn update_compiler_versions(connection_pool: &ConnectionPool) {
     transaction.commit().await.unwrap();
 }
 
-use micro_dal::connection::DbVariant;
 use structopt::StructOpt;
 
 #[derive(StructOpt)]
-#[structopt(name = "micro contract code verifier", author = "zka")]
+#[structopt(name = "micro contract code verifier", author = "Zkamoeba")]
 struct Opt {
     /// Number of jobs to process. If None, runs indefinitely.
     #[structopt(long)]
@@ -131,10 +130,15 @@ async fn main() -> anyhow::Result<()> {
         listener_port: verifier_config.prometheus_port,
         ..ApiConfig::from_env().context("ApiConfig")?.prometheus
     };
-    let pool = ConnectionPool::singleton(DbVariant::Master)
-        .build()
-        .await
-        .unwrap();
+    let postgres_config = PostgresConfig::from_env().context("PostgresConfig")?;
+    let pool = ConnectionPool::singleton(
+        postgres_config
+            .master_url()
+            .context("Master DB URL is absent")?,
+    )
+    .build()
+    .await
+    .unwrap();
 
     #[allow(deprecated)] // TODO (QIT-21): Use centralized configuration approach.
     let log_format = vlog::log_format_from_env();

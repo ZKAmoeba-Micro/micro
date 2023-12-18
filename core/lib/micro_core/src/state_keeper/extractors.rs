@@ -1,13 +1,12 @@
 //! Pure functions that convert data as required by the state keeper.
 
-use chrono::{DateTime, TimeZone, Utc};
-
 use std::{
     convert::TryFrom,
     fmt,
     time::{Duration, Instant},
 };
 
+use chrono::{DateTime, TimeZone, Utc};
 use micro_dal::StorageProcessor;
 use micro_types::{L1BatchNumber, U256};
 use micro_utils::h256_to_u256;

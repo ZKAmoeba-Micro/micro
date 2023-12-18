@@ -3,7 +3,7 @@
 pragma solidity ^0.8.0;
 
 /**
- *
+ * @author Zkamoeba
  * @dev The interface that is used for encoding/decoding of
  * different types of paymaster flows.
  * @notice This is NOT an interface to be implementated

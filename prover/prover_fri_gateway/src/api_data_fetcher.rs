@@ -1,13 +1,13 @@
 use std::time::Duration;
 
 use async_trait::async_trait;
-use micro_config::configs::FriProverGatewayConfig;
-use micro_dal::ConnectionPool;
-use micro_object_store::ObjectStore;
 use reqwest::Client;
 use serde::{de::DeserializeOwned, Serialize};
-use tokio::sync::watch;
-use tokio::time::sleep;
+use tokio::{sync::watch, time::sleep};
+use micro_dal::ConnectionPool;
+use micro_object_store::ObjectStore;
+
+use crate::metrics::METRICS;
 
 /// The path to the API endpoint that returns the next proof generation data.
 pub(crate) const PROOF_GENERATION_DATA_PATH: &str = "/proof_generation_data";
@@ -21,7 +21,6 @@ pub(crate) struct PeriodicApiStruct {
     pub(crate) api_url: String,
     pub(crate) poll_duration: Duration,
     pub(crate) client: Client,
-    pub(crate) config: FriProverGatewayConfig,
 }
 
 impl PeriodicApiStruct {
@@ -35,6 +34,7 @@ impl PeriodicApiStruct {
         Resp: DeserializeOwned,
     {
         tracing::info!("Sending request to {}", endpoint);
+
         self.client
             .post(endpoint)
             .json(&request)
@@ -71,7 +71,7 @@ impl PeriodicApiStruct {
                         self.handle_response(job_id, response).await;
                     }
                     Err(err) => {
-                        metrics::counter!("prover_fri.prover_fri_gateway.http_error", 1, "service_name" => Self::SERVICE_NAME);
+                        METRICS.http_error[&Self::SERVICE_NAME].inc();
                         tracing::error!("HTTP request failed due to error: {}", err);
                     }
                 }

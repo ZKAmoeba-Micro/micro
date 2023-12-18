@@ -2,8 +2,8 @@ use std::time::Duration;
 
 use micro_types::Address;
 
-use crate::account::ExecutionType;
 use crate::{
+    account::ExecutionType,
     all::All,
     command::{ApiRequest, ApiRequestType, SubscriptionType, TxCommand, TxType},
 };

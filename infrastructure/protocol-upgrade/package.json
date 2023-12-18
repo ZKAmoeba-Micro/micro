@@ -15,15 +15,16 @@
     "tabtab": "^3.0.2"
   },
   "devDependencies": {
-    "@zkamoeba/hardhat-micro-solc": "^0.4.2",
+    "@zkamoeba/hardhat-micro-solc": "^0.3.15",
     "@types/deep-extend": "^0.4.31",
     "@types/node": "^14.6.1",
     "@types/node-fetch": "^2.5.7",
     "@types/tabtab": "^3.0.1",
-    "hardhat": "=2.12.4",
+    "hardhat": "=2.16.0",
     "typescript": "^4.3.5",
-    "l2-micro-contracts": "link:../../contacts/micro",
-    "l1-micro-contracts": "link:../../contacts/ethereum"
+    "l2-micro-contracts": "link:../../contracts/micro",
+    "l1-micro-contracts": "link:../../contracts/ethereum",
+    "micro-web3": "^0.15.5"
   },
   "scripts": {
     "build": "tsc",

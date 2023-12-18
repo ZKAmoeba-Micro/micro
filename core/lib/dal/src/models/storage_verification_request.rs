@@ -1,8 +1,10 @@
-use micro_types::contract_verification_api::{
-    CompilerType, CompilerVersions, SourceCodeData, VerificationIncomingRequest,
-    VerificationRequest,
+use micro_types::{
+    contract_verification_api::{
+        CompilerType, CompilerVersions, SourceCodeData, VerificationIncomingRequest,
+        VerificationRequest,
+    },
+    Address,
 };
-use micro_types::Address;
 
 #[derive(Debug, Clone, sqlx::FromRow)]
 pub struct StorageVerificationRequest {

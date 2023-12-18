@@ -17,3 +17,4 @@ tokio = { version = "1", features = ["time"] }
 tracing = "0.1"
 
 micro_utils = { path = "../../lib/utils" }
+vise = { git = "https://github.com/ZKAmoeba-Micro/vise.git", branch = "main" }

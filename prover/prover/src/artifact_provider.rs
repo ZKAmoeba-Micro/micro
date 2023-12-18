@@ -1,8 +1,10 @@
-use prover_service::ArtifactProvider;
 use std::io::Read;
+
 use anyhow::Context as _;
-use zkevm_test_harness::abstract_micro_circuit::concrete_circuits::MicroVerificationKey;
-use zkevm_test_harness::pairing::bn256::Bn256;
+use prover_service::ArtifactProvider;
+use zkevm_test_harness::{
+    abstract_micro_circuit::concrete_circuits::MicroVerificationKey, pairing::bn256::Bn256,
+};
 use micro_setup_key_server::get_setup_for_circuit_type;
 use micro_verification_key_server::get_vk_for_circuit_type;
 

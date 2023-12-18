@@ -1,9 +1,8 @@
 use std::convert::TryInto;
 
-use rand::{rngs::SmallRng, seq::SliceRandom, thread_rng, RngCore, SeedableRng};
-
 use micro::web3::signing::keccak256;
 use micro_types::H256;
+use rand::{rngs::SmallRng, seq::SliceRandom, thread_rng, RngCore, SeedableRng};
 
 use crate::all::AllWeighted;
 

@@ -1,7 +1,3 @@
-# For using private GitHub dependencies, CI downdloads all crates outside of the contatiner
-# Not expected to work locally
-
-# BUILDING STAGE
 # syntax=docker/dockerfile:experimental
 FROM debian:bookworm-slim as builder
 
@@ -14,8 +10,8 @@ ENV RUSTUP_HOME=/usr/local/rustup \
     PATH=/usr/local/cargo/bin:$PATH
 
 RUN curl https://sh.rustup.rs -sSf | bash -s -- -y && \
-    rustup install nightly-2023-07-21 && \
-    rustup default nightly-2023-07-21
+    rustup install nightly-2023-08-21 && \
+    rustup default nightly-2023-08-21
 
 WORKDIR /usr/src/micro
 COPY . .

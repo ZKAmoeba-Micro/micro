@@ -6,7 +6,7 @@ services:
       - PLUGIN_CONFIG
 
   zk:
-    image: "zkamoeba/zk-environment:latest2.0"
+    image: "zkamoeba/zk-environment:latest2.0-lightweight-nightly"
     depends_on:
       - geth
       - postgres

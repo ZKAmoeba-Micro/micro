@@ -1,9 +1,6 @@
-use futures::FutureExt;
-
 use std::time::Duration;
 
-use db_test_macro::db_test;
-
+use futures::FutureExt;
 use micro_contracts::BaseSystemContractsHashes;
 use micro_dal::ConnectionPool;
 use micro_mempool::L2TxFilter;
@@ -12,27 +9,25 @@ use micro_types::{
     MiniblockNumber, ProtocolVersionId, StorageKey, VmEvent, H256, U256,
 };
 use micro_utils::time::seconds_since_epoch;
-use vm::utils::fee::derive_base_fee_and_gas_per_pubdata;
+use multivm::vm_latest::utils::fee::derive_base_fee_and_gas_per_pubdata;
 
-use crate::state_keeper::tests::{create_l1_batch_metadata, default_l1_batch_env};
-
+use self::tester::Tester;
 use crate::state_keeper::{
     io::{MiniblockParams, MiniblockSealer, StateKeeperIO},
     mempool_actor::l2_tx_filter,
     tests::{
-        create_execution_result, create_transaction, create_updates_manager,
-        default_vm_block_result, Query,
+        create_execution_result, create_l1_batch_metadata, create_transaction,
+        create_updates_manager, default_l1_batch_env, default_vm_block_result, Query,
     },
     updates::{MiniblockSealCommand, MiniblockUpdates, UpdatesManager},
 };
 
 mod tester;
 
-use self::tester::Tester;
-
 /// Ensure that MempoolIO.filter is correctly initialized right after mempool initialization.
-#[db_test]
-async fn test_filter_initialization(connection_pool: ConnectionPool) {
+#[tokio::test]
+async fn test_filter_initialization() {
+    let connection_pool = ConnectionPool::test_pool().await;
     let tester = Tester::new();
 
     // Genesis is needed for proper mempool initialization.
@@ -44,8 +39,9 @@ async fn test_filter_initialization(connection_pool: ConnectionPool) {
 }
 
 /// Ensure that MempoolIO.filter is modified correctly if there is a pending batch upon mempool initialization.
-#[db_test]
-async fn test_filter_with_pending_batch(connection_pool: ConnectionPool) {
+#[tokio::test]
+async fn test_filter_with_pending_batch() {
+    let connection_pool = ConnectionPool::test_pool().await;
     let tester = Tester::new();
 
     tester.genesis(&connection_pool).await;
@@ -87,8 +83,9 @@ async fn test_filter_with_pending_batch(connection_pool: ConnectionPool) {
 }
 
 /// Ensure that MempoolIO.filter is modified correctly if there is no pending batch.
-#[db_test]
-async fn test_filter_with_no_pending_batch(connection_pool: ConnectionPool) {
+#[tokio::test]
+async fn test_filter_with_no_pending_batch() {
+    let connection_pool = ConnectionPool::test_pool().await;
     let tester = Tester::new();
     tester.genesis(&connection_pool).await;
 
@@ -157,36 +154,38 @@ async fn test_timestamps_are_distinct(
     assert!(batch_params.1.timestamp > prev_miniblock_timestamp);
 }
 
-#[db_test]
-async fn l1_batch_timestamp_basics(connection_pool: ConnectionPool) {
+#[tokio::test]
+async fn l1_batch_timestamp_basics() {
+    let connection_pool = ConnectionPool::test_pool().await;
     let current_timestamp = seconds_since_epoch();
     test_timestamps_are_distinct(connection_pool, current_timestamp, false).await;
 }
 
-#[db_test]
-async fn l1_batch_timestamp_with_clock_skew(connection_pool: ConnectionPool) {
+#[tokio::test]
+async fn l1_batch_timestamp_with_clock_skew() {
+    let connection_pool = ConnectionPool::test_pool().await;
     let current_timestamp = seconds_since_epoch();
     test_timestamps_are_distinct(connection_pool, current_timestamp + 2, false).await;
 }
 
-#[db_test]
-async fn l1_batch_timestamp_respects_prev_miniblock(connection_pool: ConnectionPool) {
+#[tokio::test]
+async fn l1_batch_timestamp_respects_prev_miniblock() {
+    let connection_pool = ConnectionPool::test_pool().await;
     let current_timestamp = seconds_since_epoch();
     test_timestamps_are_distinct(connection_pool, current_timestamp, true).await;
 }
 
-#[db_test]
-async fn l1_batch_timestamp_respects_prev_miniblock_with_clock_skew(
-    connection_pool: ConnectionPool,
-) {
+#[tokio::test]
+async fn l1_batch_timestamp_respects_prev_miniblock_with_clock_skew() {
+    let connection_pool = ConnectionPool::test_pool().await;
     let current_timestamp = seconds_since_epoch();
     test_timestamps_are_distinct(connection_pool, current_timestamp + 2, true).await;
 }
 
-#[db_test]
-async fn processing_storage_logs_when_sealing_miniblock(connection_pool: ConnectionPool) {
-    let mut miniblock =
-        MiniblockUpdates::new(0, 1, H256::zero(), 1, Some(ProtocolVersionId::latest()));
+#[tokio::test]
+async fn processing_storage_logs_when_sealing_miniblock() {
+    let connection_pool = ConnectionPool::test_pool().await;
+    let mut miniblock = MiniblockUpdates::new(0, 1, H256::zero(), 1, ProtocolVersionId::latest());
 
     let tx = create_transaction(10, 100);
     let storage_logs = [
@@ -241,6 +240,8 @@ async fn processing_storage_logs_when_sealing_miniblock(connection_pool: Connect
         base_system_contracts_hashes: BaseSystemContractsHashes::default(),
         protocol_version: Some(ProtocolVersionId::latest()),
         l2_erc20_bridge_addr: Address::default(),
+        consensus: None,
+        pre_insert_txs: false,
     };
     let mut conn = connection_pool
         .access_storage_tagged("state_keeper")
@@ -277,11 +278,11 @@ async fn processing_storage_logs_when_sealing_miniblock(connection_pool: Connect
     }
 }
 
-#[db_test]
-async fn processing_events_when_sealing_miniblock(pool: ConnectionPool) {
+#[tokio::test]
+async fn processing_events_when_sealing_miniblock() {
+    let pool = ConnectionPool::test_pool().await;
     let l1_batch_number = L1BatchNumber(2);
-    let mut miniblock =
-        MiniblockUpdates::new(0, 1, H256::zero(), 1, Some(ProtocolVersionId::latest()));
+    let mut miniblock = MiniblockUpdates::new(0, 1, H256::zero(), 1, ProtocolVersionId::latest());
 
     let events = (0_u8..10).map(|i| VmEvent {
         location: (l1_batch_number, u32::from(i / 4)),
@@ -316,6 +317,8 @@ async fn processing_events_when_sealing_miniblock(pool: ConnectionPool) {
         base_system_contracts_hashes: BaseSystemContractsHashes::default(),
         protocol_version: Some(ProtocolVersionId::latest()),
         l2_erc20_bridge_addr: Address::default(),
+        consensus: None,
+        pre_insert_txs: false,
     };
     let mut conn = pool.access_storage_tagged("state_keeper").await.unwrap();
     conn.protocol_versions_dal()
@@ -348,7 +351,7 @@ async fn test_miniblock_and_l1_batch_processing(
     // Save metadata for the genesis L1 batch so that we don't hang in `seal_l1_batch`.
     let metadata = create_l1_batch_metadata(0);
     conn.blocks_dal()
-        .save_l1_batch_metadata(L1BatchNumber(0), &metadata, H256::zero())
+        .save_l1_batch_metadata(L1BatchNumber(0), &metadata, H256::zero(), false)
         .await
         .unwrap();
     drop(conn);
@@ -406,18 +409,21 @@ async fn test_miniblock_and_l1_batch_processing(
     assert!(l1_batch_header.is_finished);
 }
 
-#[db_test]
-async fn miniblock_and_l1_batch_processing(pool: ConnectionPool) {
+#[tokio::test]
+async fn miniblock_and_l1_batch_processing() {
+    let pool = ConnectionPool::test_pool().await;
     test_miniblock_and_l1_batch_processing(pool, 1).await;
 }
 
-#[db_test]
-async fn miniblock_and_l1_batch_processing_with_sync_sealer(pool: ConnectionPool) {
+#[tokio::test]
+async fn miniblock_and_l1_batch_processing_with_sync_sealer() {
+    let pool = ConnectionPool::test_pool().await;
     test_miniblock_and_l1_batch_processing(pool, 0).await;
 }
 
-#[db_test]
-async fn miniblock_sealer_handle_blocking(pool: ConnectionPool) {
+#[tokio::test]
+async fn miniblock_sealer_handle_blocking() {
+    let pool = ConnectionPool::test_pool().await;
     let (mut sealer, mut sealer_handle) = MiniblockSealer::new(pool, 1);
 
     // The first command should be successfully submitted immediately.
@@ -426,6 +432,8 @@ async fn miniblock_sealer_handle_blocking(pool: ConnectionPool) {
         L1BatchNumber(1),
         MiniblockNumber(1),
         Address::default(),
+        None,
+        false,
     );
     sealer_handle.submit(seal_command).await;
 
@@ -434,6 +442,8 @@ async fn miniblock_sealer_handle_blocking(pool: ConnectionPool) {
         L1BatchNumber(1),
         MiniblockNumber(2),
         Address::default(),
+        None,
+        false,
     );
     {
         let submit_future = sealer_handle.submit(seal_command);
@@ -462,6 +472,8 @@ async fn miniblock_sealer_handle_blocking(pool: ConnectionPool) {
         L1BatchNumber(2),
         MiniblockNumber(3),
         Address::default(),
+        None,
+        false,
     );
     sealer_handle.submit(seal_command).await;
     let command = sealer.commands_receiver.recv().await.unwrap();
@@ -469,8 +481,9 @@ async fn miniblock_sealer_handle_blocking(pool: ConnectionPool) {
     sealer_handle.wait_for_all_commands().await;
 }
 
-#[db_test]
-async fn miniblock_sealer_handle_parallel_processing(pool: ConnectionPool) {
+#[tokio::test]
+async fn miniblock_sealer_handle_parallel_processing() {
+    let pool = ConnectionPool::test_pool().await;
     let (mut sealer, mut sealer_handle) = MiniblockSealer::new(pool, 5);
 
     // 5 miniblock sealing commands can be submitted without blocking.
@@ -480,6 +493,8 @@ async fn miniblock_sealer_handle_parallel_processing(pool: ConnectionPool) {
             L1BatchNumber(1),
             MiniblockNumber(i),
             Address::default(),
+            None,
+            false,
         );
         sealer_handle.submit(seal_command).await;
     }
@@ -494,8 +509,9 @@ async fn miniblock_sealer_handle_parallel_processing(pool: ConnectionPool) {
 }
 
 /// Ensure that subsequent miniblocks that belong to the same L1 batch have different timestamps
-#[db_test]
-async fn different_timestamp_for_miniblocks_in_same_batch(connection_pool: ConnectionPool) {
+#[tokio::test]
+async fn different_timestamp_for_miniblocks_in_same_batch() {
+    let connection_pool = ConnectionPool::test_pool().await;
     let tester = Tester::new();
 
     // Genesis is needed for proper mempool initialization.

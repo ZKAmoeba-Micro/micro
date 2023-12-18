@@ -1,17 +1,17 @@
-use crate::eth_watch::{
-    client::{Error, EthClient},
-    event_processors::EventProcessor,
-};
-use itertools::Itertools;
+use std::convert::TryFrom;
+
 use micro_contracts::micro_contract;
 use micro_dal::StorageProcessor;
-use micro_types::{
-    l1::{L1FactoryDep, L1Tx},
-    web3::types::Log,
-    PriorityOpId, H256,
+use micro_types::{l1::L1Tx, web3::types::Log, PriorityOpId, H256};
+
+use crate::{
+    eth_watch::{
+        client::{Error, EthClient},
+        event_processors::EventProcessor,
+        metrics::{PollStage, METRICS},
+    },
+    metrics::{TxStage, APP_METRICS},
 };
-use std::time::Instant;
-use std::{collections::HashMap, convert::TryFrom};
 
 /// Responsible for saving new priority L1 transactions to the database.
 #[derive(Debug)]
@@ -133,17 +133,9 @@ impl<W: EthClient + Sync> EventProcessor<W> for PriorityOpsEventProcessor {
             "priority transaction serial id mismatch"
         );
 
-        let stage_start = Instant::now();
-        metrics::counter!(
-            "server.processed_txs",
-            new_ops.len() as u64,
-            "stage" => "mempool_added"
-        );
-        metrics::counter!(
-            "server.processed_l1_txs",
-            new_ops.len() as u64,
-            "stage" => "mempool_added"
-        );
+        let stage_latency = METRICS.poll_eth_node[&PollStage::PersistL1Txs].start();
+        APP_METRICS.processed_txs[&TxStage::added_to_mempool()].inc();
+        APP_METRICS.processed_l1_txs[&TxStage::added_to_mempool()].inc();
         for new_op in new_ops {
             let eth_block = new_op.eth_block();
             storage
@@ -151,17 +143,12 @@ impl<W: EthClient + Sync> EventProcessor<W> for PriorityOpsEventProcessor {
                 .insert_transaction_l1(new_op, eth_block)
                 .await;
         }
-        metrics::histogram!("eth_watcher.poll_eth_node", stage_start.elapsed(), "stage" => "persist_l1_txs");
-
+        stage_latency.observe();
         self.next_expected_priority_id = last_new.serial_id().next();
-
         Ok(())
     }
 
-    fn relevant_topic(&self) -> Vec<H256> {
-        vec![
-            self.new_priority_request_signature,
-            self.new_priority_request_factory_deps_signature,
-        ]
+    fn relevant_topic(&self) -> H256 {
+        self.new_priority_request_signature
     }
 }

@@ -1,0 +1,18 @@
+[package]
+name = "micro_env_config"
+version = "0.1.0"
+edition = "2018"
+authors = []
+homepage = "https://micro.io/"
+repository = "https://github.com/ZKAmoeba-Micro/micro"
+license = "MIT OR Apache-2.0"
+keywords = ["blockchain", "micro"]
+categories = ["cryptography"]
+
+[dependencies]
+micro_basic_types = { path = "../../lib/basic_types" }
+micro_config = { path = "../../lib/config" }
+
+anyhow = "1.0"
+serde = "1.0"
+envy = "0.4"

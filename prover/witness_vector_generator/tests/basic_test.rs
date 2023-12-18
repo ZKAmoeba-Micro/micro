@@ -1,7 +1,7 @@
 use std::fs;
+
 use micro_prover_fri_types::{CircuitWrapper, ProverJob, ProverServiceDataKey};
-use micro_types::proofs::AggregationRound;
-use micro_types::L1BatchNumber;
+use micro_types::{proofs::AggregationRound, L1BatchNumber};
 use micro_witness_vector_generator::generator::WitnessVectorGenerator;
 
 #[test]

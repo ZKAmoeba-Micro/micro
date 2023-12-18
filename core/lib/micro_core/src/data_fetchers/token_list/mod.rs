@@ -14,12 +14,10 @@ use std::{
 };
 
 use async_trait::async_trait;
-use tokio::sync::watch;
-
 use micro_config::{configs::fetcher::TokenListSource, FetcherConfig};
 use micro_dal::{ConnectionPool, StorageProcessor};
-use micro_types::network::Network;
-use micro_types::{tokens::TokenMetadata, Address};
+use micro_types::{network::Network, tokens::TokenMetadata, Address};
+use tokio::sync::watch;
 
 use super::error::{ApiFetchError, ErrorAnalyzer};
 

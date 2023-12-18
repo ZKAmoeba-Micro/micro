@@ -1,11 +1,11 @@
+use micro_basic_types::L1BatchNumber;
 use serde::{Deserialize, Serialize};
 
-use micro_basic_types::L1BatchNumber;
-
-use crate::aggregated_operations::L1BatchProofForL1;
-use crate::proofs::PrepareBasicCircuitsJob;
-use crate::protocol_version::{FriProtocolVersionId, L1VerifierConfig};
-use crate::PackedEthSignature;
+use crate::{
+    aggregated_operations::L1BatchProofForL1,
+    proofs::PrepareBasicCircuitsJob,
+    protocol_version::{FriProtocolVersionId, L1VerifierConfig},
+};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ProofGenerationData {
@@ -16,14 +16,11 @@ pub struct ProofGenerationData {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct ProofGenerationDataRequest {
-    pub timestamp: i64,
-    pub signature: PackedEthSignature,
-}
+pub struct ProofGenerationDataRequest {}
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum ProofGenerationDataResponse {
-    Success(ProofGenerationData),
+    Success(Option<ProofGenerationData>),
     Error(String),
 }
 
@@ -31,7 +28,7 @@ pub enum ProofGenerationDataResponse {
 pub enum SubmitProofRequest {
     Proof(Box<L1BatchProofForL1>),
     // The proof generation was skipped due to sampling
-    SkippedProofGeneration(PackedEthSignature),
+    SkippedProofGeneration,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

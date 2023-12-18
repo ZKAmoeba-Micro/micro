@@ -1,34 +1,43 @@
+use std::time::Instant;
+
 use anyhow::Context as _;
 use async_trait::async_trait;
-use std::time::Instant;
 use tokio::task::JoinHandle;
-
+use zkevm_test_harness::proof_wrapper_utils::{wrap_proof, WrapperConfig};
 use micro_dal::ConnectionPool;
 use micro_object_store::ObjectStore;
-use micro_prover_fri_types::circuit_definitions::boojum::field::goldilocks::GoldilocksField;
-use micro_prover_fri_types::circuit_definitions::circuit_definitions::recursion_layer::{
-    MicroRecursionLayerProof, MicroRecursionLayerStorageType,
+use micro_prover_fri_types::{
+    circuit_definitions::{
+        boojum::field::goldilocks::GoldilocksField,
+        circuit_definitions::recursion_layer::{
+            MicroRecursionLayerProof, MicroRecursionLayerStorageType,
+        },
+        zkevm_circuits::scheduler::block_header::BlockAuxilaryOutputWitness,
+    },
+    get_current_pod_name, AuxOutputWitnessWrapper, FriProofWrapper,
 };
-use micro_prover_fri_types::circuit_definitions::zkevm_circuits::scheduler::block_header::BlockAuxilaryOutputWitness;
-use micro_prover_fri_types::{get_current_pod_name, AuxOutputWitnessWrapper, FriProofWrapper};
 use micro_queued_job_processor::JobProcessor;
-use micro_types::aggregated_operations::L1BatchProofForL1;
-use micro_types::zkevm_test_harness::abstract_micro_circuit::concrete_circuits::MicroVerificationKey;
-use micro_types::zkevm_test_harness::abstract_micro_circuit::concrete_circuits::{
-    MicroCircuit, MicroProof,
+use micro_types::{
+    aggregated_operations::L1BatchProofForL1,
+    zkevm_test_harness::{
+        abstract_micro_circuit::concrete_circuits::{
+            MicroCircuit, MicroProof, MicroVerificationKey,
+        },
+        bellman::{bn256::Bn256, plonk::better_better_cs::proof::Proof},
+        witness::oracle::VmWitnessOracle,
+    },
+    L1BatchNumber,
 };
-use micro_types::zkevm_test_harness::bellman::bn256::Bn256;
-use micro_types::zkevm_test_harness::bellman::plonk::better_better_cs::proof::Proof;
-use micro_types::zkevm_test_harness::witness::oracle::VmWitnessOracle;
-use micro_types::{L1BatchNumber, PackedEthSignature};
 use micro_vk_setup_data_server_fri::{get_recursive_layer_vk_for_circuit_type, get_snark_vk};
-use zkevm_test_harness::proof_wrapper_utils::wrap_proof;
+
+use crate::metrics::METRICS;
 
 pub struct ProofCompressor {
     blob_store: Box<dyn ObjectStore>,
     pool: ConnectionPool,
     compression_mode: u8,
     verify_wrapper_proof: bool,
+    max_attempts: u32,
 }
 
 impl ProofCompressor {
@@ -37,12 +46,14 @@ impl ProofCompressor {
         pool: ConnectionPool,
         compression_mode: u8,
         verify_wrapper_proof: bool,
+        max_attempts: u32,
     ) -> Self {
         Self {
             blob_store,
             pool,
             compression_mode,
             verify_wrapper_proof,
+            max_attempts,
         }
     }
 
@@ -55,7 +66,9 @@ impl ProofCompressor {
             MicroRecursionLayerStorageType::SchedulerCircuit as u8,
         )
         .context("get_recursiver_layer_vk_for_circuit_type()")?;
-        let (wrapper_proof, _) = wrap_proof(proof, scheduler_vk, compression_mode);
+        let config = WrapperConfig::new(compression_mode);
+
+        let (wrapper_proof, _) = wrap_proof(proof, scheduler_vk, config);
         let inner = wrapper_proof.into_inner();
         // (Re)serialization should always succeed.
         // TODO: is that true here?
@@ -119,13 +132,13 @@ impl JobProcessor for ProofCompressor {
             "Started proof compression for L1 batch: {:?}",
             l1_batch_number
         );
-        let started_at = Instant::now();
+        let observer = METRICS.blob_fetch_time.start();
+
         let fri_proof: FriProofWrapper = self.blob_store.get(fri_proof_id)
             .await.with_context(|| format!("Failed to get fri proof from blob store for {l1_batch_number} with id {fri_proof_id}"))?;
-        metrics::histogram!(
-            "prover_fri.proof_fri_compressor.blob_fetch_time",
-            started_at.elapsed(),
-        );
+
+        observer.observe();
+
         let scheduler_proof = match fri_proof {
             FriProofWrapper::Base(_) => anyhow::bail!("Must be a scheduler proof not base layer"),
             FriProofWrapper::Recursive(proof) => proof,
@@ -161,10 +174,7 @@ impl JobProcessor for ProofCompressor {
         started_at: Instant,
         artifacts: Proof<Bn256, MicroCircuit<Bn256, VmWitnessOracle<Bn256>>>,
     ) -> anyhow::Result<()> {
-        metrics::histogram!(
-            "prover_fri.proof_fri_compressor.compression_time",
-            started_at.elapsed(),
-        );
+        METRICS.compression_time.observe(started_at.elapsed());
         tracing::info!(
             "Finished fri proof compression for job: {job_id} took: {:?}",
             started_at.elapsed()
@@ -180,8 +190,6 @@ impl JobProcessor for ProofCompressor {
         let l1_batch_proof = L1BatchProofForL1 {
             aggregation_result_coords,
             scheduler_proof: artifacts,
-            signature: PackedEthSignature::default(),
-            time_taken: 0,
         };
         let blob_save_started_at = Instant::now();
         let blob_url = self
@@ -189,10 +197,10 @@ impl JobProcessor for ProofCompressor {
             .put(job_id, &l1_batch_proof)
             .await
             .context("Failed to save converted l1_batch_proof")?;
-        metrics::histogram!(
-            "prover_fri.proof_fri_compressor.blob_save_time",
-            blob_save_started_at.elapsed(),
-        );
+        METRICS
+            .blob_save_time
+            .observe(blob_save_started_at.elapsed());
+
         self.pool
             .access_storage()
             .await
@@ -201,5 +209,23 @@ impl JobProcessor for ProofCompressor {
             .mark_proof_compression_job_successful(job_id, started_at.elapsed(), &blob_url)
             .await;
         Ok(())
+    }
+
+    fn max_attempts(&self) -> u32 {
+        self.max_attempts
+    }
+
+    async fn get_job_attempts(&self, job_id: &L1BatchNumber) -> anyhow::Result<u32> {
+        let mut prover_storage = self
+            .pool
+            .access_storage()
+            .await
+            .context("failed to acquire DB connection for ProofCompressor")?;
+        prover_storage
+            .fri_proof_compressor_dal()
+            .get_proof_compression_job_attempts(*job_id)
+            .await
+            .map(|attempts| attempts.unwrap_or(0))
+            .context("failed to get job attempts for ProofCompressor")
     }
 }

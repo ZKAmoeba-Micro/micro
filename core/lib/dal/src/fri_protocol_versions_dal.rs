@@ -1,7 +1,6 @@
 use std::convert::TryFrom;
 
-use micro_types::protocol_version::FriProtocolVersionId;
-use micro_types::protocol_version::L1VerifierConfig;
+use micro_types::protocol_version::{FriProtocolVersionId, L1VerifierConfig};
 
 use crate::StorageProcessor;
 

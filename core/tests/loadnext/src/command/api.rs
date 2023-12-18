@@ -1,8 +1,7 @@
-use num::Integer;
-use rand::RngCore;
-
 use micro::EthNamespaceClient;
 use micro_types::api;
+use num::Integer;
+use rand::RngCore;
 
 use crate::{
     account_pool::SyncWallet,
@@ -54,7 +53,7 @@ impl AllWeighted for ApiRequestType {
 pub struct ApiRequest {
     /// Type of the request to be performed.
     pub request_type: ApiRequestType,
-    /// Micro block number, generated randomly.
+    /// micro block number, generated randomly.
     pub block_number: api::BlockNumber,
 }
 

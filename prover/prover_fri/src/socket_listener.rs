@@ -1,29 +1,30 @@
 #[cfg(feature = "gpu")]
 pub mod gpu_socket_listener {
-    use micro_dal::ConnectionPool;
-    use micro_types::proofs::AggregationRound;
-    use micro_types::proofs::{GpuProverInstanceStatus, SocketAddress};
-    use micro_vk_setup_data_server_fri::{
-        get_finalization_hints, get_round_for_recursive_circuit_type,
-    };
+    use std::{net::SocketAddr, time::Instant};
+
+    use anyhow::Context as _;
     use shivini::synthesis_utils::{
         init_base_layer_cs_for_repeated_proving, init_recursive_layer_cs_for_repeated_proving,
     };
-    use std::net::SocketAddr;
-    use std::time::Instant;
-
-    use crate::utils::{GpuProverJob, ProvingAssembly, SharedWitnessVectorQueue};
-    use anyhow::Context as _;
-    use micro_object_store::bincode;
-    use micro_prover_fri_types::{CircuitWrapper, ProverServiceDataKey, WitnessVectorArtifacts};
-    use tokio::sync::watch;
     use tokio::{
         io::copy,
         net::{TcpListener, TcpStream},
+        sync::watch,
+    };
+    use micro_dal::ConnectionPool;
+    use micro_object_store::bincode;
+    use micro_prover_fri_types::{CircuitWrapper, ProverServiceDataKey, WitnessVectorArtifacts};
+    use micro_types::proofs::{AggregationRound, GpuProverInstanceStatus, SocketAddress};
+    use micro_vk_setup_data_server_fri::{
+        get_finalization_hints, get_round_for_recursive_circuit_type,
+    };
+
+    use crate::{
+        metrics::METRICS,
+        utils::{GpuProverJob, ProvingAssembly, SharedWitnessVectorQueue},
     };
 
     pub(crate) struct SocketListener {
-        interface_address: SocketAddress,
         address: SocketAddress,
         queue: SharedWitnessVectorQueue,
         pool: ConnectionPool,
@@ -33,7 +34,6 @@ pub mod gpu_socket_listener {
 
     impl SocketListener {
         pub fn new(
-            interface_address: SocketAddress,
             address: SocketAddress,
             queue: SharedWitnessVectorQueue,
             pool: ConnectionPool,
@@ -41,7 +41,6 @@ pub mod gpu_socket_listener {
             zone: String,
         ) -> Self {
             Self {
-                interface_address,
                 address,
                 queue,
                 pool,
@@ -53,8 +52,8 @@ pub mod gpu_socket_listener {
             let listening_address = SocketAddr::new(self.address.host, self.address.port);
             tracing::info!(
                 "Starting assembly receiver at host: {}, port: {}",
-                self.interface_address.host,
-                self.interface_address.port
+                self.address.host,
+                self.address.port
             );
             let listener = TcpListener::bind(listening_address)
                 .await
@@ -67,7 +66,7 @@ pub mod gpu_socket_listener {
                 .unwrap()
                 .fri_gpu_prover_queue_dal()
                 .insert_prover_instance(
-                    self.interface_address.clone(),
+                    self.address.clone(),
                     self.specialized_prover_group_id,
                     self.zone.clone(),
                 )
@@ -96,10 +95,9 @@ pub mod gpu_socket_listener {
                     now.elapsed().as_millis()
                 );
 
-                let res = self.handle_incoming_file(stream).await;
-                if let Err(e) = res {
-                    tracing::error!("handle_incoming_file failed() {}", e);
-                }
+                self.handle_incoming_file(stream)
+                    .await
+                    .context("handle_incoming_file()")?;
 
                 now = Instant::now();
             }
@@ -117,11 +115,10 @@ pub mod gpu_socket_listener {
                 file_size_in_gb,
                 started_at.elapsed().as_secs()
             );
-            metrics::histogram!(
-                    "prover_fri.prover_fri.witness_vector_blob_time",
-                    started_at.elapsed(),
-                    "blob_size_in_gb" => file_size_in_gb.to_string(),
-            );
+
+            METRICS.witness_vector_blob_time[&(file_size_in_gb as u64)]
+                .observe(started_at.elapsed());
+
             let witness_vector = bincode::deserialize::<WitnessVectorArtifacts>(&assembly)
                 .context("Failed deserializing witness vector")?;
             let assembly = generate_assembly_for_repeated_proving(
@@ -152,11 +149,7 @@ pub mod gpu_socket_listener {
                 .await
                 .unwrap()
                 .fri_gpu_prover_queue_dal()
-                .update_prover_instance_status(
-                    self.interface_address.clone(),
-                    status,
-                    self.zone.clone(),
-                )
+                .update_prover_instance_status(self.address.clone(), status, self.zone.clone())
                 .await;
             Ok(())
         }
@@ -193,11 +186,9 @@ pub mod gpu_socket_listener {
             job_id,
             started_at.elapsed()
         );
-        metrics::histogram!(
-                "prover_fri.prover.gpu_assembly_generation_time",
-                started_at.elapsed(),
-                "circuit_type" => circuit_id.to_string()
-        );
+
+        METRICS.gpu_assembly_generation_time[&circuit_id.to_string()].observe(started_at.elapsed());
+
         Ok(cs)
     }
 }

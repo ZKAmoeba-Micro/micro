@@ -1,16 +1,21 @@
-use crate::get_recursive_layer_vk_for_circuit_type;
-use crate::utils::get_leaf_vk_params;
-use anyhow::Context as _;
-use once_cell::sync::Lazy;
 use std::str::FromStr;
+
+use anyhow::Context as _;
+use micro_prover_fri_types::circuit_definitions::{
+    boojum::field::goldilocks::GoldilocksField,
+    circuit_definitions::recursion_layer::MicroRecursionLayerStorageType,
+};
+use micro_types::{
+    protocol_version::{L1VerifierConfig, VerifierParams},
+    H256,
+};
+use once_cell::sync::Lazy;
 use structopt::lazy_static::lazy_static;
 use zkevm_test_harness::witness::recursive_aggregation::{
     compute_leaf_vks_and_params_commitment, compute_node_vk_commitment,
 };
-use micro_prover_fri_types::circuit_definitions::boojum::field::goldilocks::GoldilocksField;
-use micro_prover_fri_types::circuit_definitions::circuit_definitions::recursion_layer::MicroRecursionLayerStorageType;
-use micro_types::protocol_version::{L1VerifierConfig, VerifierParams};
-use micro_types::H256;
+
+use crate::{get_recursive_layer_vk_for_circuit_type, utils::get_leaf_vk_params};
 
 lazy_static! {
     // TODO: do not initialize a static const with data read in runtime.

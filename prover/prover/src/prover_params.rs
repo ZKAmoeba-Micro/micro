@@ -1,8 +1,7 @@
 use std::time::Duration;
 
-use prover_service::Params;
-
 use micro_config::ProverConfig;
+use prover_service::Params;
 
 #[derive(Debug)]
 pub struct ProverParams {

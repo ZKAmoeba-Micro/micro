@@ -1,14 +1,13 @@
 use std::time::Instant;
 
-use rand::seq::IteratorRandom;
-use regex::Regex;
-
 use micro::{
     error::{ClientError, RpcError},
     types::FilterBuilder,
     EthNamespaceClient,
 };
 use micro_types::{api, ethabi::Contract, H256, U64};
+use rand::seq::IteratorRandom;
+use regex::Regex;
 
 use super::{Aborted, AccountLifespan};
 use crate::{

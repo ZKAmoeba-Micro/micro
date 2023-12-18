@@ -1,10 +1,11 @@
 use std::path::PathBuf;
 
 use micro_basic_types::{AccountTreeId, Address, U256};
-use micro_config::constants::{
+use micro_contracts::{read_sys_contract_bytecode, ContractLanguage, SystemContractsRepo};
+use micro_system_constants::{
     BOOTLOADER_UTILITIES_ADDRESS, COMPRESSOR_ADDRESS, EVENT_WRITER_ADDRESS,
 };
-use micro_contracts::{read_sys_contract_bytecode, ContractLanguage, SystemContractsRepo};
+use once_cell::sync::Lazy;
 
 use crate::{
     block::DeployedContract, ACCOUNT_CODE_STORAGE_ADDRESS, BATCH_EVENT_ADDRESS,
@@ -14,7 +15,6 @@ use crate::{
     L1_MESSENGER_ADDRESS, L2_ETH_TOKEN_ADDRESS, MSG_VALUE_SIMULATOR_ADDRESS, NONCE_HOLDER_ADDRESS,
     RECEVING_ADDRESS, SHA256_PRECOMPILE_ADDRESS, SYSTEM_CONTEXT_ADDRESS, WHITE_LIST_ADDRESS,
 };
-use once_cell::sync::Lazy;
 
 // Note, that in the NONCE_HOLDER_ADDRESS's storage the nonces of accounts
 // are stored in the following form:

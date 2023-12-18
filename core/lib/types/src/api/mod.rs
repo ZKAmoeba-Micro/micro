@@ -1,20 +1,21 @@
 use chrono::{DateTime, Utc};
-use serde::{de, Deserialize, Deserializer, Serialize, Serializer};
-use strum::Display;
-
 use micro_basic_types::{
     web3::types::{Bytes, H160, H256, H64, U256, U64},
     L1BatchNumber,
 };
 use micro_contracts::BaseSystemContractsHashes;
+use serde::{de, Deserialize, Deserializer, Serialize, Serializer};
+use strum::Display;
 
-use crate::protocol_version::L1VerifierConfig;
 pub use crate::transaction_request::{
     Eip712Meta, SerializationTransactionError, TransactionRequest,
 };
-use crate::vm_trace::{Call, CallType};
-use crate::web3::types::{AccessList, Index, H2048};
-use crate::{Address, MiniblockNumber, ProtocolVersionId};
+use crate::{
+    protocol_version::L1VerifierConfig,
+    vm_trace::{Call, CallType},
+    web3::types::{AccessList, Index, H2048},
+    Address, MiniblockNumber, ProtocolVersionId,
+};
 
 pub mod en;
 
@@ -271,7 +272,7 @@ pub struct Block<TX> {
     /// Hash of the uncles
     #[serde(rename = "sha3Uncles")]
     pub uncles_hash: H256,
-    /// Miner/author's address
+    /// Miner / author's address
     #[serde(rename = "miner", default, deserialize_with = "null_to_default")]
     pub author: H160,
     /// State root hash
@@ -463,7 +464,7 @@ pub struct Transaction {
     pub from: Option<Address>,
     /// Recipient (None when contract creation)
     pub to: Option<Address>,
-    /// Transfered value
+    /// Transferred value
     pub value: U256,
     /// Gas Price
     #[serde(rename = "gasPrice")]
@@ -505,7 +506,7 @@ pub struct Transaction {
     pub max_priority_fee_per_gas: Option<U256>,
     /// Id of the current chain
     #[serde(rename = "chainId")]
-    pub chain_id: u64,
+    pub chain_id: U256,
     /// Number of the l1 batch this transaction was included within.
     #[serde(
         rename = "l1BatchNumber",
@@ -548,15 +549,9 @@ pub struct TransactionDetails {
 #[derive(Debug, Clone)]
 pub struct GetLogsFilter {
     pub from_block: MiniblockNumber,
-    pub to_block: Option<BlockNumber>,
+    pub to_block: MiniblockNumber,
     pub addresses: Vec<Address>,
     pub topics: Vec<(u32, Vec<H256>)>,
-}
-
-#[derive(Debug, Clone)]
-pub struct GetEventLogsFilter {
-    pub log_filter: GetLogsFilter,
-    pub event_names: Vec<Vec<H256>>,
 }
 
 /// Result of debugging block
@@ -633,7 +628,7 @@ pub enum SupportedTracers {
     CallTracer,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct CallTracerConfig {
     pub only_top_call: bool,
@@ -643,6 +638,7 @@ pub struct CallTracerConfig {
 #[serde(rename_all = "camelCase")]
 pub struct TracerConfig {
     pub tracer: SupportedTracers,
+    #[serde(default)]
     pub tracer_config: CallTracerConfig,
 }
 
@@ -689,4 +685,20 @@ pub struct L1BatchDetails {
     pub number: L1BatchNumber,
     #[serde(flatten)]
     pub base: BlockDetailsBase,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct StorageProof {
+    pub key: H256,
+    pub proof: Vec<H256>,
+    pub value: H256,
+    pub index: u64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Proof {
+    pub address: Address,
+    pub storage_proof: Vec<StorageProof>,
 }

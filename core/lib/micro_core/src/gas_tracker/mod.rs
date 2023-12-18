@@ -7,7 +7,7 @@ use micro_types::{
     block::{BlockGasCount, L1BatchHeader},
     commitment::{L1BatchMetadata, L1BatchWithMetadata},
     tx::tx_execution_info::{DeduplicatedWritesMetrics, ExecutionMetrics},
-    ExecuteTransactionCommon, Transaction, H256,
+    ExecuteTransactionCommon, ProtocolVersionId, Transaction, H256,
 };
 
 mod constants;
@@ -46,8 +46,11 @@ fn additional_pubdata_commit_cost(execution_metrics: &ExecutionMetrics) -> u64 {
     (execution_metrics.size() as u64) * GAS_PER_BYTE
 }
 
-fn additional_writes_commit_cost(writes_metrics: &DeduplicatedWritesMetrics) -> u64 {
-    (writes_metrics.size() as u64) * GAS_PER_BYTE
+fn additional_writes_commit_cost(
+    writes_metrics: &DeduplicatedWritesMetrics,
+    protocol_version: ProtocolVersionId,
+) -> u64 {
+    (writes_metrics.size(protocol_version) as u64) * GAS_PER_BYTE
 }
 
 pub fn new_block_gas_count() -> BlockGasCount {
@@ -79,9 +82,12 @@ pub fn gas_count_from_metrics(execution_metrics: &ExecutionMetrics) -> BlockGasC
     }
 }
 
-pub fn gas_count_from_writes(writes_metrics: &DeduplicatedWritesMetrics) -> BlockGasCount {
+pub fn gas_count_from_writes(
+    writes_metrics: &DeduplicatedWritesMetrics,
+    protocol_version: ProtocolVersionId,
+) -> BlockGasCount {
     BlockGasCount {
-        commit: additional_writes_commit_cost(writes_metrics),
+        commit: additional_writes_commit_cost(writes_metrics, protocol_version),
         prove: 0,
         execute: 0,
     }
@@ -103,7 +109,20 @@ pub(crate) fn commit_gas_count_for_l1_batch(
     let total_factory_deps_len: u64 = sorted_factory_deps
         .map(|factory_dep| factory_dep.len() as u64)
         .sum();
-    let additional_calldata_bytes = metadata.initial_writes_compressed.len() as u64
+
+    // Boojum upgrade changes how storage writes are communicated/compressed.
+    let is_pre_boojum = header
+        .protocol_version
+        .map(|v| v.is_pre_boojum())
+        .unwrap_or(true);
+    let state_diff_size = if is_pre_boojum {
+        metadata.initial_writes_compressed.len() as u64
+            + metadata.repeated_writes_compressed.len() as u64
+    } else {
+        metadata.state_diffs_compressed.len() as u64
+    };
+
+    let additional_calldata_bytes = state_diff_size
         + metadata.repeated_writes_compressed.len() as u64
         + metadata.l2_l1_messages_compressed.len() as u64
         + total_messages_len

@@ -1,8 +1,8 @@
 # Ignore submodule
 bellman-cuda
-sdk/micro-web3.js/CHANGELOG.md
 sdk/micro-rs/CHANGELOG.md
 CHANGELOG.md
 
-# ignore micro-contracts, since they have their own formatting CI
+# Ignore contract submodules
 contracts
+etc/system-contracts

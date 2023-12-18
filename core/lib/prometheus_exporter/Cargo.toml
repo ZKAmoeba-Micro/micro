@@ -14,8 +14,10 @@ anyhow = "1.0"
 metrics = "0.21"
 metrics-exporter-prometheus = "0.12"
 tokio = "1"
+vise = { git = "https://github.com/ZKAmoeba-Micro/vise.git", branch = "main" }
 
 [dependencies.vise-exporter]
 git = "https://github.com/ZKAmoeba-Micro/vise.git"
-branch = "main"
+version = "0.1.0"
+rev = "1066acc708dd51566f282126f13c5742841339c1"
 features = ["legacy"]

@@ -1,6 +1,6 @@
 [package]
 name = "vlog"
-version="0.1.0"
+version = "0.1.0"
 edition = "2018"
 authors = []
 homepage = "https://www.zkamoeba.com/"
@@ -13,6 +13,11 @@ publish = false # This is an utility crate, not to be used by libraries.
 [dependencies]
 chrono = "0.4"
 tracing = "0.1"
-tracing-subscriber = { version = "0.3", features = ["fmt", "env-filter", "time", "json"] }
+tracing-subscriber = { version = "0.3", features = [
+    "fmt",
+    "env-filter",
+    "time",
+    "json",
+] }
 sentry = "0.31"
 serde_json = "1.0"

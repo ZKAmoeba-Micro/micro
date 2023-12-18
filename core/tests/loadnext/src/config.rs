@@ -1,12 +1,9 @@
-use serde::Deserialize;
-use tokio::sync::Semaphore;
-
-use std::path::PathBuf;
-use std::time::Duration;
+use std::{path::PathBuf, time::Duration};
 
 use micro_contracts::test_contracts::LoadnextContractExecutionParams;
-use micro_types::network::Network;
-use micro_types::{Address, L2ChainId, H160};
+use micro_types::{network::Network, Address, L2ChainId, H160};
+use serde::Deserialize;
+use tokio::sync::Semaphore;
 
 use crate::fs_utils::read_tokens;
 
@@ -148,7 +145,7 @@ fn default_max_inflight_txs() -> usize {
 }
 
 fn default_l1_rpc_address() -> String {
-    let result = "http://127.0.0.1:1234/rpc/v1".to_string();
+    let result = "http://127.0.0.1:8545".to_string();
     tracing::info!("Using default L1_RPC_ADDRESS: {result}");
     result
 }
@@ -315,9 +312,9 @@ impl TransactionWeights {
 impl Default for TransactionWeights {
     fn default() -> Self {
         Self {
-            deposit: 0.1,
+            deposit: 0.05,
             withdrawal: 0.5,
-            l1_transactions: 0.1,
+            l1_transactions: 0.05,
             l2_transactions: 1.0,
         }
     }

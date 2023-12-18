@@ -1,22 +1,21 @@
 //! `transactions` is module that holds the essential information for every transaction.
 //!
-//! Since in zkAmoeba every operation can be executed either from the contract or rollup,
+//! Since in micro every operation can be executed either from the contract or rollup,
 //! it makes more sense to define the contents of each transaction chain-agnostic, and extent this data
 //! with metadata (such as fees and/or signatures) for L1 and L2 separately.
 
+use std::fmt::Debug;
+
 use micro_basic_types::{Address, H256};
 use micro_utils::bytecode::CompressedBytecodeInfo;
-use std::fmt::Debug;
+
+use self::tx_execution_info::TxExecutionStatus;
+pub use self::{execute::Execute, tx_execution_info::ExecutionMetrics};
+use crate::{vm_trace::Call, Transaction};
 
 pub mod execute;
 pub mod primitives;
 pub mod tx_execution_info;
-
-pub use self::execute::Execute;
-use crate::vm_trace::Call;
-use crate::Transaction;
-pub use tx_execution_info::ExecutionMetrics;
-use tx_execution_info::TxExecutionStatus;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct TransactionExecutionResult {
@@ -49,7 +48,7 @@ impl TransactionExecutionResult {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct IncludedTxLocation {
     pub tx_hash: H256,
     pub tx_index_in_miniblock: u32,

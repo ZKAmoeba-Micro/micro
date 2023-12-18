@@ -1,10 +1,14 @@
-use micro_dal::{connection::DbVariant, ConnectionPool};
-use micro_types::contract_verification_api::SourceCodeData;
 use std::io::Write;
+
+use micro_config::PostgresConfig;
+use micro_dal::ConnectionPool;
+use micro_env_config::FromEnv;
+use micro_types::contract_verification_api::SourceCodeData;
 
 #[tokio::main]
 async fn main() {
-    let pool = ConnectionPool::singleton(DbVariant::Replica)
+    let config = PostgresConfig::from_env().unwrap();
+    let pool = ConnectionPool::singleton(config.replica_url().unwrap())
         .build()
         .await
         .unwrap();

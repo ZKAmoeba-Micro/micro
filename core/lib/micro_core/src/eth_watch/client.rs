@@ -1,19 +1,16 @@
-use std::fmt::Debug;
-
-use tokio::time::Instant;
-
 use micro_contracts::verifier_contract;
 use micro_eth_client::{types::Error as EthClientError, EthInterface};
-
 use micro_types::{
     ethabi::{Contract, Token},
     vk_transform::l1_vk_commitment,
     web3::{
         self,
-        types::{BlockNumber, FilterBuilder, Log},
+        types::{BlockId, BlockNumber, FilterBuilder, Log},
     },
     Address, H256,
 };
+
+use super::metrics::METRICS;
 
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
@@ -51,7 +48,9 @@ pub struct EthHttpQueryClient<E> {
     client: E,
     topics: Vec<H256>,
     micro_contract_addr: Address,
-    governance_address: Address,
+    /// Address of the `Governance` contract. It's optional because it is present only for post-boojum chains.
+    /// If address is some then client will listen to events coming from it.
+    governance_address: Option<Address>,
     verifier_contract_abi: Contract,
     confirmations_for_eth_event: Option<u64>,
 }
@@ -60,11 +59,11 @@ impl<E: EthInterface> EthHttpQueryClient<E> {
     pub fn new(
         client: E,
         micro_contract_addr: Address,
-        governance_address: Address,
+        governance_address: Option<Address>,
         confirmations_for_eth_event: Option<u64>,
     ) -> Self {
         tracing::debug!(
-            "New eth client, micro addr: {:x}, governance addr: {:x}",
+            "New eth client, micro addr: {:x}, governance addr: {:?}",
             micro_contract_addr,
             governance_address
         );
@@ -85,7 +84,13 @@ impl<E: EthInterface> EthHttpQueryClient<E> {
         topics: Vec<H256>,
     ) -> Result<Vec<Log>, Error> {
         let filter = FilterBuilder::default()
-            .address(vec![self.micro_contract_addr, self.governance_address])
+            .address(
+                [Some(self.micro_contract_addr), self.governance_address]
+                    .iter()
+                    .flatten()
+                    .copied()
+                    .collect(),
+            )
             .from_block(from)
             .to_block(to)
             .topics(Some(topics), None, None, None)
@@ -100,7 +105,7 @@ impl<E: EthInterface + Send + Sync + 'static> EthClient for EthHttpQueryClient<E
     async fn scheduler_vk_hash(&self, verifier_address: Address) -> Result<H256, Error> {
         // This is here for backward compatibility with the old verifier:
         // Legacy verifier returns the full verification key;
-        // New verifier returns the hash of the verification key
+        // New verifier returns the hash of the verification key.
 
         let vk_hash = self
             .client
@@ -140,8 +145,7 @@ impl<E: EthInterface + Send + Sync + 'static> EthClient for EthHttpQueryClient<E
         to: BlockNumber,
         retries_left: usize,
     ) -> Result<Vec<Log>, Error> {
-        let start = Instant::now();
-
+        let latency = METRICS.get_priority_op_events.start();
         let mut result = self.get_filter_logs(from, to, self.topics.clone()).await;
 
         // This code is compatible with both Infura and Alchemy API providers.
@@ -211,7 +215,7 @@ impl<E: EthInterface + Send + Sync + 'static> EthClient for EthHttpQueryClient<E
             }
         }
 
-        metrics::histogram!("eth_watcher.get_priority_op_events", start.elapsed());
+        latency.observe();
         result
     }
 
@@ -221,7 +225,7 @@ impl<E: EthInterface + Send + Sync + 'static> EthClient for EthHttpQueryClient<E
             Ok(latest_block_number.saturating_sub(confirmations))
         } else {
             self.client
-                .block("finalized".to_string(), "watch")
+                .block(BlockId::Number(BlockNumber::Finalized), "watch")
                 .await
                 .map_err(Into::into)
                 .map(|res| {

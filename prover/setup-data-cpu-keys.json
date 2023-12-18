@@ -1,0 +1,5 @@
+{
+  "us": "gs://zkamoeba-setup-data-us/e2e94ff/",
+  "europe": "gs://zkamoeba-setup-data-europe/e2e94ff/",
+  "asia": "gs://zkamoeba-setup-data-asia/e2e94ff/"
+}

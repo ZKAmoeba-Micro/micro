@@ -32,10 +32,6 @@ api_namespaces = ["eth", "web3", "net", "pubsub", "zks", "en", "debug"]
 bootloader_hash = "0x0100091ba79ef3787d87bc4d54a646390bf52aa3fa0cc4e8bec039323e3f7030"
 default_aa_hash = "0x0100065dc386f7b648718f2a0b08887b8d813e6b6728936fecb16a4bef7d5fd5"
 
-# Whether to try using MultiVM
-# WARN: Only to be used locally until the feature is fully tested.
-experimental_multivm_support = false
-
 with_prover = false
 
 [rust]

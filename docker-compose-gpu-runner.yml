@@ -6,7 +6,8 @@ services:
       - PLUGIN_CONFIG
 
   zk:
-    image: "zkamoeba/zk-environment:latest2.0"
+    image: "zkamoeba/zk-environment:cuda-11-8-latest"
+    container_name: zk
     depends_on:
       - geth
       - postgres
@@ -33,7 +34,7 @@ services:
       resources:
         reservations:
           devices:
-            - capabilities: [gpu]
+            - capabilities: [ gpu ]
   postgres:
     image: "postgres:14"
     ports:

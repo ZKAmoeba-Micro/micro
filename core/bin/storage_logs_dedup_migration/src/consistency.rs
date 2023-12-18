@@ -1,14 +1,17 @@
 use clap::Parser;
-
-use micro_dal::connection::DbVariant;
+use micro_config::PostgresConfig;
 use micro_dal::ConnectionPool;
+use micro_env_config::FromEnv;
 use micro_types::MiniblockNumber;
 
 const MIGRATED_TABLE: &str = "storage_logs";
 const NOT_MIGRATED_TABLE: &str = "storage_logs_backup";
 
 #[derive(Debug, Parser)]
-#[command(author = "", about = "Consistency checker for the migration")]
+#[command(
+    author = "Zkamoeba",
+    about = "Consistency checker for the migration"
+)]
 struct Cli {
     /// Miniblock number to start check from.
     #[arg(long)]
@@ -20,8 +23,9 @@ struct Cli {
 
 #[tokio::main]
 async fn main() {
+    let config = PostgresConfig::from_env().unwrap();
     let opt = Cli::parse();
-    let pool = ConnectionPool::singleton(DbVariant::Replica)
+    let pool = ConnectionPool::singleton(config.replica_url().unwrap())
         .build()
         .await
         .unwrap();

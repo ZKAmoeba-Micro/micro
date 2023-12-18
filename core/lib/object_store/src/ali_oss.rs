@@ -138,6 +138,10 @@ impl<'a> ObjectStore for AliyunOssStorage<'a> {
         .await?;
         Ok(())
     }
+
+    fn storage_prefix_raw(&self, bucket: Bucket) -> String {
+        format!("{}/{}", self.bucket_prefix, bucket)
+    }
 }
 
 #[cfg(test)]

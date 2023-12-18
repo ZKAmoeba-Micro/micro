@@ -1,16 +1,19 @@
 //! This module determines the fees to pay in txs containing blocks submitted to the L1.
 
-// Built-in deps
-use std::collections::VecDeque;
-use std::sync::{Arc, RwLock};
-use tokio::sync::watch::Receiver;
+use std::{
+    collections::VecDeque,
+    sync::{Arc, RwLock},
+};
 
 use micro_config::GasAdjusterConfig;
 use micro_eth_client::{types::Error, EthInterface};
+use tokio::sync::watch;
 
+use self::metrics::METRICS;
 use super::{L1GasPriceProvider, L1TxParamsProvider};
+use crate::state_keeper::metrics::KEEPER_METRICS;
 
-pub mod bounded_gas_adjuster;
+mod metrics;
 #[cfg(test)]
 mod tests;
 
@@ -79,27 +82,37 @@ impl<E: EthInterface> GasAdjuster<E> {
                 )
                 .await?;
 
-            metrics::gauge!(
-                "server.gas_adjuster.current_base_fee_per_gas",
-                *history.last().unwrap() as f64
-            );
-
+            METRICS
+                .current_base_fee_per_gas
+                .set(*history.last().unwrap());
             self.statistics.add_samples(&history);
 
             let gas_price = self.eth_client.get_gas_price("gas_adjuster").await?;
             let gas_price_history = vec![gas_price.as_u64()];
 
-            metrics::gauge!(
-                "server.gas_adjuster.current_priority_fee_per_gas",
-                *gas_price_history.last().unwrap() as f64
-            );
+            METRICS
+                .current_priority_fee_per_gas
+                .set(*gas_price_history.last().unwrap());
 
             self.statistics2.add_samples(&gas_price_history);
         }
         Ok(())
     }
 
-    pub async fn run(self: Arc<Self>, stop_receiver: Receiver<bool>) -> anyhow::Result<()> {
+    fn bound_gas_price(&self, gas_price: u64) -> u64 {
+        let max_l1_gas_price = self.config.max_l1_gas_price();
+        if gas_price > max_l1_gas_price {
+            tracing::warn!(
+                "Effective gas price is too high: {gas_price}, using max allowed: {}",
+                max_l1_gas_price
+            );
+            KEEPER_METRICS.gas_price_too_high.inc();
+            return max_l1_gas_price;
+        }
+        gas_price
+    }
+
+    pub async fn run(self: Arc<Self>, stop_receiver: watch::Receiver<bool>) -> anyhow::Result<()> {
         loop {
             if *stop_receiver.borrow() {
                 tracing::info!("Stop signal received, gas_adjuster is shutting down");
@@ -126,7 +139,11 @@ impl<E: EthInterface> L1GasPriceProvider for GasAdjuster<E> {
 
         let effective_gas_price = self.get_base_fee(0) + self.get_priority_fee();
 
-        (self.config.internal_l1_pricing_multiplier * effective_gas_price as f64) as u64
+        let calculated_price =
+            (self.config.internal_l1_pricing_multiplier * effective_gas_price as f64) as u64;
+
+        // Bound the price if it's too high.
+        self.bound_gas_price(calculated_price)
     }
 }
 
@@ -146,9 +163,7 @@ impl<E: EthInterface> L1TxParamsProvider for GasAdjuster<E> {
         // let scale_factor = a + b * time_in_mempool as f64;
         let scale_factor = a * b.powf(time_in_mempool as f64);
         let median = self.statistics.median();
-
-        metrics::gauge!("server.gas_adjuster.median_base_fee_per_gas", median as f64);
-
+        METRICS.median_base_fee_per_gas.set(median);
         let new_fee = median as f64 * scale_factor;
         new_fee as u64
     }

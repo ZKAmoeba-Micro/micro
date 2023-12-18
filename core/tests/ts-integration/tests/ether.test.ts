@@ -124,10 +124,9 @@ describe('ETH token checks', () => {
             'Incorrect tx type in receipt'
         );
 
-        await expect(alice.sendTransaction({ type: micro.utils.EIP712_TX_TYPE, to: bob.address, value })).toBeAccepted([
-            ethBalanceChange,
-            correctReceiptType
-        ]);
+        await expect(alice.sendTransaction({ type: micro.utils.EIP712_TX_TYPE, to: bob.address, value })).toBeAccepted(
+            [ethBalanceChange, correctReceiptType]
+        );
     });
 
     test('Can perform a transfer (EIP1559)', async () => {

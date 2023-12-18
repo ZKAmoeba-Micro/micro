@@ -2,10 +2,9 @@ use std::collections::HashMap;
 
 use bigdecimal::BigDecimal;
 use jsonrpsee::{core::RpcResult, proc_macros::rpc};
-
 use micro_types::{
     api::{
-        BlockDetails, BridgeAddresses, L1BatchDetails, L2ToL1LogProof, ProtocolVersion,
+        BlockDetails, BridgeAddresses, L1BatchDetails, L2ToL1LogProof, Proof, ProtocolVersion,
         TransactionDetails,
     },
     fee::Fee,
@@ -14,7 +13,7 @@ use micro_types::{
     Address, L1BatchNumber, MiniblockNumber, H256, U256, U64,
 };
 
-use crate::types::{Filter, Log, Token};
+use crate::types::Token;
 
 #[cfg_attr(
     all(feature = "client", feature = "server"),
@@ -109,8 +108,13 @@ pub trait ZksNamespace {
         version_id: Option<u16>,
     ) -> RpcResult<Option<ProtocolVersion>>;
 
-    #[method(name = "getLogsWithVirtualBlocks")]
-    async fn get_logs_with_virtual_blocks(&self, filter: Filter) -> RpcResult<Vec<Log>>;
+    #[method(name = "getProof")]
+    async fn get_proof(
+        &self,
+        address: Address,
+        keys: Vec<H256>,
+        l1_batch_number: L1BatchNumber,
+    ) -> RpcResult<Proof>;
 
     #[method(name = "getStatistics")]
     async fn get_statistics_info(&self) -> RpcResult<StatiticsInfo>;

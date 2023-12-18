@@ -1,27 +1,26 @@
+use std::{path::Path, time::Duration};
+
 use bitflags::bitflags;
-use serde::Serialize;
-use tokio::time::sleep;
-
-use std::path::Path;
-use std::time::Duration;
-
 use micro_config::{ContractsConfig, ETHSenderConfig};
 use micro_contracts::micro_contract;
 use micro_dal::ConnectionPool;
+use micro_eth_signer::{EthereumSigner, PrivateKeySigner, TransactionParameters};
 use micro_merkle_tree::domain::MicroTree;
 use micro_state::RocksdbStorage;
 use micro_storage::RocksDB;
-use micro_types::aggregated_operations::AggregatedActionType;
-use micro_types::ethabi::Token;
-use micro_types::web3::{
-    contract::{Contract, Options},
-    transports::Http,
-    types::{BlockId, BlockNumber},
-    Web3,
+use micro_types::{
+    aggregated_operations::AggregatedActionType,
+    ethabi::Token,
+    web3::{
+        contract::{Contract, Options},
+        transports::Http,
+        types::{BlockId, BlockNumber},
+        Web3,
+    },
+    L1BatchNumber, PackedEthSignature, H160, H256, U256,
 };
-use micro_types::{L1BatchNumber, PackedEthSignature, H160, H256, U256, U64};
-
-use micro_eth_signer::{EthereumSigner, PrivateKeySigner, TransactionParameters};
+use serde::Serialize;
+use tokio::time::sleep;
 
 bitflags! {
     pub struct BlockReverterFlags: u32 {
@@ -132,7 +131,7 @@ impl BlockReverter {
                 .get_number_of_last_l1_batch_executed_on_eth()
                 .await
                 .unwrap()
-                .unwrap_or_default();
+                .expect("failed to get last executed L1 batch");
             assert!(
                 last_l1_batch_to_keep >= last_executed_l1_batch,
                 "Attempt to revert already executed L1 batches"
@@ -190,8 +189,8 @@ impl BlockReverter {
         path: &Path,
         storage_root_hash: H256,
     ) {
-        let db = RocksDB::new(path, true);
-        let mut tree = MicroTree::new_lightweight(db);
+        let db = RocksDB::new(path);
+        let mut tree = MicroTree::new_lightweight(db.into());
 
         if tree.next_l1_batch_number() <= last_l1_batch_to_keep {
             tracing::info!("Tree is behind the L1 batch to revert to; skipping");
@@ -300,9 +299,13 @@ impl BlockReverter {
         let signer = PrivateKeySigner::new(eth_config.reverter_private_key);
         let chain_id = web3.eth().chain_id().await.unwrap().as_u64();
 
-        let data = contract
-            .function("revertBatches")
-            .unwrap()
+        let revert_function = contract
+            .function("revertBlocks")
+            .or_else(|_| contract.function("revertBatches"))
+            .expect(
+                "Either `revertBlocks` or `revertBatches` function must be present in contract",
+            );
+        let data = revert_function
             .encode_input(&[Token::Uint(last_l1_batch_to_keep.0.into())])
             .unwrap();
 
@@ -336,7 +339,6 @@ impl BlockReverter {
 
         loop {
             if let Some(receipt) = web3.eth().transaction_receipt(hash).await.unwrap() {
-                tracing::info!("receipt {:?}", receipt);
                 assert_eq!(receipt.status, Some(1.into()), "revert transaction failed");
                 tracing::info!("revert transaction has completed");
                 return;
@@ -420,7 +422,8 @@ impl BlockReverter {
             .unwrap()
             .eth_sender_dal()
             .clear_failed_transactions()
-            .await;
+            .await
+            .unwrap();
     }
 
     pub fn change_rollback_executed_l1_batches_allowance(

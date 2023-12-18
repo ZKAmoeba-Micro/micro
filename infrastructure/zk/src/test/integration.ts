@@ -24,6 +24,11 @@ export async function contractVerification(bail: boolean = false) {
     await utils.spawn('yarn ts-integration contract-verification-test' + flag);
 }
 
+export async function snapshotsCreator(bail: boolean = false) {
+    const flag = bail ? ' --bail' : '';
+    await utils.spawn('yarn ts-integration snapshots-creator-test' + flag);
+}
+
 export async function server(options: string[] = []) {
     if (process.env.MICRO_ENV?.startsWith('ext-node')) {
         process.env.MICRO_WEB3_API_URL = `http://127.0.0.1:${process.env.EN_HTTP_PORT}`;
@@ -63,7 +68,7 @@ export async function testkit(args: string[], timeout: number) {
     let containerID = '';
     const prevUrls = process.env.ETH_CLIENT_WEB3_URL?.split(',')[0];
     if (process.env.MICRO_ENV == 'dev' && process.env.CI != '1') {
-        const { stdout } = await utils.exec('docker run --rm -d -p 7545:8545 matterlabs/geth:latest fast');
+        const { stdout } = await utils.exec('docker run --rm -d -p 7545:8545 zkamoeba/geth:latest fast');
         containerID = stdout;
         process.env.ETH_CLIENT_WEB3_URL = 'http://localhost:7545';
     }
@@ -172,6 +177,14 @@ command
     .option('--bail')
     .action(async (cmd: Command) => {
         await contractVerification(cmd.bail);
+    });
+
+command
+    .command('snapshots-creator')
+    .description('run snapshots creator tests')
+    .option('--bail')
+    .action(async (cmd: Command) => {
+        await snapshotsCreator(cmd.bail);
     });
 
 command

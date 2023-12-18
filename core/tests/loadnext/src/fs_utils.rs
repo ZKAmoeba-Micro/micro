@@ -1,14 +1,10 @@
 //! Utilities used for reading tokens, contracts bytecode and ABI from the
 //! filesystem.
 
-use std::fs::File;
-use std::io::BufReader;
-use std::path::Path;
+use std::{fs::File, io::BufReader, path::Path};
 
+use micro_types::{ethabi::Contract, network::Network, Address};
 use serde::Deserialize;
-
-use micro_types::network::Network;
-use micro_types::{ethabi::Contract, Address};
 
 /// A token stored in `etc/tokens/{network}.json` files.
 #[derive(Debug, Deserialize)]
@@ -93,8 +89,9 @@ pub fn loadnext_contract(path: &Path) -> anyhow::Result<TestContract> {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use std::path::PathBuf;
+
+    use super::*;
 
     #[test]
     fn check_read_test_contract() {

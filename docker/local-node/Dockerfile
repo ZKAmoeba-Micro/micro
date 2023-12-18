@@ -1,17 +1,20 @@
 # Image is always built from the server image to reuse the common parts
 # This image is expected to be built locally beforehand (implemented in the `zk` tool)
-FROM matterlabs/server-v2:latest2.0
+FROM zkamoeba/server-v2:latest2.0
 
 WORKDIR /
 
 # Install required dependencies
 RUN apt-get update; apt-get install -y make bash git openssl libssl-dev gcc g++ curl pkg-config software-properties-common jq wget
-RUN apt-get install -y libpq5 ca-certificates postgresql-client && rm -rf /var/lib/apt/lists/*
+RUN apt-get install -y curl gnupg libpq5 ca-certificates postgresql-client && rm -rf /var/lib/apt/lists/*
 
 # Install node and yarn
-RUN curl -sL https://deb.nodesource.com/setup_18.x | bash -
-RUN apt-get install -y nodejs npm
-RUN npm install -g yarn
+ENV NODE_MAJOR=18
+RUN mkdir -p /etc/apt/keyrings && \
+    wget -c -O - https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
+    echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list && \
+    apt-get update && apt-get install nodejs -y && \
+    npm install -g yarn
 
 # Copy compiler (both solc and zksolc) binaries
 # Obtain `solc` 0.8.12.
@@ -21,8 +24,6 @@ RUN wget https://github.com/ethereum/solc-bin/raw/gh-pages/linux-amd64/solc-linu
 
 # Copy required packages while preserving the folders structure from the repo
 # It's required because these packages use relative paths to the SDK
-# Copy the SDK
-COPY sdk/micro-web3.js /sdk/micro-web3.js
 # Copy `zk` tool
 COPY infrastructure/zk /infrastructure/zk
 # Copy `local-setup-preparation` tool
@@ -45,8 +46,6 @@ ENV MICRO_ACTION=dont_ask
 
 # Build all the required TS packages
 
-# Build SDK (`yarn add ethers` required because it's a peer dependency)
-RUN cd /sdk/micro-web3.js/ && yarn add ethers@5.7.2 && yarn build && cd /
 # Build `zk` tool
 RUN cd /infrastructure/zk && yarn && yarn build && cd /
 # Build `local-setup-preparation` tool

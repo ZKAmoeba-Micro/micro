@@ -1,9 +1,7 @@
-use futures::{stream, TryStreamExt};
-
 use std::time::{Duration, Instant};
 
-use micro::error::ClientError;
-use micro::types::PubSubFilterBuilder;
+use futures::{stream, TryStreamExt};
+use micro::{error::ClientError, types::PubSubFilterBuilder};
 use micro_web3_decl::{
     jsonrpsee::{
         core::client::{Subscription, SubscriptionClientT},

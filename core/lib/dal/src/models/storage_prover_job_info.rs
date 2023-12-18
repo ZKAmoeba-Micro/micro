@@ -1,16 +1,13 @@
-use core::panic;
-use sqlx::types::chrono::{DateTime, NaiveDateTime, NaiveTime, Utc};
-use std::convert::TryFrom;
-use std::str::FromStr;
+use std::{convert::TryFrom, panic, str::FromStr};
 
-use micro_types::proofs::{
-    JobPosition, ProverJobStatus, ProverJobStatusFailed, ProverJobStatusInProgress,
-    ProverJobStatusSuccessful,
-};
 use micro_types::{
-    proofs::{AggregationRound, ProverJobInfo},
+    proofs::{
+        AggregationRound, JobPosition, ProverJobInfo, ProverJobStatus, ProverJobStatusFailed,
+        ProverJobStatusInProgress, ProverJobStatusSuccessful,
+    },
     L1BatchNumber,
 };
+use sqlx::types::chrono::{DateTime, NaiveDateTime, NaiveTime, Utc};
 
 #[derive(sqlx::FromRow)]
 pub struct StorageProverJobInfo {

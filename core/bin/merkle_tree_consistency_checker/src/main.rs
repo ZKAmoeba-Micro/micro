@@ -1,16 +1,16 @@
-use anyhow::Context as _;
-use clap::Parser;
-
 use std::{path::Path, time::Instant};
 
+use anyhow::Context as _;
+use clap::Parser;
 use micro_config::DBConfig;
+use micro_env_config::FromEnv;
 use micro_merkle_tree::domain::MicroTree;
 use micro_storage::RocksDB;
 use micro_types::L1BatchNumber;
 
 #[derive(Debug, Parser)]
 #[command(
-    author = "",
+    author = "Zkamoeba",
     version,
     about = "Merkle tree consistency checker",
     long_about = None
@@ -27,8 +27,8 @@ impl Cli {
         let db_path = &config.merkle_tree.path;
         tracing::info!("Verifying consistency of Merkle tree at {db_path}");
         let start = Instant::now();
-        let db = RocksDB::new(Path::new(db_path), true);
-        let tree = MicroTree::new_lightweight(db);
+        let db = RocksDB::new(Path::new(db_path));
+        let tree = MicroTree::new_lightweight(db.into());
 
         let l1_batch_number = if let Some(number) = self.l1_batch {
             L1BatchNumber(number)

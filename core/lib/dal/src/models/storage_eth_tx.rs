@@ -1,8 +1,11 @@
-use micro_types::aggregated_operations::AggregatedActionType;
-use micro_types::eth_sender::{EthTx, TxHistory, TxHistoryToSend};
-use micro_types::{Address, L1BatchNumber, Nonce, H256};
-use sqlx::types::chrono::NaiveDateTime;
 use std::str::FromStr;
+
+use micro_types::{
+    aggregated_operations::AggregatedActionType,
+    eth_sender::{EthTx, TxHistory, TxHistoryToSend},
+    Address, L1BatchNumber, Nonce, H256,
+};
+use sqlx::types::chrono::NaiveDateTime;
 
 #[derive(Debug, Clone)]
 pub struct StorageEthTx {

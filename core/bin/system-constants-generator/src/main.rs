@@ -1,24 +1,24 @@
 use std::fs;
 
-use micro_types::DEPLOY_L2_CONTRACT_TX_GAS_LIMIT;
+use codegen::{Block, Scope};
 use micro_types::{
+    zkevm_test_harness::zk_evm::zkevm_opcode_defs::{
+        circuit_prices::{
+            ECRECOVER_CIRCUIT_COST_IN_ERGS, KECCAK256_CIRCUIT_COST_IN_ERGS,
+            SHA256_CIRCUIT_COST_IN_ERGS,
+        },
+        system_params::MAX_TX_ERGS_LIMIT,
+    },
     IntrinsicSystemGasConstants, GUARANTEED_PUBDATA_IN_TX, L1_GAS_PER_PUBDATA_BYTE,
     MAX_GAS_PER_PUBDATA_BYTE, MAX_NEW_FACTORY_DEPS, MAX_TXS_IN_BLOCK,
+};
+use multivm::vm_latest::constants::{
+    BLOCK_OVERHEAD_GAS, BLOCK_OVERHEAD_L1_GAS, BOOTLOADER_TX_ENCODING_SPACE, MAX_PUBDATA_PER_BLOCK,
 };
 use serde::{Deserialize, Serialize};
 
 mod intrinsic_costs;
 mod utils;
-
-use codegen::Block;
-use codegen::Scope;
-use micro_types::zkevm_test_harness::zk_evm::zkevm_opcode_defs::circuit_prices::{
-    ECRECOVER_CIRCUIT_COST_IN_ERGS, KECCAK256_CIRCUIT_COST_IN_ERGS, SHA256_CIRCUIT_COST_IN_ERGS,
-};
-use micro_types::zkevm_test_harness::zk_evm::zkevm_opcode_defs::system_params::MAX_TX_ERGS_LIMIT;
-use vm::constants::{
-    BLOCK_OVERHEAD_GAS, BLOCK_OVERHEAD_L1_GAS, BOOTLOADER_TX_ENCODING_SPACE, MAX_PUBDATA_PER_BLOCK,
-};
 
 // Params needed for L1 contracts
 #[derive(Copy, Clone, Debug, Serialize, Deserialize)]
@@ -41,7 +41,6 @@ struct L1SystemConfig {
     l1_tx_delta_factory_deps_pubdata: u32,
     max_new_factory_deps: u32,
     required_l2_gas_price_per_pubdata: u64,
-    deploy_l2_contract_tx_gas_limit: u64,
 }
 
 pub fn generate_l1_contracts_system_config(gas_constants: &IntrinsicSystemGasConstants) -> String {
@@ -69,7 +68,6 @@ pub fn generate_l1_contracts_system_config(gas_constants: &IntrinsicSystemGasCon
         l1_tx_delta_factory_deps_pubdata: gas_constants.l1_tx_delta_factory_dep_pubdata,
         max_new_factory_deps: MAX_NEW_FACTORY_DEPS as u32,
         required_l2_gas_price_per_pubdata: MAX_GAS_PER_PUBDATA_BYTE,
-        deploy_l2_contract_tx_gas_limit: DEPLOY_L2_CONTRACT_TX_GAS_LIMIT,
     };
 
     serde_json::to_string_pretty(&l1_contracts_config).unwrap()
@@ -213,7 +211,7 @@ fn save_file(path_in_repo: &str, content: String) {
 fn update_rust_system_constants(intrinsic_gas_constants: &IntrinsicSystemGasConstants) {
     let rust_fee_constants = generate_rust_fee_constants(intrinsic_gas_constants);
     save_file(
-        "core/lib/config/src/constants/fees/intrinsic.rs",
+        "core/lib/constants/src/fees/intrinsic.rs",
         rust_fee_constants,
     );
 }

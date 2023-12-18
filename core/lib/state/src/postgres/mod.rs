@@ -1,5 +1,3 @@
-use tokio::{runtime::Handle, sync::mpsc};
-
 use std::{
     mem,
     sync::{Arc, RwLock},
@@ -7,16 +5,17 @@ use std::{
 
 use micro_dal::{ConnectionPool, StorageProcessor};
 use micro_types::{L1BatchNumber, MiniblockNumber, StorageKey, StorageValue, H256};
-
-mod metrics;
-#[cfg(test)]
-mod tests;
+use tokio::{runtime::Handle, sync::mpsc};
 
 use self::metrics::{Method, ValuesUpdateStage, CACHE_METRICS, STORAGE_METRICS};
 use crate::{
     cache::{Cache, CacheValue},
     ReadStorage,
 };
+
+mod metrics;
+#[cfg(test)]
+mod tests;
 
 /// Type alias for smart contract source code cache.
 type FactoryDepsCache = Cache<H256, Vec<u8>>;

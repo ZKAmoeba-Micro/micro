@@ -3,7 +3,8 @@ use serde::{Deserialize, Serialize};
 
 use crate::{l2::TransactionType, U256};
 
-#[derive(Debug, Default, Clone, Copy)]
+#[derive(Debug, Default, Clone, Copy, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", tag = "result")]
 pub struct TransactionExecutionMetrics {
     pub initial_storage_writes: usize,
     pub repeated_storage_writes: usize,
@@ -21,6 +22,8 @@ pub struct TransactionExecutionMetrics {
     pub total_log_queries: usize,
     pub cycles_used: u32,
     pub computational_gas_used: u32,
+    pub total_updated_values_size: usize,
+    pub pubdata_published: u32,
 }
 
 #[derive(Debug, Default, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]

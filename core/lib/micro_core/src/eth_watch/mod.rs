@@ -4,32 +4,30 @@
 //! Poll interval is configured using the `ETH_POLL_INTERVAL` constant.
 //! Number of confirmations is configured using the `CONFIRMATIONS_FOR_ETH_EVENT` environment variable.
 
-// Built-in deps
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
-// External uses
-use anyhow::Context as _;
-use tokio::{sync::watch, task::JoinHandle};
-
-// Workspace deps
-use micro_config::constants::PRIORITY_EXPIRATION;
 use micro_config::ETHWatchConfig;
 use micro_dal::{ConnectionPool, StorageProcessor};
-use micro_types::{
-    web3::types::BlockNumber as Web3BlockNumber, Address, PriorityOpId, ProtocolVersionId,
-};
-
-// Local deps
-use self::client::{Error, EthClient, EthHttpQueryClient};
-use crate::eth_watch::client::RETRY_LIMIT;
-use event_processors::{
-    priority_ops::PriorityOpsEventProcessor, upgrades::UpgradesEventProcessor, EventProcessor,
-};
 use micro_eth_client::EthInterface;
+use micro_system_constants::PRIORITY_EXPIRATION;
+use micro_types::{
+    ethabi::Contract, web3::types::BlockNumber as Web3BlockNumber, Address, PriorityOpId,
+    ProtocolVersionId,
+};
+use tokio::{sync::watch, task::JoinHandle};
+
+use self::{
+    client::{Error, EthClient, EthHttpQueryClient, RETRY_LIMIT},
+    event_processors::{
+        governance_upgrades::GovernanceUpgradesEventProcessor,
+        priority_ops::PriorityOpsEventProcessor, upgrades::UpgradesEventProcessor, EventProcessor,
+    },
+    metrics::{PollStage, METRICS},
+};
 
 mod client;
 mod event_processors;
-
+mod metrics;
 #[cfg(test)]
 mod tests;
 
@@ -52,6 +50,7 @@ pub struct EthWatch<W: EthClient + Sync> {
 impl<W: EthClient + Sync> EthWatch<W> {
     pub async fn new(
         diamond_proxy_address: Address,
+        governance_contract: Option<Contract>,
         mut client: W,
         pool: &ConnectionPool,
         poll_interval: Duration,
@@ -64,16 +63,24 @@ impl<W: EthClient + Sync> EthWatch<W> {
 
         let priority_ops_processor =
             PriorityOpsEventProcessor::new(state.next_expected_priority_id);
-        let upgrades_processor =
-            UpgradesEventProcessor::new(diamond_proxy_address, state.last_seen_version_id);
-        let event_processors: Vec<Box<dyn EventProcessor<W>>> = vec![
+        let upgrades_processor = UpgradesEventProcessor::new(state.last_seen_version_id);
+        let mut event_processors: Vec<Box<dyn EventProcessor<W>>> = vec![
             Box::new(priority_ops_processor),
             Box::new(upgrades_processor),
         ];
 
+        if let Some(governance_contract) = governance_contract {
+            let governance_upgrades_processor = GovernanceUpgradesEventProcessor::new(
+                diamond_proxy_address,
+                state.last_seen_version_id,
+                &governance_contract,
+            );
+            event_processors.push(Box::new(governance_upgrades_processor))
+        }
+
         let topics = event_processors
             .iter()
-            .flat_map(|p| p.relevant_topic())
+            .map(|p| p.relevant_topic())
             .collect();
         client.set_topics(topics);
 
@@ -134,8 +141,7 @@ impl<W: EthClient + Sync> EthWatch<W> {
             }
 
             timer.tick().await;
-
-            metrics::counter!("server.eth_watch.eth_poll", 1);
+            METRICS.eth_poll.inc();
 
             let mut storage = pool.access_storage_tagged("eth_watch").await.unwrap();
             if let Err(error) = self.loop_iteration(&mut storage).await {
@@ -153,9 +159,8 @@ impl<W: EthClient + Sync> EthWatch<W> {
 
     #[tracing::instrument(skip(self, storage))]
     async fn loop_iteration(&mut self, storage: &mut StorageProcessor<'_>) -> Result<(), Error> {
-        let stage_start = Instant::now();
+        let stage_latency = METRICS.poll_eth_node[&PollStage::Request].start();
         let to_block = self.client.finalized_block_number().await?;
-
         if to_block <= self.last_processed_ethereum_block {
             return Ok(());
         }
@@ -168,39 +173,39 @@ impl<W: EthClient + Sync> EthWatch<W> {
                 RETRY_LIMIT,
             )
             .await?;
-        metrics::histogram!("eth_watcher.poll_eth_node", stage_start.elapsed(), "stage" => "request");
+        stage_latency.observe();
 
         for processor in self.event_processors.iter_mut() {
             processor
                 .process_events(storage, &self.client, events.clone())
                 .await?;
         }
-
         self.last_processed_ethereum_block = to_block;
         Ok(())
     }
 }
 
 pub async fn start_eth_watch<E: EthInterface + Send + Sync + 'static>(
+    config: ETHWatchConfig,
     pool: ConnectionPool,
     eth_gateway: E,
     diamond_proxy_addr: Address,
-    governance_addr: Address,
+    governance: (Contract, Address),
     stop_receiver: watch::Receiver<bool>,
 ) -> anyhow::Result<JoinHandle<anyhow::Result<()>>> {
-    let eth_watch = ETHWatchConfig::from_env().context("ETHWatchConfig::from_env()")?;
     let eth_client = EthHttpQueryClient::new(
         eth_gateway,
         diamond_proxy_addr,
-        governance_addr,
-        eth_watch.confirmations_for_eth_event,
+        Some(governance.1),
+        config.confirmations_for_eth_event,
     );
 
     let mut eth_watch = EthWatch::new(
         diamond_proxy_addr,
+        Some(governance.0),
         eth_client,
         &pool,
-        eth_watch.poll_interval(),
+        config.poll_interval(),
     )
     .await;
 

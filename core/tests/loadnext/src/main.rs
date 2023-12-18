@@ -4,12 +4,7 @@
 //! Without required variables provided, test is launched in the localhost/development mode with some hard-coded
 //! values to check the local micro deployment.
 
-use tokio::sync::watch;
-
 use std::time::Duration;
-
-use micro_config::configs::api::PrometheusConfig;
-use prometheus_exporter::PrometheusExporterConfig;
 
 use loadnext::{
     command::TxType,
@@ -17,6 +12,9 @@ use loadnext::{
     executor::Executor,
     report_collector::LoadtestResult,
 };
+use micro_config::configs::api::PrometheusConfig;
+use prometheus_exporter::PrometheusExporterConfig;
+use tokio::sync::watch;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {

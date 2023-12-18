@@ -1,10 +1,9 @@
-use bigdecimal::BigDecimal;
-
 use std::collections::HashMap;
 
+use bigdecimal::BigDecimal;
 use micro_types::{
     api::{
-        BlockDetails, BridgeAddresses, L1BatchDetails, L2ToL1LogProof, ProtocolVersion,
+        BlockDetails, BridgeAddresses, L1BatchDetails, L2ToL1LogProof, Proof, ProtocolVersion,
         TransactionDetails,
     },
     fee::Fee,
@@ -15,7 +14,7 @@ use micro_types::{
 use micro_web3_decl::{
     jsonrpsee::core::{async_trait, RpcResult},
     namespaces::zks::ZksNamespaceServer,
-    types::{Filter, Log, Token},
+    types::Token,
 };
 
 use crate::{
@@ -154,8 +153,13 @@ impl<G: L1GasPriceProvider + Send + Sync + 'static> ZksNamespaceServer for ZksNa
         Ok(self.get_protocol_version_impl(version_id).await)
     }
 
-    async fn get_logs_with_virtual_blocks(&self, filter: Filter) -> RpcResult<Vec<Log>> {
-        self.get_logs_with_virtual_blocks_impl(filter)
+    async fn get_proof(
+        &self,
+        address: Address,
+        keys: Vec<H256>,
+        l1_batch_number: L1BatchNumber,
+    ) -> RpcResult<Proof> {
+        self.get_proofs_impl(address, keys, l1_batch_number)
             .await
             .map_err(into_jsrpc_error)
     }
