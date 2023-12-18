@@ -16,7 +16,7 @@
     "devDependencies": {
         "@zkamoeba/hardhat-micro-deploy": "^0.6.1",
         "@zkamoeba/hardhat-micro-solc": "0.4.2",
-        "@zkamoeba/hardhat-micro-vyper": "^1.0.0",
+        "@zkamoeba/hardhat-micro-vyper": "^1.0.4",
         "@nomiclabs/hardhat-vyper": "^3.0.5",
         "@types/jest": "^29.0.3",
         "@types/node": "^14.14.5",
@@ -31,6 +31,6 @@
         "ts-jest": "^29.0.1",
         "ts-node": "^10.1.0",
         "typescript": "^4.3.5",
-        "micro-web3": "^0.15.5"
+        "@zkamoeba/micro-web3": "^0.15.4"
     }
 }

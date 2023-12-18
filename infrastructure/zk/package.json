@@ -20,7 +20,7 @@
         "node-fetch": "^2.6.1",
         "pg": "^8.11.3",
         "tabtab": "^3.0.2",
-        "micro-web3": "^0.15.5"
+        "@zkamoeba/micro-web3": "^0.15.4"
     },
     "devDependencies": {
         "@zkamoeba/hardhat-micro-solc": "^0.3.15",

@@ -6,7 +6,7 @@
   "dependencies": {
     "ethers": "~5.7.0",
     "ts-node": "^10.7.0",
-    "micro-web3": "^0.15.5"
+    "@zkamoeba/micro-web3": "^0.15.4"
   },
   "devDependencies": {
     "typescript": "^4.5.5",
