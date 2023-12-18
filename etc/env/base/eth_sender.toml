@@ -7,7 +7,7 @@
 # operator_commit_eth_addr is defined in the `private.toml`
 
 # Amount of confirmations required to consider L1 transaction committed.
-wait_confirmations = 1
+wait_confirmations = 10
 # Amount of blocks we will wait before considering L1 transaction stuck.
 expected_wait_time_block = 30
 # Node polling period in seconds.
@@ -40,6 +40,8 @@ max_aggregated_tx_gas = 9_000_000_000
 
 # Max gas that can used to include single block in aggregated operation
 max_single_tx_gas = 9_000_000_000
+
+l1_batch_min_age_before_execute_seconds = 600
 
 # Max acceptable fee for sending tx to L1
 max_acceptable_priority_fee_in_gwei = 100000000000
