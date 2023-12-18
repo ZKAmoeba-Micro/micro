@@ -1,5 +1,6 @@
 #![allow(clippy::derive_partial_eq_without_eq, clippy::format_push_string)]
 
+use assignments_dal::AssignmentsDal;
 use sqlx::{pool::PoolConnection, postgres::Postgres, Connection, PgConnection, Transaction};
 pub use sqlx::{types::BigDecimal, Error as SqlxError};
 

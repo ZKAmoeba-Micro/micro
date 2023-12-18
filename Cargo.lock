@@ -6022,7 +6022,7 @@ dependencies = [
  "metrics",
  "metrics-exporter-prometheus",
  "tokio",
- "vise 0.1.0 (git+https://github.com/ZKAmoeba-Micro/vise.git?branch=main)",
+ "vise 0.1.0 (git+https://github.com/ZKAmoeba-Micro/vise.git?rev=1066acc708dd51566f282126f13c5742841339c1)",
  "vise-exporter",
 ]
 
