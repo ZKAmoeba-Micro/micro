@@ -1,6 +1,6 @@
 import { TestMessage } from './matcher-helpers';
 import { MatcherModifier } from '../modifiers';
-import * as micro from 'micro-web3';
+import * as micro from '@zkameba/micro-web3';
 
 // This file contains implementation of matchers for micro/ethereum transaction.
 // For actual doc-comments, see `typings/jest.d.ts` file.

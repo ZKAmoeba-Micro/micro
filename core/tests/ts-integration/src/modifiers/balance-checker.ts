@@ -2,12 +2,12 @@
  * Collection of modifiers to check token balance changes caused by a transaction.
  */
 
-import * as micro from 'micro-web3';
+import * as micro from '@zkameba/micro-web3';
 import * as ethers from 'ethers';
 import { TestMessage } from '../matchers/matcher-helpers';
 import { MatcherModifier, MatcherMessage } from '.';
 import { Fee } from '../types';
-import { IERC20Factory } from 'micro-web3/build/typechain';
+import { IERC20Factory } from '@zkameba/micro-web3/build/typechain';
 
 /**
  * Modifier that ensures that fee was taken from the wallet for a transaction.

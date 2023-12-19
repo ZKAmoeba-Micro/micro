@@ -3,7 +3,7 @@
  * scheduled, processed and/or postponed.
  */
 import { TestMaster } from '../src/index';
-import * as micro from 'micro-web3';
+import * as micro from '@zkameba/micro-web3';
 
 describe('Tests for the mempool behavior', () => {
     let testMaster: TestMaster;

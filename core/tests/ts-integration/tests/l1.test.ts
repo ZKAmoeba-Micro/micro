@@ -6,10 +6,10 @@
  * and waiting for the block finalization).
  */
 import { TestMaster } from '../src/index';
-import * as micro from 'micro-web3';
+import * as micro from '@zkameba/micro-web3';
 import * as ethers from 'ethers';
 import { deployContract, getTestContract, scaledGasPrice, waitForNewL1Batch } from '../src/helpers';
-import { getHashedL2ToL1Msg, L1_MESSENGER, L1_MESSENGER_ADDRESS } from 'micro-web3/build/src/utils';
+import { getHashedL2ToL1Msg, L1_MESSENGER, L1_MESSENGER_ADDRESS } from '@zkameba/micro-web3/build/src/utils';
 
 const SYSTEM_CONFIG = require(`${process.env.MICRO_HOME}/contracts/SystemConfig.json`);
 

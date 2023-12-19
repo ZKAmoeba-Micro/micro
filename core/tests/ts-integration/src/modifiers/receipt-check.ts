@@ -1,5 +1,5 @@
 import { MatcherModifier, MatcherMessage } from '.';
-import * as micro from 'micro-web3';
+import * as micro from '@zkameba/micro-web3';
 
 /**
  * Creates a custom checker for the transaction receipt.

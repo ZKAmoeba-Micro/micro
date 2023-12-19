@@ -2,7 +2,7 @@
  * Base interface for custom transaction matcher modifiers.
  */
 
-import * as micro from 'micro-web3';
+import * as micro from '@zkameba/micro-web3';
 
 /**
  * Base class for custom transaction matcher modifiers.

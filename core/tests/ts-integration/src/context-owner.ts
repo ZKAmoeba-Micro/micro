@@ -1,4 +1,4 @@
-import * as micro from 'micro-web3';
+import * as micro from '@zkameba/micro-web3';
 import * as ethers from 'ethers';
 
 import { TestContext, TestEnvironment, TestWallets } from './types';

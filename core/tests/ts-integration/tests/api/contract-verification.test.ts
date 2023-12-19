@@ -1,10 +1,10 @@
 import { TestMaster } from '../../src/index';
-import * as micro from 'micro-web3';
+import * as micro from '@zkameba/micro-web3';
 import * as ethers from 'ethers';
 import fetch from 'node-fetch';
 import fs from 'fs';
 import { deployContract, getContractSource, getTestContract } from '../../src/helpers';
-import { sleep } from 'micro-web3/build/src/utils';
+import { sleep } from '@zkameba/micro-web3/build/src/utils';
 
 // Regular expression to match ISO dates.
 const DATE_REGEX = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{6})?/;

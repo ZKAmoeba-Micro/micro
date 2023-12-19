@@ -1,11 +1,11 @@
 import * as utils from 'zk/build/utils';
 import { Tester } from './tester';
-import * as zkweb3 from 'micro-web3';
+import * as zkweb3 from '@zkameba/micro-web3';
 import { BigNumber, BigNumberish, ethers } from 'ethers';
 import { expect } from 'chai';
-import { hashBytecode } from 'micro-web3/build/src/utils';
+import { hashBytecode } from '@zkameba/micro-web3/build/src/utils';
 import fs from 'fs';
-import { TransactionResponse } from 'micro-web3/build/src/types';
+import { TransactionResponse } from '@zkameba/micro-web3/build/src/types';
 import { BytesLike } from '@ethersproject/bytes';
 
 const L1_CONTRACTS_FOLDER = `${process.env.MICRO_HOME}/contracts/ethereum/artifacts/cache/solpp-generated-contracts`;

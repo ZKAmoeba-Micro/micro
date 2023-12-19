@@ -2,15 +2,15 @@
  * This suite contains tests checking the behavior of paymasters -- entities that can cover fees for users.
  */
 import { TestMaster } from '../src/index';
-import * as micro from 'micro-web3';
-import { Provider, Wallet, utils, Contract } from 'micro-web3';
+import * as micro from '@zkameba/micro-web3';
+import { Provider, Wallet, utils, Contract } from '@zkameba/micro-web3';
 import * as ethers from 'ethers';
 import { deployContract, getTestContract } from '../src/helpers';
 import { L2_ETH_PER_ACCOUNT } from '../src/context-owner';
 import { checkReceipt } from '../src/modifiers/receipt-check';
 import { extractFee } from '../src/modifiers/balance-checker';
 import { TestMessage } from '../src/matchers/matcher-helpers';
-import { Address } from 'micro-web3/build/src/types';
+import { Address } from '@zkameba/micro-web3/build/src/types';
 import * as hre from 'hardhat';
 import { Deployer } from '@zkamoeba/hardhat-micro-deploy';
 import { MicroArtifact } from '@zkamoeba/hardhat-micro-deploy/dist/types';

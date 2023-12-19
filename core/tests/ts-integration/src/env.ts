@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as fs from 'fs';
 import * as ethers from 'ethers';
-import * as micro from 'micro-web3';
+import * as micro from '@zkameba/micro-web3';
 import { TestEnvironment } from './types';
 import { Reporter } from './reporter';
 

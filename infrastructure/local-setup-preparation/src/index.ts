@@ -1,4 +1,4 @@
-import { utils } from 'micro-web3';
+import { utils } from '@zkameba/micro-web3';
 import { ethers } from 'ethers';
 import { getEthersProvider, getWalletKeys } from './utils';
 

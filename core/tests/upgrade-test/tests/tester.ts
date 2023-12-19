@@ -1,5 +1,5 @@
 import * as ethers from 'ethers';
-import * as zkweb3 from 'micro-web3';
+import * as zkweb3 from '@zkameba/micro-web3';
 import * as fs from 'fs';
 import * as path from 'path';
 
