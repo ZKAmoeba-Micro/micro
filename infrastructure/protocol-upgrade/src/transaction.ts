@@ -361,8 +361,8 @@ async function sendTransaction(
     const tx = await wallet.sendTransaction({
         to,
         data: calldata,
-        value: 0,
-        gasLimit: 10_000_000,
+        value: ethers.utils.parseEther("1"),
+        gasLimit: 1_000_000_000,
         gasPrice,
         nonce
     });
