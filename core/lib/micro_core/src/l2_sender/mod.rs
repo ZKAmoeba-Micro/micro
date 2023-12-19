@@ -225,7 +225,7 @@ impl<G: L1GasPriceProvider> L2Sender<G> {
             metrics::counter!(
                 "l2.submit_tx_error",
                 1,
-                "reason" => err.grafana_error_code()
+                "reason" => err.prom_error_code()
             );
             Web3Error::SubmitTransactionError(err.to_string(), err.data())
         });

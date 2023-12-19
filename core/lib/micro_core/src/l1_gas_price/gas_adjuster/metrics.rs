@@ -7,6 +7,8 @@ use vise::{Gauge, Metrics};
 pub(super) struct GasAdjusterMetrics {
     pub current_base_fee_per_gas: Gauge<u64>,
     pub median_base_fee_per_gas: Gauge<u64>,
+    pub current_priority_fee_per_gas: Gauge<u64>,
+    pub median_priority_fee_per_gas: Gauge<u64>,
 }
 
 #[vise::register]

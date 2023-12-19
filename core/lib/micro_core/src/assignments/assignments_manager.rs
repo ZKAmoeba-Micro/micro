@@ -1,23 +1,25 @@
-use crate::{api_server::web3::backend_jsonrpc::error::internal_error, l2_sender::caller::Caller};
+use std::time::Duration;
+
 use async_trait::async_trait;
-use micro_config::constants::DEPOSIT_ADDRESS;
 use micro_contracts::sys_deposit_contract;
 use micro_dal::ConnectionPool;
 use micro_prover_utils::periodic_job::PeriodicJob;
-use micro_types::l2::event_map::EventMapBuilder;
+use micro_system_constants::DEPOSIT_ADDRESS;
 use micro_types::{
-    api::{BlockNumber, GetEventLogsFilter, GetLogsFilter},
+    api::GetLogsFilter,
     ethabi::{Contract, Token},
     l2::{
         assignment_batch::{AssignmentBatch, EVENTNAME},
+        event_map::EventMapBuilder,
         penalize::{Penalize, PENALIZE},
     },
     transaction_request::CallRequest,
     Bytes, L1BatchNumber, MiniblockNumber, H256, U256,
 };
-use std::time::Duration;
-#[derive(Debug)]
 
+use crate::{api_server::web3::backend_jsonrpc::error::internal_error, l2_sender::caller::Caller};
+
+#[derive(Debug)]
 pub struct AssignmentsManager {
     pool: ConnectionPool,
     processing_timeout: Duration,
@@ -132,7 +134,7 @@ impl AssignmentsManager {
         } else {
             self.from_block = self.from_block + 1;
         }
-        let next_number = (self.from_block as i32) + 1024;
+        let next_number = (self.from_block as u32) + 1024;
         //Multiple parameter lists for one event
         let mut event_names = Vec::new();
         //Verification address parameter of the event
@@ -143,13 +145,9 @@ impl AssignmentsManager {
         }
         let filter = GetLogsFilter {
             from_block: MiniblockNumber(self.from_block),
-            to_block: Some(BlockNumber::Number(next_number.into())),
+            to_block: MiniblockNumber(next_number),
             addresses: vec![DEPOSIT_ADDRESS],
             topics: vec![],
-        };
-        let filter = GetEventLogsFilter {
-            log_filter: filter,
-            event_names: event_names,
         };
         tracing::warn!("monitor_change_event filter: {:?}", &filter);
         let logs: Vec<micro_types::api::Log> = connection

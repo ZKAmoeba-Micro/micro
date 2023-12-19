@@ -8,6 +8,7 @@ use micro_eth_client::{
     BoundEthInterface,
 };
 use micro_types::{
+    aggregated_operations::AggregatedActionType,
     eth_sender::EthTx,
     web3::{
         contract::Options,
@@ -70,7 +71,7 @@ where
             ethereum_gateway,
             config,
             gas_adjuster,
-            fair_l2_gas_price: u64,
+            fair_l2_gas_price,
         }
     }
 

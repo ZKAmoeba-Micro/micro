@@ -846,7 +846,7 @@ impl<G: L1GasPriceProvider> TxSender<G> {
         })
     }
 
-    pub(super) async fn eth_call(
+    pub(crate) async fn eth_call(
         &self,
         block_args: BlockArgs,
         tx: L2Tx,

@@ -12,7 +12,7 @@ use zkevm_test_harness::{
     witness::oracle::VmWitnessOracle,
 };
 
-use crate::{commitment::L1BatchWithMetadata, PackedEthSignature};
+use crate::{commitment::L1BatchWithMetadata, PackedEthSignature, ProtocolVersionId};
 
 fn l1_batch_range_from_batches(
     batches: &[L1BatchWithMetadata],
@@ -201,7 +201,7 @@ impl L1BatchExecuteOperation {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum AggregatedActionType {
     Commit,
     PublishProofOnchain,
@@ -271,6 +271,14 @@ impl AggregatedOperation {
             Self::Commit(_) => "commit",
             Self::PublishProofOnchain(_) => "proof",
             Self::Execute(_) => "execute",
+        }
+    }
+
+    pub fn protocol_version(&self) -> ProtocolVersionId {
+        match self {
+            Self::Commit(op) => op.l1_batches[0].header.protocol_version.unwrap(),
+            Self::PublishProofOnchain(op) => op.l1_batches[0].header.protocol_version.unwrap(),
+            Self::Execute(op) => op.l1_batches[0].header.protocol_version.unwrap(),
         }
     }
 }

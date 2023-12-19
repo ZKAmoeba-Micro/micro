@@ -121,11 +121,11 @@ impl L1BatchPublishCriterion for TimestampDeadlineCriterion {
 #[derive(Debug)]
 pub struct GasCriterion {
     pub op: AggregatedActionType,
-    pub gas_limit: u32,
+    pub gas_limit: u64,
 }
 
 impl GasCriterion {
-    pub fn new(op: AggregatedActionType, gas_limit: u32) -> GasCriterion {
+    pub fn new(op: AggregatedActionType, gas_limit: u64) -> GasCriterion {
         GasCriterion { op, gas_limit }
     }
 
@@ -133,7 +133,7 @@ impl GasCriterion {
         &self,
         storage: &mut StorageProcessor<'_>,
         batch_number: L1BatchNumber,
-    ) -> u32 {
+    ) -> u64 {
         storage
             .blocks_dal()
             .get_l1_batches_predicted_gas(batch_number..=batch_number, self.op)
@@ -160,7 +160,7 @@ impl L1BatchPublishCriterion for GasCriterion {
             "Config max gas cost for operations is too low"
         );
         // We're not sure our predictions are accurate, so it's safer to lower the gas limit by 10%
-        let mut gas_left = (self.gas_limit as f64 * 0.9).round() as u32 - base_cost;
+        let mut gas_left = (self.gas_limit as f64 * 0.9).round() as u64 - base_cost;
 
         let mut last_l1_batch = None;
         for (index, l1_batch) in consecutive_l1_batches.iter().enumerate() {

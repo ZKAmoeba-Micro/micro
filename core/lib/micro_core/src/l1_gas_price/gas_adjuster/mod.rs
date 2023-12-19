@@ -187,6 +187,7 @@ impl<E: EthInterface> L1TxParamsProvider for GasAdjuster<E> {
         if median > self.config.default_priority_fee_per_gas {
             self.config.default_priority_fee_per_gas
         } else {
+            METRICS.median_priority_fee_per_gas.set(median);
             median
         }
     }

@@ -17,7 +17,6 @@ use micro_config::{
         },
         contracts::ProverAtGenesis,
         database::MerkleTreeMode,
-        ProofDataHandlerConfig,
     },
     ApiConfig, ContractsConfig, DBConfig, ETHSenderConfig, PostgresConfig,
 };
@@ -50,6 +49,7 @@ use crate::{
         web3,
         web3::{state::InternalApiConfig, ApiServerHandles, Namespace},
     },
+    assignments::assignments_manager::AssignmentsManager,
     basic_witness_input_producer::BasicWitnessInputProducer,
     data_fetchers::run_data_fetchers,
     eth_sender::{Aggregator, EthTxAggregator, EthTxManager},
@@ -77,6 +77,7 @@ use crate::{
 };
 
 pub mod api_server;
+mod assignments;
 pub mod basic_witness_input_producer;
 pub mod block_reverter;
 mod consensus;
@@ -614,7 +615,11 @@ pub async fn initialize_components(
                 .await
                 .context("gas_adjuster.get_or_init()")?,
             eth_client,
-            state_keeper_config.fair_l2_gas_price,
+            configs
+                .state_keeper_config
+                .clone()
+                .context("state_keeper_config")?
+                .fair_l2_gas_price,
         );
         task_futures.extend([tokio::spawn(
             eth_tx_manager_actor.run(eth_manager_pool, stop_receiver.clone()),
@@ -651,11 +656,16 @@ pub async fn initialize_components(
                 .context("build_Storage_caches()")?,
         };
 
-        let network_config = NetworkConfig::from_env().context("NetworkConfig::from_env()")?;
-        let eth_sender = ETHSenderConfig::from_env().context("ETHSenderConfig::from_env()")?;
-        let state_keeper_config =
-            StateKeeperConfig::from_env().context("StateKeeperConfig::from_env()")?;
-        let api_config = ApiConfig::from_env().context("ApiConfig::from_env()")?;
+        let network_config = configs.network_config.clone().context("network_config")?;
+        let eth_sender = configs
+            .eth_sender_config
+            .clone()
+            .context("eth_sender_config")?;
+        let state_keeper_config = configs
+            .state_keeper_config
+            .clone()
+            .context("state_keeper_config")?;
+        let api_config = configs.api_config.clone().context("api_config")?;
         let tx_sender_config = TxSenderConfig::new(
             &state_keeper_config,
             &api_config.web3_json_rpc,
@@ -663,9 +673,9 @@ pub async fn initialize_components(
         );
 
         let bounded_gas_adjuster = gas_adjuster
-            .get_or_init_bounded()
+            .get_or_init()
             .await
-            .context("gas_adjuster.get_or_init_bounded()")?;
+            .context("gas_adjuster.get_or_init()")?;
 
         let (tx_sender, vm_barrier) = build_tx_sender(
             &tx_sender_config,
@@ -695,19 +705,20 @@ pub async fn initialize_components(
         task_futures.extend([tokio::spawn(l2_sender.run(stop_receiver.clone()))]);
 
         tracing::info!("initialized l2 sender in {:?}", started_at.elapsed());
-        metrics::gauge!("server.init.latency", started_at.elapsed(), "stage" => "l2_sender");
     }
 
     if components.contains(&Component::AssignmentsManager) {
         let started_at = Instant::now();
         tracing::info!("initializing Assignments Manager");
 
-        let assignment_pool = ConnectionPool::singleton(DbVariant::Master)
+        let assignment_pool = ConnectionPool::singleton(postgres_config.master_url()?)
             .build()
             .await
             .context("failed to build assignment_pool")?;
-        let proof_data_handler =
-            ProofDataHandlerConfig::from_env().context("ProofDataHandlerConfig::from_env()")?;
+        let proof_data_handler = configs
+            .proof_data_handler_config
+            .clone()
+            .context("proof_data_handler_config")?;
         let assignments_man = AssignmentsManager::new(
             proof_data_handler.proof_generation_timeout(),
             proof_data_handler.retry_interval_ms,
@@ -720,7 +731,6 @@ pub async fn initialize_components(
             "initialized Assignments Manager in {:?}",
             started_at.elapsed()
         );
-        metrics::gauge!("server.init.latency", started_at.elapsed(), "stage" => "assignments_manager");
     }
 
     add_trees_to_task_futures(

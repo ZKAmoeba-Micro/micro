@@ -124,6 +124,7 @@ impl EthSenderTester {
             eth_sender_config.sender,
             gas_adjuster.clone(),
             gateway.clone(),
+            37000000000,
         );
         Self {
             gateway,

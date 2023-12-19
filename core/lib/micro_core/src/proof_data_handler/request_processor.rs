@@ -111,15 +111,18 @@ impl RequestProcessor {
         );
 
         // get proof job by prover address
-        let l1_batch_number = self
+        let l1_batch_number_result = self
             .pool
             .access_storage()
             .await
             .unwrap()
             .assignments_dal()
             .get_next_block_to_be_proven(prover_addr)
-            .await
-            .ok_or(RequestProcessorError::NoPendingBatches)?;
+            .await;
+        let l1_batch_number = match l1_batch_number_result {
+            Some(number) => number,
+            None => return Ok(Json(ProofGenerationDataResponse::Success(None))), // no batches pending to be proven
+        };
 
         let blob = self
             .blob_store
@@ -188,7 +191,7 @@ impl RequestProcessor {
                         return Err(RequestProcessorError::ProveTimeout);
                     }
                 } else {
-                    return Err(RequestProcessorError::NoPendingBatches);
+                    return Err(RequestProcessorError::ProveTimeout);
                 }
 
                 let blob_url = self
@@ -271,7 +274,7 @@ impl RequestProcessor {
                     .await
                     .map_err(RequestProcessorError::Sqlx)?;
             }
-            SubmitProofRequest::SkippedProofGeneration => {
+            SubmitProofRequest::SkippedProofGeneration(signature) => {
                 let signed_bytes =
                     PackedEthSignature::message_to_signed_bytes(&l1_batch_number.0.to_be_bytes());
                 let prover_addr = signature
