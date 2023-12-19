@@ -12,7 +12,7 @@ categories = ["cryptography"]
 [dependencies]
 zk_evm_1_4_0 = { package = "zk_evm", git = "https://github.com/ZKAmoeba-Micro/micro-zk_evm.git", branch = "v1.4.0" }
 zk_evm_1_3_3 = { package = "zk_evm", git = "https://github.com/ZKAmoeba-Micro/micro-zk_evm.git", branch = "v1.3.3" }
-zk_evm_1_3_1 = { package = "zk_evm", git = "https://github.com/ZKAmoeba-Micro/micro-zk_evm.git", branch = "v1.3.1" }
+zk_evm_1_3_1 = { package = "zk_evm", git = "https://github.com/ZKAmoeba-Micro/micro-zk_evm.git", branch = "v1.3.1-without-lifetime" }
 
 micro_types = { path = "../types" }
 micro_state = { path = "../state" }
