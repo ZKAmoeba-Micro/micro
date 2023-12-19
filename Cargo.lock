@@ -4564,6 +4564,7 @@ dependencies = [
  "micro_contracts",
  "micro_core",
  "micro_dal",
+ "micro_env_config",
  "micro_health_check",
  "micro_prover_utils",
  "micro_state",

@@ -14,6 +14,7 @@ publish = false                                        # We don't want to publis
 micro_core = { path = "../../lib/micro_core" }
 micro_dal = { path = "../../lib/dal" }
 micro_config = { path = "../../lib/config" }
+micro_env_config = { path = "../../lib/env_config" }
 micro_storage = { path = "../../lib/storage" }
 micro_utils = { path = "../../lib/utils" }
 micro_state = { path = "../../lib/state" }

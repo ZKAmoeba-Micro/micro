@@ -3,8 +3,11 @@ use std::{sync::Arc, time::Duration};
 use anyhow::Context;
 use clap::Parser;
 use futures::{future::FusedFuture, FutureExt};
-use metrics::EN_METRICS;
 use micro_basic_types::{Address, L2ChainId};
+use micro_config::configs::{
+    house_keeper::HouseKeeperConfig, FriProofCompressorConfig, FriProverConfig,
+    FriWitnessGeneratorConfig,
+};
 use micro_core::{
     api_server::{
         execution_sandbox::VmConcurrencyLimiter,
@@ -37,18 +40,21 @@ use micro_core::{
     },
 };
 use micro_dal::{healthcheck::ConnectionPoolHealthCheck, ConnectionPool};
+use micro_env_config::FromEnv;
 use micro_health_check::CheckHealth;
+use micro_prover_utils::periodic_job::PeriodicJob;
 use micro_state::PostgresStorageCaches;
 use micro_storage::RocksDB;
 use micro_utils::wait_for_tasks::wait_for_tasks;
 use prometheus_exporter::PrometheusExporterConfig;
-use tokio::{sync::watch, task, time::sleep};
+use tokio::{
+    sync::watch,
+    task::{self, JoinHandle},
+    time::sleep,
+};
 
 mod config;
 mod metrics;
-
-const RELEASE_MANIFEST: &str =
-    std::include_str!("../../../../.github/release-please/manifest.json");
 
 use crate::config::ExternalNodeConfig;
 
@@ -104,15 +110,10 @@ async fn build_state_keeper(
 
 async fn add_house_keeper_to_task_futures(
     task_futures: &mut Vec<JoinHandle<anyhow::Result<()>>>,
+    prover_connection_pool: ConnectionPool,
 ) -> anyhow::Result<()> {
     let house_keeper_config =
         HouseKeeperConfig::from_env().context("HouseKeeperConfig::from_env()")?;
-
-    let prover_connection_pool = ConnectionPool::builder(DbVariant::Prover, 50)
-        .set_max_size(Some(house_keeper_config.prover_db_pool_size))
-        .build()
-        .await
-        .context("failed to build a prover_connection_pool")?;
 
     // All FRI Prover related components are configured below.
     let fri_prover_config = FriProverConfig::from_env().context("FriProverConfig::from_env()")?;
@@ -167,14 +168,6 @@ async fn init_tasks(
     HealthCheckHandle,
     watch::Receiver<bool>,
 )> {
-    let release_manifest: serde_json::Value = serde_json::from_str(RELEASE_MANIFEST)
-        .expect("release manifest is a valid json document; qed");
-    let release_manifest_version = release_manifest["core"].as_str().expect(
-        "a release-please manifest with \"core\" version field was specified at build time; qed.",
-    );
-
-    let version = semver::Version::parse(release_manifest_version)
-        .expect("version in manifest is a correct semver format; qed");
     let main_node_url = config
         .required
         .main_node_url()
@@ -193,23 +186,6 @@ async fn init_tasks(
         config.optional.miniblock_seal_queue_capacity,
     );
     task_handles.push(tokio::spawn(miniblock_sealer.run()));
-    let pool = connection_pool.clone();
-    task_handles.push(tokio::spawn(async move {
-        loop {
-            let protocol_version = pool
-                .access_storage()
-                .await
-                .unwrap()
-                .protocol_versions_dal()
-                .last_used_version_id()
-                .await
-                .map(|version| version as u16);
-
-            EN_METRICS.version[&(format!("{}", version), protocol_version)].set(1);
-
-            tokio::time::sleep(Duration::from_secs(10)).await;
-        }
-    }));
 
     let state_keeper = build_state_keeper(
         action_queue,
@@ -364,7 +340,9 @@ async fn init_tasks(
 
     healthchecks.push(Box::new(ws_server_handles.health_check));
     healthchecks.push(Box::new(http_server_handles.health_check));
-    healthchecks.push(Box::new(ConnectionPoolHealthCheck::new(connection_pool)));
+    healthchecks.push(Box::new(ConnectionPoolHealthCheck::new(
+        connection_pool.clone(),
+    )));
     let healthcheck_handle = HealthCheckHandle::spawn_server(
         ([0, 0, 0, 0], config.required.healthcheck_port).into(),
         healthchecks,
@@ -387,7 +365,7 @@ async fn init_tasks(
     task_handles.push(consistency_checker_handle);
 
     if config.required.with_prover {
-        add_house_keeper_to_task_futures(&mut task_handles).await?;
+        add_house_keeper_to_task_futures(&mut task_handles, connection_pool).await?;
     }
 
     Ok((task_handles, stop_sender, healthcheck_handle, stop_receiver))
