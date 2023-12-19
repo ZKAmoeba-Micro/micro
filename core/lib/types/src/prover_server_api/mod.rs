@@ -5,6 +5,7 @@ use crate::{
     aggregated_operations::L1BatchProofForL1,
     proofs::PrepareBasicCircuitsJob,
     protocol_version::{FriProtocolVersionId, L1VerifierConfig},
+    PackedEthSignature,
 };
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -16,7 +17,10 @@ pub struct ProofGenerationData {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct ProofGenerationDataRequest {}
+pub struct ProofGenerationDataRequest {
+    pub timestamp: i64,
+    pub signature: PackedEthSignature,
+}
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum ProofGenerationDataResponse {
@@ -28,7 +32,7 @@ pub enum ProofGenerationDataResponse {
 pub enum SubmitProofRequest {
     Proof(Box<L1BatchProofForL1>),
     // The proof generation was skipped due to sampling
-    SkippedProofGeneration,
+    SkippedProofGeneration(PackedEthSignature),
 }
 
 #[derive(Debug, Serialize, Deserialize)]

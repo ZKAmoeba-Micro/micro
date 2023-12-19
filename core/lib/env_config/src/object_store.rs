@@ -54,7 +54,7 @@ mod tests {
             bucket_base_url: bucket_base_url.to_string(),
             mode: ObjectStoreMode::FileBacked,
             file_backed_base_path: "artifacts".to_string(),
-            gcs_credential_file_path: "/path/to/credentials.json".to_string(),
+            credential_file_path: "/path/to/credentials.json".to_string(),
             max_retries: 5,
         }
     }

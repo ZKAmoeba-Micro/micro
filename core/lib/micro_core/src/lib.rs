@@ -17,6 +17,7 @@ use micro_config::{
         },
         contracts::ProverAtGenesis,
         database::MerkleTreeMode,
+        ProofDataHandlerConfig,
     },
     ApiConfig, ContractsConfig, DBConfig, ETHSenderConfig, PostgresConfig,
 };
@@ -67,6 +68,7 @@ use crate::{
         waiting_to_queued_fri_witness_job_mover::WaitingToQueuedFriWitnessJobMover,
     },
     l1_gas_price::{GasAdjusterSingleton, L1GasPriceProvider},
+    l2_sender::{L2Sender, L2SenderConfig},
     metadata_calculator::{
         MetadataCalculator, MetadataCalculatorConfig, MetadataCalculatorModeConfig,
     },
@@ -612,6 +614,7 @@ pub async fn initialize_components(
                 .await
                 .context("gas_adjuster.get_or_init()")?,
             eth_client,
+            state_keeper_config.fair_l2_gas_price,
         );
         task_futures.extend([tokio::spawn(
             eth_tx_manager_actor.run(eth_manager_pool, stop_receiver.clone()),
@@ -644,7 +647,7 @@ pub async fn initialize_components(
 
         let storage_caches = match storage_caches {
             Some(storage_caches) => storage_caches,
-            None => build_storage_caches(&replica_connection_pool, &mut task_futures)
+            None => build_storage_caches(configs, &replica_connection_pool, &mut task_futures)
                 .context("build_Storage_caches()")?,
         };
 

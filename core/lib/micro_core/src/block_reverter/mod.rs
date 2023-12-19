@@ -17,7 +17,7 @@ use micro_types::{
         types::{BlockId, BlockNumber},
         Web3,
     },
-    L1BatchNumber, PackedEthSignature, H160, H256, U256,
+    L1BatchNumber, PackedEthSignature, H160, H256, U256, U64,
 };
 use serde::Serialize;
 use tokio::time::sleep;

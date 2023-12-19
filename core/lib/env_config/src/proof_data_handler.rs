@@ -23,6 +23,8 @@ mod tests {
             proof_generation_timeout_in_secs: 18000,
             protocol_version_loading_mode: ProtocolVersionLoadingMode::FromEnvVar,
             fri_protocol_version_id: 2,
+            retry_interval_ms: 1000,
+            once_score: 1,
         }
     }
 

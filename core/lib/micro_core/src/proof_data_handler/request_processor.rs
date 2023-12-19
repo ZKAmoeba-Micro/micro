@@ -6,10 +6,11 @@ use axum::{
     response::{IntoResponse, Response},
     Json,
 };
+use chrono::Utc;
 use micro_config::configs::{
     proof_data_handler::ProtocolVersionLoadingMode, ProofDataHandlerConfig,
 };
-use micro_dal::{ConnectionPool, SqlxError};
+use micro_dal::{assignments_dal::ProverResultStatus, ConnectionPool, SqlxError};
 use micro_object_store::{ObjectStore, ObjectStoreError};
 use micro_types::{
     commitment::serialize_commitments,
@@ -19,7 +20,7 @@ use micro_types::{
         SubmitProofRequest, SubmitProofResponse,
     },
     web3::signing::keccak256,
-    L1BatchNumber, H256,
+    L1BatchNumber, PackedEthSignature, H256,
 };
 use micro_utils::u256_to_h256;
 
@@ -147,7 +148,9 @@ impl RequestProcessor {
             l1_verifier_config,
         };
 
-        Ok(Json(ProofGenerationDataResponse::Success(proof_gen_data)))
+        Ok(Json(ProofGenerationDataResponse::Success(Some(
+            proof_gen_data,
+        ))))
     }
 
     pub(crate) async fn submit_proof(

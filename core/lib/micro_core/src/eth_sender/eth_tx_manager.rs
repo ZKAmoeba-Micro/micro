@@ -14,7 +14,7 @@ use micro_types::{
         error::Error as Web3Error,
         types::{BlockId, BlockNumber},
     },
-    L1BlockNumber, Nonce, H256, U256,
+    L1BlockNumber, Nonce, DEPLOY_L2_CONTRACT_TX_GAS_LIMIT, H256, U256,
 };
 use micro_utils::time::seconds_since_epoch;
 use tokio::sync::watch;
@@ -52,6 +52,7 @@ pub struct EthTxManager<E, G> {
     ethereum_gateway: E,
     config: SenderConfig,
     gas_adjuster: Arc<G>,
+    fair_l2_gas_price: u64,
 }
 
 impl<E, G> EthTxManager<E, G>
@@ -59,11 +60,17 @@ where
     E: BoundEthInterface + Sync,
     G: L1TxParamsProvider,
 {
-    pub fn new(config: SenderConfig, gas_adjuster: Arc<G>, ethereum_gateway: E) -> Self {
+    pub fn new(
+        config: SenderConfig,
+        gas_adjuster: Arc<G>,
+        ethereum_gateway: E,
+        fair_l2_gas_price: u64,
+    ) -> Self {
         Self {
             ethereum_gateway,
             config,
             gas_adjuster,
+            fair_l2_gas_price: u64,
         }
     }
 

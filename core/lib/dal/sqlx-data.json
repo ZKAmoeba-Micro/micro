@@ -8994,6 +8994,26 @@
     },
     "query": "SELECT l1_block_number FROM transactions\n                WHERE priority_op_id IS NOT NULL\n                ORDER BY priority_op_id DESC\n                LIMIT 1"
   },
+  "b0533ba23f8cc2fe66b1f4d58d4133d2914e9da15c619fca4e913224c8f4c059": {
+    "describe": {
+      "columns": [
+        {
+          "name": "count!",
+          "ordinal": 0,
+          "type_info": "Int8"
+        }
+      ],
+      "nullable": [
+        null
+      ],
+      "parameters": {
+        "Left": [
+          "Int4"
+        ]
+      }
+    },
+    "query": "SELECT COUNT(*) as \"count!\" FROM l1_batches WHERE eth_commit_tx_id = $1 OR eth_prove_tx_id = $1 OR eth_execute_tx_id = $1"
+  },
   "b11978a1a31a57fe754d08f7bf547c14e5474786700b5ed7445596568d18543a": {
     "describe": {
       "columns": [],
