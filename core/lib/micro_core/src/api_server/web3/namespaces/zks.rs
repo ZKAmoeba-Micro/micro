@@ -676,7 +676,6 @@ impl<G: L1GasPriceProvider> ZksNamespace<G> {
 
     #[tracing::instrument(skip(self))]
     pub async fn get_statistics_info_impl(&self) -> StatiticsInfo {
-        let start = Instant::now();
         let endpoint_name = "get_statistics_info_impl";
         let mut l2_block_id = self
             .state
@@ -685,7 +684,7 @@ impl<G: L1GasPriceProvider> ZksNamespace<G> {
             .await
             .unwrap()
             .blocks_web3_dal()
-            .get_sealed_l2_miniblok_number()
+            .get_sealed_miniblock_number()
             .await
             .map(|n| U64::from(n.0))
             .map_err(|err| internal_error(endpoint_name, err))
@@ -726,8 +725,6 @@ impl<G: L1GasPriceProvider> ZksNamespace<G> {
             .await;
 
         l2_block_id = l2_block_id.add(1);
-
-        metrics::histogram!("api.web3.call", start.elapsed(), "endpoint" => endpoint_name);
 
         StatiticsInfo {
             tx_mempool: tx_mempool,

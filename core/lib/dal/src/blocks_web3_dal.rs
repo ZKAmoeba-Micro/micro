@@ -326,6 +326,21 @@ impl BlocksWeb3Dal<'_, '_> {
         Ok(number.map(|number| L1BatchNumber(number as u32)))
     }
 
+    pub async fn get_sealed_prove_miniblock_number(
+        &mut self,
+    ) -> Result<MiniblockNumber, sqlx::Error> {
+        let number: i64 = sqlx::query!(
+                r#"SELECT COALESCE(MAX( NUMBER ),0) AS "number" FROM miniblocks
+                WHERE l1_batch_number = ( SELECT MAX ( NUMBER ) FROM l1_batches WHERE eth_prove_tx_id IS NOT NULL)"#
+            )
+            .fetch_one(self.storage.conn())
+            .await?
+            .number
+            .expect("DAL invocation before genesis");
+
+        Ok(MiniblockNumber(number as u32))
+    }
+
     pub async fn get_miniblock_range_of_l1_batch(
         &mut self,
         l1_batch_number: L1BatchNumber,

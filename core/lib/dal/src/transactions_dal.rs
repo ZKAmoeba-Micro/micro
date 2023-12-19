@@ -1139,4 +1139,14 @@ impl TransactionsDal<'_, '_> {
         .unwrap()
         .map(|tx| tx.into())
     }
+
+    pub async fn get_tx_memory(&mut self) -> u32 {
+        let counts: i64 =
+            sqlx::query!(r#"SELECT COUNT(*) as "count!" FROM transactions WHERE in_mempool=TRUE"#)
+                .fetch_one(self.storage.conn())
+                .await
+                .unwrap()
+                .count;
+        counts as u32
+    }
 }
