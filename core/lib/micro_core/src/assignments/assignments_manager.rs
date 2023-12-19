@@ -142,7 +142,7 @@ impl AssignmentsManager {
         //     let h256 = vec![*signal];
         //     event_names.push(h256);
         // }
-        let topic = (1, &self.event_signatures);
+        let topic = (1, self.event_signatures.clone());
         let filter = GetLogsFilter {
             from_block: MiniblockNumber(self.from_block),
             to_block: MiniblockNumber(next_number),
