@@ -6,7 +6,7 @@ import { TestMaster } from '../src/index';
 import { shouldChangeETHBalances, shouldOnlyTakeFee } from '../src/modifiers/balance-checker';
 import { checkReceipt } from '../src/modifiers/receipt-check';
 
-import * as micro from '@zkameba/micro-web3';
+import * as micro from '@zkamoeba/micro-web3';
 import { BigNumber, Overrides } from 'ethers';
 import { scaledGasPrice } from '../src/helpers';
 

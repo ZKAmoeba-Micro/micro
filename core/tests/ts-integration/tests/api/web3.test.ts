@@ -2,14 +2,14 @@
  * This suite contains tests for the Web3 API compatibility and micro-specific extensions.
  */
 import { TestMaster } from '../../src';
-import * as micro from '@zkameba/micro-web3';
-import { types } from '@zkameba/micro-web3';
+import * as micro from '@zkamoeba/micro-web3';
+import { types } from '@zkamoeba/micro-web3';
 import { ethers, Event } from 'ethers';
 import { serialize } from '@ethersproject/transactions';
 import { deployContract, getTestContract, waitForNewL1Batch, anyTransaction } from '../../src/helpers';
 import { shouldOnlyTakeFee } from '../../src/modifiers/balance-checker';
 import fetch, { RequestInit } from 'node-fetch';
-import { EIP712_TX_TYPE, PRIORITY_OPERATION_L2_TX_TYPE } from '@zkameba/micro-web3/build/src/utils';
+import { EIP712_TX_TYPE, PRIORITY_OPERATION_L2_TX_TYPE } from '@zkamoeba/micro-web3/build/src/utils';
 // Regular expression to match variable-length hex number.
 const HEX_VALUE_REGEX = /^0x[\da-fA-F]*$/;
 const DATE_REGEX = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{6})?/;

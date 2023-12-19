@@ -11,8 +11,8 @@ import { deployContract, getTestContract, waitForNewL1Batch } from '../src/helpe
 import { shouldOnlyTakeFee } from '../src/modifiers/balance-checker';
 
 import * as ethers from 'ethers';
-import * as micro from '@zkameba/micro-web3';
-import { Provider } from '@zkameba/micro-web3';
+import * as micro from '@zkamoeba/micro-web3';
+import { Provider } from '@zkamoeba/micro-web3';
 import { RetryProvider } from '../src/retry-provider';
 
 // TODO: Leave only important ones.

@@ -12,7 +12,7 @@
 import * as utils from 'zk/build/utils';
 import { TestMaster } from '../src/index';
 
-import * as micro from '@zkameba/micro-web3';
+import * as micro from '@zkamoeba/micro-web3';
 import { BigNumber, ethers } from 'ethers';
 import { Token } from '../src/types';
 

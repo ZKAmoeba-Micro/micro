@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import * as micro from '@zkameba/micro-web3';
+import * as micro from '@zkamoeba/micro-web3';
 import * as ethers from 'ethers';
 import * as hre from 'hardhat';
 import { MicroArtifact } from '@zkamoeba/hardhat-micro-solc/dist/src/types';

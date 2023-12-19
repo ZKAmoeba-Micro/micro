@@ -1,4 +1,4 @@
-import * as micro from '@zkameba/micro-web3';
+import * as micro from '@zkamoeba/micro-web3';
 import * as ethers from 'ethers';
 import { TestEnvironment, TestContext } from './types';
 import { claimEtherBack } from './context-owner';

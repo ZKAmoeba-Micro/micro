@@ -15,7 +15,7 @@ export async function compileSystemContracts() {
 
 export async function compileAll() {
     await compileSystemContracts();
-    await compileTestContracts();
+    // await compileTestContracts();
 }
 
 export const command = new Command('compiler').description('compile contract');

@@ -9,10 +9,10 @@ import { TestMaster } from '../src/index';
 import { shouldChangeTokenBalances } from '../src/modifiers/balance-checker';
 import { L2_ETH_PER_ACCOUNT } from '../src/context-owner';
 
-import * as micro from '@zkameba/micro-web3';
+import * as micro from '@zkamoeba/micro-web3';
 import * as ethers from 'ethers';
 import { BigNumberish, BytesLike } from 'ethers';
-import { serialize, hashBytecode } from '@zkameba/micro-web3/build/src/utils';
+import { serialize, hashBytecode } from '@zkamoeba/micro-web3/build/src/utils';
 import { deployOnAnyLocalAddress, ForceDeployment } from '../src/system';
 import { getTestContract } from '../src/helpers';
 

@@ -5,7 +5,7 @@ import { ForceDeployUpgraderFactory } from 'l2-micro-contracts/typechain';
 import { Command } from 'commander';
 import { getCommonDataFileName, getL2UpgradeFileName } from '../utils';
 import fs from 'fs';
-import { REQUIRED_L1_TO_L2_GAS_PER_PUBDATA_LIMIT } from '@zkameba/micro-web3/build/src/utils';
+import { REQUIRED_L1_TO_L2_GAS_PER_PUBDATA_LIMIT } from '@zkamoeba/micro-web3/build/src/utils';
 
 const SYSTEM_UPGRADE_TX_TYPE = 254;
 const FORCE_DEPLOYER_ADDRESS = '0x0000000000000000000000000000000000008007';

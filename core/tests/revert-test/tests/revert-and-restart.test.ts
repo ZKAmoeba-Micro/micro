@@ -1,6 +1,6 @@
 import * as utils from 'zk/build/utils';
 import { Tester } from './tester';
-import * as zkweb3 from '@zkameba/micro-web3';
+import * as zkweb3 from '@zkamoeba/micro-web3';
 import { BigNumber, Contract, ethers } from 'ethers';
 import { expect } from 'chai';
 import fs from 'fs';

@@ -3,7 +3,7 @@
  */
 import { TestMaster } from '../src/index';
 
-import * as micro from '@zkameba/micro-web3';
+import * as micro from '@zkamoeba/micro-web3';
 import { scaledGasPrice, waitUntilBlockFinalized } from '../src/helpers';
 import { WETH9, WETH9Factory } from 'l1-micro-contracts/typechain';
 import { L2Weth, L2WethFactory } from 'l2-micro-contracts/typechain';

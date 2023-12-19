@@ -6,7 +6,7 @@ import { TestMaster } from '../src/index';
 import { Token } from '../src/types';
 import { spawn as _spawn } from 'child_process';
 
-import * as micro from '@zkameba/micro-web3';
+import * as micro from '@zkamoeba/micro-web3';
 import * as ethers from 'ethers';
 import { scaledGasPrice } from '../src/helpers';
 import {

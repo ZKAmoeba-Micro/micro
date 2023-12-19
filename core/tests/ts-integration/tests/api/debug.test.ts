@@ -5,9 +5,9 @@
 import { TestMaster } from '../../src';
 import { Token } from '../../src/types';
 
-import * as micro from '@zkameba/micro-web3';
+import * as micro from '@zkamoeba/micro-web3';
 import { ethers } from 'ethers';
-import { BOOTLOADER_FORMAL_ADDRESS } from '@zkameba/micro-web3/build/src/utils';
+import { BOOTLOADER_FORMAL_ADDRESS } from '@zkamoeba/micro-web3/build/src/utils';
 import fs from 'fs';
 
 describe('Debug methods', () => {

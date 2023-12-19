@@ -4,8 +4,8 @@
 
 import { TestMaster } from '../src/index';
 
-import * as micro from '@zkameba/micro-web3';
-import { utils, types } from '@zkameba/micro-web3';
+import * as micro from '@zkamoeba/micro-web3';
+import { utils, types } from '@zkamoeba/micro-web3';
 import * as ethers from 'ethers';
 import { deployContract, getTestContract } from '../src/helpers';
 import { ERC20_PER_ACCOUNT, L2_ETH_PER_ACCOUNT } from '../src/context-owner';
