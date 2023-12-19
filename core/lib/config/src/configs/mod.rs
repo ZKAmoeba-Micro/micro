@@ -14,6 +14,7 @@ pub use self::{
     fri_proof_compressor::FriProofCompressorConfig,
     fri_prover::FriProverConfig,
     fri_prover_gateway::FriProverGatewayConfig,
+    fri_prover_task_apply::FriProverTaskApplyConfig,
     fri_witness_generator::FriWitnessGeneratorConfig,
     fri_witness_vector_generator::FriWitnessVectorGeneratorConfig,
     object_store::ObjectStoreConfig,
