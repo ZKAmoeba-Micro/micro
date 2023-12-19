@@ -135,19 +135,19 @@ impl AssignmentsManager {
             self.from_block = self.from_block + 1;
         }
         let next_number = (self.from_block as u32) + 1024;
-        //Multiple parameter lists for one event
-        let mut event_names = Vec::new();
-        //Verification address parameter of the event
-        for signal in &self.event_signatures {
-            let h256 = vec![*signal];
-            //let topic = (1, h256);
-            event_names.push(h256);
-        }
+        // //Multiple parameter lists for one event
+        // let mut event_names = Vec::new();
+        // //Verification address parameter of the event
+        // for signal in &self.event_signatures {
+        //     let h256 = vec![*signal];
+        //     event_names.push(h256);
+        // }
+        let topic = (1, &self.event_signatures);
         let filter = GetLogsFilter {
             from_block: MiniblockNumber(self.from_block),
             to_block: MiniblockNumber(next_number),
             addresses: vec![DEPOSIT_ADDRESS],
-            topics: vec![],
+            topics: vec![topic],
         };
         tracing::warn!("monitor_change_event filter: {:?}", &filter);
         let logs: Vec<micro_types::api::Log> = connection
