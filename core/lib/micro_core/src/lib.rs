@@ -26,7 +26,7 @@ use micro_eth_client::{
     clients::http::{PKSigningClient, QueryClient},
     BoundEthInterface, EthInterface,
 };
-use micro_health_check::{CheckHealth, HealthStatus, ReactiveHealthCheck};
+use micro_health_check::{CheckHealth, ReactiveHealthCheck};
 use micro_object_store::{ObjectStore, ObjectStoreFactory};
 use micro_prover_utils::periodic_job::PeriodicJob;
 use micro_queued_job_processor::JobProcessor;
@@ -36,7 +36,6 @@ use micro_types::{
     system_contracts::get_system_smart_contracts,
     L2ChainId, PackedEthSignature, ProtocolVersionId,
 };
-use prometheus_exporter::PrometheusExporterConfig;
 use temp_config_store::TempConfigStore;
 use tokio::{sync::watch, task::JoinHandle};
 
@@ -353,25 +352,25 @@ pub async fn initialize_components(
     let (cb_sender, cb_receiver) = oneshot::channel();
 
     // Prometheus exporter and circuit breaker checker should run for every component configuration.
-    let prom_config = configs
-        .prometheus_config
-        .clone()
-        .context("prometheus_config")?;
-    let prom_config = PrometheusExporterConfig::pull(prom_config.listener_port);
+    // let prom_config = configs
+    //     .prometheus_config
+    //     .clone()
+    //     .context("prometheus_config")?;
+    // let prom_config = PrometheusExporterConfig::pull(prom_config.listener_port);
 
-    let (prometheus_health_check, prometheus_health_updater) =
+    let (prometheus_health_check, _prometheus_health_updater) =
         ReactiveHealthCheck::new("prometheus_exporter");
     healthchecks.push(Box::new(prometheus_health_check));
-    let prometheus_task = prom_config.run(stop_receiver.clone());
-    let prometheus_task = tokio::spawn(async move {
-        prometheus_health_updater.update(HealthStatus::Ready.into());
-        let res = prometheus_task.await;
-        drop(prometheus_health_updater);
-        res
-    });
+    // let prometheus_task = prom_config.run(stop_receiver.clone());
+    // let prometheus_task = tokio::spawn(async move {
+    //     prometheus_health_updater.update(HealthStatus::Ready.into());
+    //     let res = prometheus_task.await;
+    //     drop(prometheus_health_updater);
+    //     res
+    // });
 
     let mut task_futures: Vec<JoinHandle<anyhow::Result<()>>> = vec![
-        prometheus_task,
+        // prometheus_task,
         tokio::spawn(circuit_breaker_checker.run(cb_sender, stop_receiver.clone())),
     ];
 

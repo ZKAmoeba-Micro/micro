@@ -120,7 +120,7 @@ impl<W: EthClient + Sync> EventProcessor<W> for GovernanceUpgradesEventProcessor
         Ok(())
     }
 
-    fn relevant_topic(&self) -> H256 {
-        self.upgrade_proposal_signature
+    fn relevant_topic(&self) -> Vec<H256> {
+        vec![self.upgrade_proposal_signature]
     }
 }

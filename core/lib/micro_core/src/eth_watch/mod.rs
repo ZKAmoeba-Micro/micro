@@ -80,7 +80,7 @@ impl<W: EthClient + Sync> EthWatch<W> {
 
         let topics = event_processors
             .iter()
-            .map(|p| p.relevant_topic())
+            .flat_map(|p| p.relevant_topic())
             .collect();
         client.set_topics(topics);
 

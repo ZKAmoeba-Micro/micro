@@ -89,7 +89,7 @@ impl<W: EthClient + Sync> EventProcessor<W> for UpgradesEventProcessor {
         Ok(())
     }
 
-    fn relevant_topic(&self) -> H256 {
-        UPGRADE_PROPOSAL_SIGNATURE
+    fn relevant_topic(&self) -> Vec<H256> {
+        vec![UPGRADE_PROPOSAL_SIGNATURE]
     }
 }

@@ -153,7 +153,10 @@ impl<W: EthClient + Sync> EventProcessor<W> for PriorityOpsEventProcessor {
         Ok(())
     }
 
-    fn relevant_topic(&self) -> H256 {
-        self.new_priority_request_signature
+    fn relevant_topic(&self) -> Vec<H256> {
+        vec![
+            self.new_priority_request_signature,
+            self.new_priority_request_factory_deps_signature,
+        ]
     }
 }
