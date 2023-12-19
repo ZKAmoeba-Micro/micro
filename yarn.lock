@@ -2790,10 +2790,10 @@
     chalk "4.1.2"
     dockerode "^3.3.4"
 
-"@zkamoeba/hardhat-micro-vyper@^1.0.5":
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/@zkamoeba/hardhat-micro-vyper/-/hardhat-micro-vyper-1.0.5.tgz#2b1a32d5d31e3aacd36e577d77f2a91147d85c04"
-  integrity sha512-xuKfVAa7giWK5zVYnawUoXzcSJpUsd7obxXc8THwuBLtkNvWU7FWm6lmlh30PYc95CLWIwy3rwgGOS4hUL+84A==
+"@zkamoeba/hardhat-micro-vyper@^1.0.8":
+  version "1.0.8"
+  resolved "https://registry.yarnpkg.com/@zkamoeba/hardhat-micro-vyper/-/hardhat-micro-vyper-1.0.8.tgz#e1cd84761e2179e4b80c8e832ee6dc834aa7a51d"
+  integrity sha512-I21y/XlJxRlNwYqIhIHgM35HERLeFexky9mMEiKOtjbamQvPdhnsbcq5KbJfu/SuXwqwq90AFeyqtFUqxHEaZg==
   dependencies:
     "@nomiclabs/hardhat-docker" "^2.0.0"
     chalk "4.1.2"
