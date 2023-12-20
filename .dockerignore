@@ -3,6 +3,7 @@
 !docker/local-node/entrypoint.sh
 !docker/external-node/entrypoint.sh
 !docker/contract-verifier/install-all-solc.sh
+!docker/zkamoeba
 !etc/test_config
 !etc/env/dev.env.example
 !etc/env/docker.env
