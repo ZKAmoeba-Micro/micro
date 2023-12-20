@@ -55,7 +55,7 @@ async fn main() -> anyhow::Result<()> {
     let config = FriWitnessVectorGeneratorConfig::from_env()
         .context("FriWitnessVectorGeneratorConfig::from_env()")?;
     let specialized_group_id = config.specialized_group_id;
-    let exporter_config = PrometheusExporterConfig::pull(config.prometheus_listener_port);
+    // let exporter_config = PrometheusExporterConfig::pull(config.prometheus_listener_port);
 
     let postgres_config = PostgresConfig::from_env().context("PostgresConfig::from_env()")?;
     let pool = ConnectionPool::builder(
@@ -81,7 +81,7 @@ async fn main() -> anyhow::Result<()> {
     let zone = get_zone(&prover_group_config).await.context("get_zone()")?;
     let vk_commitments = get_cached_commitments();
     let fri_prover_config = FriProverConfig::from_env().context("FriProverConfig::from_env()")?;
-    let witness_vector_generator = WitnessVectorGenerator::new(
+    let witness_vector_generator: WitnessVectorGenerator = WitnessVectorGenerator::new(
         blob_store,
         pool,
         circuit_ids_for_round_to_be_proven.clone(),
@@ -105,7 +105,7 @@ async fn main() -> anyhow::Result<()> {
     tracing::info!("Starting witness vector generation for group: {} with circuits: {:?} in zone: {} with vk_commitments: {:?}", specialized_group_id, circuit_ids_for_round_to_be_proven, zone, vk_commitments);
 
     let tasks = vec![
-        tokio::spawn(exporter_config.run(stop_receiver.clone())),
+        // tokio::spawn(exporter_config.run(stop_receiver.clone())),
         tokio::spawn(witness_vector_generator.run(stop_receiver, opt.number_of_iterations)),
     ];
 

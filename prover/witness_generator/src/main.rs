@@ -87,7 +87,7 @@ async fn main() -> anyhow::Result<()> {
     let store_factory = ObjectStoreFactory::new(object_store_config.0);
     let config =
         FriWitnessGeneratorConfig::from_env().context("FriWitnessGeneratorConfig::from_env()")?;
-    let prometheus_config = PrometheusConfig::from_env().context("PrometheusConfig::from_env()")?;
+    // let prometheus_config = PrometheusConfig::from_env().context("PrometheusConfig::from_env()")?;
     let postgres_config = PostgresConfig::from_env().context("PostgresConfig::from_env()")?;
     let connection_pool = ConnectionPool::builder(
         postgres_config.master_url()?,
@@ -154,16 +154,16 @@ async fn main() -> anyhow::Result<()> {
             &protocol_versions
         );
 
-        let prometheus_config = if use_push_gateway {
-            PrometheusExporterConfig::push(
-                prometheus_config.gateway_endpoint(),
-                prometheus_config.push_interval(),
-            )
-        } else {
-            // u16 cast is safe since i is in range [0, 4)
-            PrometheusExporterConfig::pull(prometheus_config.listener_port + i as u16)
-        };
-        let prometheus_task = prometheus_config.run(stop_receiver.clone());
+        // let prometheus_config = if use_push_gateway {
+        //     PrometheusExporterConfig::push(
+        //         prometheus_config.gateway_endpoint(),
+        //         prometheus_config.push_interval(),
+        //     )
+        // } else {
+        //     // u16 cast is safe since i is in range [0, 4)
+        //     PrometheusExporterConfig::pull(prometheus_config.listener_port + i as u16)
+        // };
+        // let prometheus_task = prometheus_config.run(stop_receiver.clone());
 
         let witness_generator_task = match round {
             AggregationRound::BasicCircuits => {
@@ -221,7 +221,7 @@ async fn main() -> anyhow::Result<()> {
             }
         };
 
-        tasks.push(tokio::spawn(prometheus_task));
+        // tasks.push(tokio::spawn(prometheus_task));
         tasks.push(tokio::spawn(witness_generator_task));
 
         tracing::info!(

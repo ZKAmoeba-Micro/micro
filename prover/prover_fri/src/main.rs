@@ -20,7 +20,7 @@ use micro_types::{
     proofs::{GpuProverInstanceStatus, SocketAddress},
 };
 use micro_utils::wait_for_tasks::wait_for_tasks;
-use prometheus_exporter::PrometheusExporterConfig;
+// use prometheus_exporter::PrometheusExporterConfig;
 use tokio::{
     sync::{oneshot, watch::Receiver},
     task::JoinHandle,
@@ -79,7 +79,7 @@ async fn main() -> anyhow::Result<()> {
     }
 
     let prover_config = FriProverConfig::from_env().context("FriProverConfig::from_env()")?;
-    let exporter_config = PrometheusExporterConfig::pull(prover_config.prometheus_port);
+    // let exporter_config = PrometheusExporterConfig::pull(prover_config.prometheus_port);
 
     let (stop_signal_sender, stop_signal_receiver) = oneshot::channel();
     let mut stop_signal_sender = Some(stop_signal_sender);
@@ -138,7 +138,8 @@ async fn main() -> anyhow::Result<()> {
     .await
     .context("get_prover_tasks()")?;
 
-    let mut tasks = vec![tokio::spawn(exporter_config.run(stop_receiver))];
+    // let mut tasks = vec![tokio::spawn(exporter_config.run(stop_receiver))];
+    let mut tasks = vec![];
     tasks.extend(prover_tasks);
 
     let particular_crypto_alerts = None;

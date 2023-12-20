@@ -79,10 +79,10 @@ async fn main() -> anyhow::Result<()> {
     tracing::info!("Starting Fri Prover Gateway");
 
     let tasks = vec![
-        tokio::spawn(
-            PrometheusExporterConfig::pull(config.prometheus_listener_port)
-                .run(stop_receiver.clone()),
-        ),
+        // tokio::spawn(
+        //     PrometheusExporterConfig::pull(config.prometheus_listener_port)
+        //         .run(stop_receiver.clone()),
+        // ),
         tokio::spawn(
             proof_gen_data_fetcher.run::<ProofGenerationDataRequest>(stop_receiver.clone()),
         ),

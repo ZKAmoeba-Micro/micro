@@ -4,7 +4,7 @@ use crate::{envy_load, FromEnv};
 
 impl FromEnv for FriProverTaskApplyConfig {
     fn from_env() -> anyhow::Result<Self> {
-        envy_load("fri_prover_gateway", "FRI_PROVER_GATEWAY_")
+        envy_load("fri_prover_task_apply", "FRI_PROVER_TASK_APPLY_")
     }
 }
 
