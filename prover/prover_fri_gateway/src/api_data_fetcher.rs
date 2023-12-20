@@ -1,6 +1,7 @@
 use std::time::Duration;
 
 use async_trait::async_trait;
+use micro_config::configs::FriProverGatewayConfig;
 use micro_dal::ConnectionPool;
 use micro_object_store::ObjectStore;
 use reqwest::Client;
@@ -21,6 +22,7 @@ pub(crate) struct PeriodicApiStruct {
     pub(crate) api_url: String,
     pub(crate) poll_duration: Duration,
     pub(crate) client: Client,
+    pub(crate) config: FriProverGatewayConfig,
 }
 
 impl PeriodicApiStruct {

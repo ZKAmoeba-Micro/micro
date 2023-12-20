@@ -24,7 +24,7 @@ use micro_types::{
         bellman::{bn256::Bn256, plonk::better_better_cs::proof::Proof},
         witness::oracle::VmWitnessOracle,
     },
-    L1BatchNumber,
+    L1BatchNumber, PackedEthSignature,
 };
 use micro_vk_setup_data_server_fri::{get_recursive_layer_vk_for_circuit_type, get_snark_vk};
 use tokio::task::JoinHandle;
@@ -190,6 +190,8 @@ impl JobProcessor for ProofCompressor {
         let l1_batch_proof = L1BatchProofForL1 {
             aggregation_result_coords,
             scheduler_proof: artifacts,
+            signature: PackedEthSignature::default(),
+            time_taken: 0,
         };
         let blob_save_started_at = Instant::now();
         let blob_url = self

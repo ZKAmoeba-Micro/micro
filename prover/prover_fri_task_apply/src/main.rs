@@ -1,5 +1,6 @@
 use anyhow::Context as _;
 use micro_config::configs::FriProverTaskApplyConfig;
+use micro_env_config::FromEnv;
 use micro_eth_client::clients::http::QueryClient;
 use micro_utils::wait_for_tasks::wait_for_tasks;
 use tokio::sync::{oneshot, watch};

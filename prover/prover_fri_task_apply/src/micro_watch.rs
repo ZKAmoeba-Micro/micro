@@ -1,9 +1,10 @@
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
 use micro::{signer::Signer, wallet::Wallet};
-use micro_config::{configs::FriProverTaskApplyConfig, constants::DEPOSIT_ADDRESS};
+use micro_config::configs::FriProverTaskApplyConfig;
 use micro_contracts::sys_deposit_contract;
 use micro_eth_signer::{EthereumSigner, PrivateKeySigner};
+use micro_system_constants::DEPOSIT_ADDRESS;
 use micro_types::{
     ethabi::{Contract, Token},
     l2::new_batch::NewBatch,
@@ -57,8 +58,6 @@ impl<W: MicroClient + Sync> EthWatch<W> {
             }
             timer.tick().await;
 
-            metrics::counter!("prover.task_apply.eth_poll", 1);
-
             if let Err(error) = self.loop_iteration().await {
                 // This is an error because otherwise we could potentially miss a priority operation
                 // thus entering priority mode, which is not desired.
@@ -75,7 +74,6 @@ impl<W: MicroClient + Sync> EthWatch<W> {
 
     #[tracing::instrument(skip(self))]
     async fn loop_iteration(&mut self) -> Result<(), Error> {
-        let stage_start = Instant::now();
         let to_block = self.client.finalized_block_number().await?;
 
         tracing::info!(
@@ -96,7 +94,7 @@ impl<W: MicroClient + Sync> EthWatch<W> {
                 RETRY_LIMIT,
             )
             .await?;
-        metrics::histogram!("eth_watcher.poll_eth_node", stage_start.elapsed(), "stage" => "request");
+
         //todo  send transaction
         if !events.is_empty() {
             for event in events {

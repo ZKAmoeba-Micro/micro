@@ -1,13 +1,13 @@
 use std::fmt::Debug;
 
-use micro_config::constants::DEPOSIT_ADDRESS;
 use micro_contracts::sys_deposit_contract;
 use micro_eth_client::{types::Error as EthClientError, EthInterface};
+use micro_system_constants::DEPOSIT_ADDRESS;
 use micro_types::{
     l2::new_batch::NEW_BATCH,
     web3::{
         self,
-        types::{BlockNumber, FilterBuilder, Log},
+        types::{BlockId, BlockNumber, FilterBuilder, Log},
     },
     Address, H256,
 };
@@ -176,7 +176,7 @@ impl<E: EthInterface + Send + Sync + 'static> MicroClient for MicroHttpQueryClie
             Ok(latest_block_number.saturating_sub(confirmations))
         } else {
             self.client
-                .block("finalized".to_string(), "task_apply")
+                .block(BlockId::Number(BlockNumber::Finalized), "task_apply")
                 .await
                 .map_err(Into::into)
                 .map(|res| {

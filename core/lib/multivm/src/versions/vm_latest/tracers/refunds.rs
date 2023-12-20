@@ -4,8 +4,10 @@ use micro_state::{StoragePtr, WriteStorage};
 use micro_system_constants::{PUBLISH_BYTECODE_OVERHEAD, SYSTEM_CONTEXT_ADDRESS};
 use micro_types::{
     event::{extract_long_l2_to_l1_messages, extract_published_bytecodes},
+    fee::Fee,
+    l2::TransactionType,
     l2_to_l1_log::L2ToL1Log,
-    L1BatchNumber, U256,
+    L1BatchNumber, EIP_1559_TX_TYPE, EIP_2930_TX_TYPE, EIP_712_TX_TYPE, U256,
 };
 use micro_utils::{bytecode::bytecode_len_in_bytes, ceil_div_u256, u256_to_h256};
 use vise::{Buckets, EncodeLabelSet, EncodeLabelValue, Family, Histogram, Metrics};
@@ -22,7 +24,10 @@ use crate::{
     },
     vm_latest::{
         bootloader_state::BootloaderState,
-        constants::{BOOTLOADER_HEAP_PAGE, OPERATOR_REFUNDS_OFFSET, TX_GAS_LIMIT_OFFSET},
+        constants::{
+            BOOTLOADER_HEAP_PAGE, OPERATOR_REFUNDS_OFFSET, TX_GAS_LIMIT_OFFSET,
+            TX_MAX_FEE_PER_GAS_OFFSET, TX_MAX_PRIORITY_PER_FEE_OFFSET, TX_TYPE_OFFSET,
+        },
         old_vm::{
             events::merge_events, history_recorder::HistoryMode, memory::SimpleMemory,
             utils::eth_price_per_pubdata_byte,
@@ -98,7 +103,10 @@ impl<S> RefundsTracer<S> {
         &self,
         bootloader_refund: u32,
         gas_spent_on_pubdata: u32,
+        tx_type: u32,
         tx_gas_limit: u32,
+        tx_max_fee_per_gas: U256,
+        tx_max_priority_fee_per_gas: U256,
         current_ergs_per_pubdata_byte: u32,
         pubdata_published: u32,
     ) -> u32 {
@@ -115,8 +123,21 @@ impl<S> RefundsTracer<S> {
                 0
             });
 
-        // For now, bootloader charges only for base fee.
-        let effective_gas_price = self.l1_batch.base_fee();
+        let effective_gas_price = Fee {
+            gas_limit: U256::from(tx_gas_limit),
+            max_fee_per_gas: tx_max_fee_per_gas,
+            max_priority_fee_per_gas: tx_max_priority_fee_per_gas,
+            gas_per_pubdata_limit: U256::zero(),
+        }
+        .get_effective_gas_price(
+            U256::from(self.l1_batch.base_fee()),
+            match tx_type as u8 {
+                EIP_712_TX_TYPE => TransactionType::EIP712Transaction,
+                EIP_1559_TX_TYPE => TransactionType::EIP1559Transaction,
+                EIP_2930_TX_TYPE => TransactionType::EIP2930Transaction,
+                _ => TransactionType::LegacyTransaction,
+            },
+        );
 
         let bootloader_eth_price_per_pubdata_byte =
             U256::from(effective_gas_price) * U256::from(current_ergs_per_pubdata_byte);
@@ -236,6 +257,31 @@ impl<S: WriteStorage, H: HistoryMode> VmTracer<S, H> for RefundsTracer<S> {
                 .value
                 .as_u32();
 
+            let tx_type = state
+                .memory
+                .read_slot(
+                    BOOTLOADER_HEAP_PAGE as usize,
+                    tx_description_offset + TX_TYPE_OFFSET,
+                )
+                .value
+                .as_u32();
+
+            let tx_max_fee_per_gas = state
+                .memory
+                .read_slot(
+                    BOOTLOADER_HEAP_PAGE as usize,
+                    tx_description_offset + TX_MAX_FEE_PER_GAS_OFFSET,
+                )
+                .value;
+
+            let tx_max_priority_fee_per_gas = state
+                .memory
+                .read_slot(
+                    BOOTLOADER_HEAP_PAGE as usize,
+                    tx_description_offset + TX_MAX_PRIORITY_PER_FEE_OFFSET,
+                )
+                .value;
+
             let used_published_storage_slots = state
                 .storage
                 .save_paid_changes(Timestamp(state.local_state.timestamp));
@@ -252,7 +298,10 @@ impl<S: WriteStorage, H: HistoryMode> VmTracer<S, H> for RefundsTracer<S> {
             let tx_body_refund = self.tx_body_refund(
                 bootloader_refund,
                 gas_spent_on_pubdata,
+                tx_type,
                 tx_gas_limit,
+                tx_max_fee_per_gas,
+                tx_max_priority_fee_per_gas,
                 current_ergs_per_pubdata_byte,
                 pubdata_published,
             );
