@@ -4,21 +4,21 @@
 
 # `RUST_LOG` environment variable for `env_logger`
 # Here we use TOML multiline strings: newlines will be trimmed.
-RUST_LOG="""\
-micro_core=debug,\
-micro_server=debug,\
-micro_prover=debug,\
-micro_contract_verifier=debug,\
+RUST_LOG = """\
+micro_core=info,\
+micro_server=info,\
+micro_prover=info,\
+micro_contract_verifier=info,\
 micro_dal=info,\
 micro_eth_client=info,\
 micro_storage=info,\
 micro_db_manager=info,\
 micro_merkle_tree=info,\
-micro_state=debug,\
-micro_utils=debug,\
+micro_state=info,\
+micro_utils=info,\
 micro_queued_job_processor=info,\
 micro_types=info,\
-micro_mempool=debug,\
+micro_mempool=info,\
 loadnext=info,\
 vm=info,\
 block_sizes_test=info,\
@@ -28,15 +28,15 @@ setup_key_generator_and_server=info,\
 micro_circuit_synthesizer=info,\
 en_playground=info,\
 micro_external_node=info,\
-cross_nodes_checker=debug,\
+cross_nodes_checker=info,\
 micro_witness_generator=info,\
 micro_prover_fri=info,\
 micro_witness_vector_generator=info,\
-micro_health_check=debug,\
+micro_health_check=info,\
 micro_proof_fri_compressor=info,\
-vise_exporter=debug,\
+vise_exporter=info,\
 """
 
 # `RUST_BACKTRACE` variable
-RUST_BACKTRACE="full"
-RUST_LIB_BACKTRACE="1"
+RUST_BACKTRACE = "full"
+RUST_LIB_BACKTRACE = "1"
