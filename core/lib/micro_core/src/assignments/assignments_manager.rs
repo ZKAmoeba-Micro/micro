@@ -1,15 +1,15 @@
 use std::time::Duration;
 
 use async_trait::async_trait;
-use micro_contracts::sys_deposit_contract;
+use micro_contracts::{sys_assignment_contract, sys_deposit_contract};
 use micro_dal::ConnectionPool;
 use micro_prover_utils::periodic_job::PeriodicJob;
-use micro_system_constants::DEPOSIT_ADDRESS;
+use micro_system_constants::{ASSIGNMENT_ADDRESS, DEPOSIT_ADDRESS};
 use micro_types::{
     api::GetLogsFilter,
     ethabi::{Contract, Token},
     l2::{
-        assignment_batch::{AssignmentBatch, EVENTNAME},
+        assignment_batch::{AssignmentBatch, ASSIGNMENT_BATCH},
         event_map::EventMapBuilder,
         penalize::{Penalize, PENALIZE},
     },
@@ -37,20 +37,26 @@ impl AssignmentsManager {
         pool: ConnectionPool,
         l2_sender: Caller,
     ) -> Self {
-        let contract_abi = sys_deposit_contract();
-        let events = vec![EVENTNAME, PENALIZE];
+        let deposit_abi = sys_deposit_contract();
+        let contract_abi = sys_assignment_contract();
+
         let mut event_signatures = Vec::new();
-        for name in events {
-            let msg = format!("{} event is missing in abi", name);
-            let signature = contract_abi.event(name).expect(msg.as_str()).signature();
-            event_signatures.push(signature);
-        }
+        let assignment_signature = contract_abi
+            .event(ASSIGNMENT_BATCH)
+            .expect("missing ASSIGNMENT_BATCH abi")
+            .signature();
+        let penalize_signature = deposit_abi
+            .event(PENALIZE)
+            .expect("missing PENALIZE abi")
+            .signature();
+        event_signatures.push(assignment_signature);
+        event_signatures.push(penalize_signature);
         Self {
             retry_interval_ms,
             processing_timeout,
             pool,
             l2_sender,
-            deposit_abi: contract_abi,
+            deposit_abi,
             event_signatures,
             from_block: 0_u32,
         }
@@ -146,7 +152,7 @@ impl AssignmentsManager {
         let filter = GetLogsFilter {
             from_block: MiniblockNumber(self.from_block),
             to_block: MiniblockNumber(next_number),
-            addresses: vec![DEPOSIT_ADDRESS],
+            addresses: vec![DEPOSIT_ADDRESS, ASSIGNMENT_ADDRESS],
             topics: vec![topic],
         };
         tracing::warn!("monitor_change_event filter: {:?}", &filter);

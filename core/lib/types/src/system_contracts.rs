@@ -8,7 +8,7 @@ use micro_system_constants::{
 use once_cell::sync::Lazy;
 
 use crate::{
-    block::DeployedContract, ACCOUNT_CODE_STORAGE_ADDRESS, BATCH_EVENT_ADDRESS,
+    block::DeployedContract, ACCOUNT_CODE_STORAGE_ADDRESS, ASSIGNMENT_ADDRESS, BATCH_EVENT_ADDRESS,
     BATCH_REWARD_ADDRESS, BOOTLOADER_ADDRESS, COMPLEX_UPGRADER_ADDRESS, CONTRACT_DEPLOYER_ADDRESS,
     DAO_ADDRESS, DEPOSIT_ADDRESS, ECRECOVER_PRECOMPILE_ADDRESS, FEE_POOL_ADDRESS,
     IMMUTABLE_SIMULATOR_STORAGE_ADDRESS, KECCAK256_PRECOMPILE_ADDRESS, KNOWN_CODES_STORAGE_ADDRESS,
@@ -24,7 +24,7 @@ use crate::{
 pub const TX_NONCE_INCREMENT: U256 = U256([1, 0, 0, 0]); // 1
 pub const DEPLOYMENT_NONCE_INCREMENT: U256 = U256([0, 0, 1, 0]); // 2^128
 
-static SYSTEM_CONTRACT_LIST: [(&str, &str, Address, ContractLanguage); 25] = [
+static SYSTEM_CONTRACT_LIST: [(&str, &str, Address, ContractLanguage); 26] = [
     (
         "",
         "AccountCodeStorage",
@@ -142,6 +142,7 @@ static SYSTEM_CONTRACT_LIST: [(&str, &str, Address, ContractLanguage); 25] = [
         RECEVING_ADDRESS,
         ContractLanguage::Sol,
     ),
+    ("", "Assignment", ASSIGNMENT_ADDRESS, ContractLanguage::Sol),
 ];
 
 static SYSTEM_CONTRACTS: Lazy<Vec<DeployedContract>> = Lazy::new(|| {

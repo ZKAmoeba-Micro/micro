@@ -4,7 +4,7 @@ use micro_basic_types::{
     ethabi::{decode, ParamType},
     H256,
 };
-use micro_contracts::sys_deposit_contract;
+use micro_contracts::sys_assignment_contract;
 use serde::{Deserialize, Serialize};
 
 use crate::{api::Log, l2::event_map::EventMapBuilder, Address, U256};
@@ -18,13 +18,16 @@ pub struct AssignmentBatch {
     pub mini_block_number: u32,
 }
 
-pub const EVENTNAME: &'static str = "AssignmentBatch";
+pub const ASSIGNMENT_BATCH: &'static str = "AssignmentBatch";
 
 impl AssignmentBatch {
     pub(crate) fn is_assignment_batch() -> H256 {
-        let msg = format!("AssignmentBatch {} event is missing in abi", EVENTNAME);
-        let signature: micro_basic_types::H256 = sys_deposit_contract()
-            .event(EVENTNAME)
+        let msg = format!(
+            "AssignmentBatch {} event is missing in abi",
+            ASSIGNMENT_BATCH
+        );
+        let signature: micro_basic_types::H256 = sys_assignment_contract()
+            .event(ASSIGNMENT_BATCH)
             .expect(msg.as_str())
             .signature();
         signature

@@ -2,9 +2,9 @@ use std::time::Duration;
 
 use micro::{signer::Signer, wallet::Wallet};
 use micro_config::configs::FriProverTaskApplyConfig;
-use micro_contracts::sys_deposit_contract;
+use micro_contracts::sys_assignment_contract;
 use micro_eth_signer::{EthereumSigner, PrivateKeySigner};
-use micro_system_constants::DEPOSIT_ADDRESS;
+use micro_system_constants::ASSIGNMENT_ADDRESS;
 use micro_types::{
     ethabi::{Contract, Token},
     l2::new_batch::NewBatch,
@@ -28,7 +28,7 @@ pub struct EthWatch<W: MicroClient + Sync> {
 
 impl<W: MicroClient + Sync> EthWatch<W> {
     pub async fn new(client: W, config: FriProverTaskApplyConfig) -> Self {
-        let contract_abi = sys_deposit_contract();
+        let contract_abi = sys_assignment_contract();
         let operator_private_key = config
             .prover_private_key()
             .expect("Operator private key is required for signing client");
@@ -119,7 +119,7 @@ impl<W: MicroClient + Sync> EthWatch<W> {
         if let Err(error) = self
             .wallet
             .start_execute_contract()
-            .contract_address(DEPOSIT_ADDRESS)
+            .contract_address(ASSIGNMENT_ADDRESS)
             .calldata(data)
             .send()
             .await

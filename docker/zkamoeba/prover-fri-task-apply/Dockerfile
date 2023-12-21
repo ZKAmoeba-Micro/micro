@@ -42,5 +42,6 @@ COPY etc/ERC20/artifacts-zk/contracts/interfaces/IERC20.sol/IERC20.json /contrac
 COPY etc/contracts-test-data/artifacts-zk/contracts/loadnext/loadnext_contract.sol/LoadnextContract.json /etc/contracts-test-data/artifacts-zk/contracts/loadnext/loadnext_contract.sol/LoadnextContract.json
 COPY etc/contracts-test-data/artifacts-zk/contracts/loadnext/loadnext_contract.sol/Foo.json /etc/contracts-test-data/artifacts-zk/contracts/loadnext/loadnext_contract.sol/Foo.json
 COPY etc/system-contracts/artifacts-zk/cache-zk/solpp-generated-contracts/interfaces/IDeposit.sol/IDeposit.json /etc/system-contracts/artifacts-zk/cache-zk/solpp-generated-contracts/interfaces/IDeposit.sol/IDeposit.json
+COPY etc/system-contracts/artifacts-zk/cache-zk/solpp-generated-contracts/interfaces/IAssignment.sol/IAssignment.json /etc/system-contracts/artifacts-zk/cache-zk/solpp-generated-contracts/interfaces/IAssignment.sol/IAssignment.json
 
 ENTRYPOINT ["micro_prover_fri_task_apply"]

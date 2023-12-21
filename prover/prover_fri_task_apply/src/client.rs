@@ -1,8 +1,8 @@
 use std::fmt::Debug;
 
-use micro_contracts::sys_deposit_contract;
+use micro_contracts::sys_assignment_contract;
 use micro_eth_client::{types::Error as EthClientError, EthInterface};
-use micro_system_constants::DEPOSIT_ADDRESS;
+use micro_system_constants::ASSIGNMENT_ADDRESS;
 use micro_types::{
     l2::new_batch::NEW_BATCH,
     web3::{
@@ -47,7 +47,7 @@ pub struct MicroHttpQueryClient<E> {
 
 impl<E: EthInterface> MicroHttpQueryClient<E> {
     pub fn new(client: E, confirmations_for_eth_event: Option<u64>) -> Self {
-        let contract_abi = sys_deposit_contract();
+        let contract_abi = sys_assignment_contract();
         let events = vec![NEW_BATCH];
         let mut topics = Vec::new();
         for name in events {
@@ -59,7 +59,7 @@ impl<E: EthInterface> MicroHttpQueryClient<E> {
         Self {
             client,
             topics,
-            contract_addr: DEPOSIT_ADDRESS,
+            contract_addr: ASSIGNMENT_ADDRESS,
             confirmations_for_eth_event,
         }
     }
