@@ -126,10 +126,10 @@ async fn main() -> anyhow::Result<()> {
     let opt = Opt::from_args();
 
     let verifier_config = ContractVerifierConfig::from_env().context("ContractVerifierConfig")?;
-    let prometheus_config = PrometheusConfig {
-        listener_port: verifier_config.prometheus_port,
-        ..ApiConfig::from_env().context("ApiConfig")?.prometheus
-    };
+    // let prometheus_config = PrometheusConfig {
+    //     listener_port: verifier_config.prometheus_port,
+    //     ..ApiConfig::from_env().context("ApiConfig")?.prometheus
+    // };
     let postgres_config = PostgresConfig::from_env().context("PostgresConfig")?;
     let pool = ConnectionPool::singleton(
         postgres_config
@@ -182,9 +182,9 @@ async fn main() -> anyhow::Result<()> {
         // The prover connection pool is not used by the contract verifier, but we need to pass it
         // since `JobProcessor` trait requires it.
         tokio::spawn(contract_verifier.run(stop_receiver.clone(), opt.jobs_number)),
-        tokio::spawn(
-            PrometheusExporterConfig::pull(prometheus_config.listener_port).run(stop_receiver),
-        ),
+        // tokio::spawn(
+        //     PrometheusExporterConfig::pull(prometheus_config.listener_port).run(stop_receiver),
+        // ),
     ];
 
     let particular_crypto_alerts = None;
