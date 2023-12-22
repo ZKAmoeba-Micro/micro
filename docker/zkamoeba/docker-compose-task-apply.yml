@@ -1,8 +1,0 @@
-version: "3.2"
-services:
-
-  task-apply:
-    image: "zkamoeba/prover-fri-task-apply:latest"
-    env_file:
-      - ./task_apply.env
-
