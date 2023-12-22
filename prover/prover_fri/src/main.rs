@@ -1,5 +1,8 @@
 #![feature(generic_const_exprs)]
-use std::future::Future;
+use std::{
+    future::Future,
+    net::{IpAddr, Ipv4Addr},
+};
 
 use anyhow::Context as _;
 use local_ip_address::local_ip;
@@ -94,15 +97,18 @@ async fn main() -> anyhow::Result<()> {
     let object_store_config =
         ProverObjectStoreConfig::from_env().context("ProverObjectStoreConfig::from_env()")?;
     let object_store_factory = ObjectStoreFactory::new(object_store_config.0);
-    let public_object_store_config =
-        PublicObjectStoreConfig::from_env().context("PublicObjectStoreConfig::from_env()")?;
+
     let public_blob_store = match prover_config.shall_save_to_public_bucket {
         false => None,
-        true => Some(
-            ObjectStoreFactory::new(public_object_store_config.0)
-                .create_store()
-                .await,
-        ),
+        true => {
+            let public_object_store_config = PublicObjectStoreConfig::from_env()
+                .context("PublicObjectStoreConfig::from_env()")?;
+            Some(
+                ObjectStoreFactory::new(public_object_store_config.0)
+                    .create_store()
+                    .await,
+            )
+        }
     };
     let specialized_group_id = prover_config.specialized_group_id;
 
@@ -222,8 +228,12 @@ async fn get_prover_tasks(
     let prover_group_config =
         ProverGroupConfig::from_env().context("ProverGroupConfig::from_env()")?;
     let zone = get_zone(&prover_group_config).await.context("get_zone()")?;
-    let local_ip = local_ip().context("Failed obtaining local IP address")?;
-    let address = SocketAddress {
+    let local_ip = if let Some(ip) = prover_config.witness_vector_receiver_host.clone() {
+        IpAddr::V4(ip.parse().unwrap())
+    } else {
+        local_ip().context("Failed obtaining local IP address")?
+    };
+    let interface_address = SocketAddress {
         host: local_ip,
         port: prover_config.witness_vector_receiver_port,
     };
@@ -235,7 +245,7 @@ async fn get_prover_tasks(
         setup_load_mode,
         circuit_ids_for_round_to_be_proven.clone(),
         consumer,
-        address.clone(),
+        interface_address.clone(),
         zone.clone(),
     );
     let producer = shared_witness_vector_queue.clone();
@@ -246,7 +256,11 @@ async fn get_prover_tasks(
         zone.clone()
     );
     let socket_listener = gpu_socket_listener::SocketListener::new(
-        address,
+        interface_address,
+        SocketAddress {
+            host: IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0)),
+            port: prover_config.witness_vector_receiver_port,
+        },
         producer,
         pool.clone(),
         prover_config.specialized_group_id,
