@@ -2,12 +2,11 @@ use std::cell::RefCell;
 
 use anyhow::Context as _;
 use futures::{channel::mpsc, executor::block_on, SinkExt, StreamExt};
-use micro_config::{configs::PrometheusConfig, ApiConfig, ContractVerifierConfig, PostgresConfig};
+use micro_config::{ContractVerifierConfig, PostgresConfig};
 use micro_dal::ConnectionPool;
 use micro_env_config::FromEnv;
 use micro_queued_job_processor::JobProcessor;
 use micro_utils::wait_for_tasks::wait_for_tasks;
-use prometheus_exporter::PrometheusExporterConfig;
 use tokio::sync::watch;
 
 use crate::verifier::ContractVerifier;

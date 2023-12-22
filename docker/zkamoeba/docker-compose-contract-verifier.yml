@@ -1,0 +1,8 @@
+version: "3.2"
+services:
+
+  task-apply:
+    image: "zkamoeba/contract-verifier:latest"
+    env_file:
+      - ./contract-verifier.env
+
