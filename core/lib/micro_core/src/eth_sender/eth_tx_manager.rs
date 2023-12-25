@@ -18,6 +18,7 @@ use micro_types::{
     L1BlockNumber, Nonce, DEPLOY_L2_CONTRACT_TX_GAS_LIMIT, H256, U256,
 };
 use micro_utils::time::seconds_since_epoch;
+use multivm::vm_latest::utils::fee::derive_l2_gas_price;
 use tokio::sync::watch;
 
 use super::{metrics::METRICS, ETHSenderError};
@@ -205,12 +206,25 @@ where
             .used_priority_fee_per_gas
             .observe(priority_fee_per_gas);
 
+        let l2_gas_rice = derive_l2_gas_price(
+            self.gas_adjuster.estimate_effective_gas_price(),
+            self.fair_l2_gas_price,
+        );
+
+        tracing::info!(
+            "sending new tx {}, l1 price {}, fair_l2_gas_price: {},l2_gas_rice:{}",
+            tx.id,
+            self.gas_adjuster.estimate_effective_gas_price(),
+            self.fair_l2_gas_price,
+            l2_gas_rice
+        );
+
         let counts = storage
             .blocks_dal()
             .get_l1_batch_counts_for_eth_tx_id(tx.id)
             .await;
 
-        let one_fee = self.fair_l2_gas_price * DEPLOY_L2_CONTRACT_TX_GAS_LIMIT;
+        let one_fee = l2_gas_rice * DEPLOY_L2_CONTRACT_TX_GAS_LIMIT;
         let l2_fee = U256::from(counts) * U256::from(one_fee);
         let value = if l2_fee > U256::from(0u64) {
             l2_fee
