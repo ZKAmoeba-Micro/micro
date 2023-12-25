@@ -14,7 +14,7 @@ micro_network_id = 270
 fee_account_addr = "0x26937d59db4463254c930D5f31353F14AA89a0F7"
 
 # Denotes the amount of slots for transactions in the block.
-transaction_slots = 1024
+transaction_slots = 100
 
 max_allowed_l2_tx_gas_limit = 4000000000
 block_commit_deadline_ms = 3600000
@@ -46,7 +46,7 @@ reject_tx_at_eth_params_percentage = 0.95
 reject_tx_at_gas_percentage = 0.95
 
 # The price the operator spends on 1 gas of computation in wei.
-fair_l2_gas_price = 37000000000
+fair_l2_gas_price = 47000000000
 
 # Max number of computational gas that validation step is allowed to take.
 validation_computational_gas_limit = 300000
