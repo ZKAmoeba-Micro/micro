@@ -7,7 +7,8 @@ use micro_types::{
     fee::Fee,
     l2::TransactionType,
     l2_to_l1_log::L2ToL1Log,
-    L1BatchNumber, EIP_1559_TX_TYPE, EIP_2930_TX_TYPE, EIP_712_TX_TYPE, U256,
+    L1BatchNumber, EIP_1559_TX_TYPE, EIP_2930_TX_TYPE, EIP_712_TX_TYPE,
+    PRIORITY_OPERATION_L2_TX_TYPE, PROTOCOL_UPGRADE_TX_TYPE, U256,
 };
 use micro_utils::{bytecode::bytecode_len_in_bytes, ceil_div_u256, u256_to_h256};
 use vise::{Buckets, EncodeLabelSet, EncodeLabelValue, Family, Histogram, Metrics};
@@ -135,6 +136,8 @@ impl<S> RefundsTracer<S> {
                 EIP_712_TX_TYPE => TransactionType::EIP712Transaction,
                 EIP_1559_TX_TYPE => TransactionType::EIP1559Transaction,
                 EIP_2930_TX_TYPE => TransactionType::EIP2930Transaction,
+                PRIORITY_OPERATION_L2_TX_TYPE => TransactionType::PriorityOpTransaction,
+                PROTOCOL_UPGRADE_TX_TYPE => TransactionType::ProtocolUpgradeTransaction,
                 _ => TransactionType::LegacyTransaction,
             },
         );

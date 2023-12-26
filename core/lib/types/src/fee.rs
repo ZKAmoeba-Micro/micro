@@ -48,6 +48,9 @@ impl Fee {
         block_base_fee_per_gas: U256,
         tx_type: TransactionType,
     ) -> U256 {
+        if tx_type == TransactionType::ProtocolUpgradeTransaction {
+            return block_base_fee_per_gas;
+        }
         assert!(block_base_fee_per_gas <= self.max_fee_per_gas);
         assert!(self.max_priority_fee_per_gas <= self.max_fee_per_gas);
 
