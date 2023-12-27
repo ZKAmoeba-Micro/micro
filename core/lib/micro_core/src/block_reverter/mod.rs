@@ -281,7 +281,7 @@ impl BlockReverter {
         tracing::info!("rolling back assigments...");
         transaction
             .assignments_dal()
-            .rollback_assigments(last_miniblock_to_keep)
+            .rollback_assigments(last_l1_batch_to_keep, last_miniblock_to_keep)
             .await
             .unwrap();
 

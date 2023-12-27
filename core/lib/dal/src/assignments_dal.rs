@@ -305,11 +305,16 @@ impl AssignmentsDal<'_, '_> {
 
     pub async fn rollback_assigments(
         &mut self,
+        last_l1_batch_to_keep: L1BatchNumber,
         last_miniblock_to_keep: MiniblockNumber,
     ) -> Result<(), SqlxError> {
-        tracing::info!("rollback_assigments last_miniblock_to_keep: {last_miniblock_to_keep}");
+        tracing::info!("rollback_assigments last_l1_batch_to_keep: {last_l1_batch_to_keep}, last_miniblock_to_keep: {last_miniblock_to_keep}");
 
-        sqlx::query!("UPDATE assignments SET status = 'rollbacked', updated_at = now() WHERE miniblock_number > $1", last_miniblock_to_keep.0 as i64)
+        sqlx::query!("UPDATE assignments SET status = 'rollbacked', updated_at = now() WHERE l1_batch_number > $1", last_l1_batch_to_keep.0 as i64)
+        .execute(self.storage.conn())
+        .await?;
+
+        sqlx::query!("UPDATE assignments SET miniblock_number = $1, updated_at = now() WHERE miniblock_number > $1", last_miniblock_to_keep.0 as i64)
         .execute(self.storage.conn())
         .await?;
         Ok(())

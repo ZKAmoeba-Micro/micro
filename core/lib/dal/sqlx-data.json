@@ -1180,18 +1180,6 @@
     },
     "query": "SELECT u.hashed_key as \"hashed_key!\", (SELECT value FROM storage_logs WHERE hashed_key = u.hashed_key AND miniblock_number <= $2 ORDER BY miniblock_number DESC, operation_number DESC LIMIT 1) as \"value?\" FROM UNNEST($1::bytea[]) AS u(hashed_key)"
   },
-  "197a62600b07fc6a8028d0ccac4b91114bc3fed503874d9edceb956f72a809e4": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      }
-    },
-    "query": "UPDATE assignments SET status = 'rollbacked', updated_at = now() WHERE miniblock_number > $1"
-  },
   "19b89495be8aa735db039ccc8a262786c58e54f132588c48f07d9537cf21d3ed": {
     "describe": {
       "columns": [
@@ -3961,6 +3949,18 @@
     },
     "query": "SELECT l1_batch_number FROM proof_generation_details WHERE status = 'ready_to_be_proven' ORDER BY l1_batch_number ASC LIMIT 1"
   },
+  "4915f97e2fb31e7f79b1a93110dfc1edfbd88b5472048ace32e521f71240cd62": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      }
+    },
+    "query": "UPDATE assignments SET miniblock_number = $1, updated_at = now() WHERE miniblock_number > $1"
+  },
   "493351e258426efc88f87fb0569b335451e0afcc2948955a16cd75cee8071fbc": {
     "describe": {
       "columns": [
@@ -6251,6 +6251,18 @@
       }
     },
     "query": "SELECT miniblock_number, log_index_in_miniblock, log_index_in_tx, tx_hash, Null::bytea as \"block_hash\", Null::bigint as \"l1_batch_number?\", shard_id, is_service, tx_index_in_miniblock, tx_index_in_l1_batch, sender, key, value FROM l2_to_l1_logs WHERE tx_hash = $1 ORDER BY log_index_in_tx ASC"
+  },
+  "80c9d0d94d0e07cbbb2a71533271322a3fc2ca51058969e6664fbe3ad0fa2f4c": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      }
+    },
+    "query": "UPDATE assignments SET status = 'rollbacked', updated_at = now() WHERE l1_batch_number > $1"
   },
   "832105952074e4ff35252d8e7973faa1b24455abc89820307db5e49a834c0718": {
     "describe": {
