@@ -1180,6 +1180,18 @@
     },
     "query": "SELECT u.hashed_key as \"hashed_key!\", (SELECT value FROM storage_logs WHERE hashed_key = u.hashed_key AND miniblock_number <= $2 ORDER BY miniblock_number DESC, operation_number DESC LIMIT 1) as \"value?\" FROM UNNEST($1::bytea[]) AS u(hashed_key)"
   },
+  "197a62600b07fc6a8028d0ccac4b91114bc3fed503874d9edceb956f72a809e4": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      }
+    },
+    "query": "UPDATE assignments SET status = 'rollbacked', updated_at = now() WHERE miniblock_number > $1"
+  },
   "19b89495be8aa735db039ccc8a262786c58e54f132588c48f07d9537cf21d3ed": {
     "describe": {
       "columns": [

@@ -278,6 +278,12 @@ impl BlockReverter {
             .delete_miniblocks(last_miniblock_to_keep)
             .await
             .unwrap();
+        tracing::info!("rolling back assigments...");
+        transaction
+            .assignments_dal()
+            .rollback_assigments(last_miniblock_to_keep)
+            .await
+            .unwrap();
 
         transaction.commit().await.unwrap();
     }

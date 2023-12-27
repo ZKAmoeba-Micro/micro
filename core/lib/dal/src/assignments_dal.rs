@@ -23,6 +23,8 @@ pub enum ProverResultStatus {
     Successful,
     #[strum(serialize = "failed")]
     Failed,
+    #[strum(serialize = "rollbacked")]
+    Rollbacked,
 }
 
 impl AssignmentsDal<'_, '_> {
@@ -283,5 +285,17 @@ impl AssignmentsDal<'_, '_> {
             .number
             .unwrap_or(0);
         Ok(MiniblockNumber(number as u32))
+    }
+
+    pub async fn rollback_assigments(
+        &mut self,
+        last_miniblock_to_keep: MiniblockNumber,
+    ) -> Result<(), SqlxError> {
+        tracing::info!("rollback_assigments last_miniblock_to_keep: {last_miniblock_to_keep}");
+
+        sqlx::query!("UPDATE assignments SET status = 'rollbacked', updated_at = now() WHERE miniblock_number > $1", last_miniblock_to_keep.0 as i64)
+        .execute(self.storage.conn())
+        .await?;
+        Ok(())
     }
 }
