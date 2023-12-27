@@ -39,11 +39,25 @@ impl AssignmentsDal<'_, '_> {
 
         tracing::info!("insert_and_update_assignments verification_address:{verification_address},block_number:{block_number},miniblock_number:{miniblock_number},event_index:{storage_index}");
 
-        sqlx::query!("INSERT INTO assignments (verification_address,l1_batch_number,miniblock_number,storage_index,status,created_at,updated_at) VALUES ($1,$2,$3,$4,'assigned_not_certified', now(), now()) ON CONFLICT(verification_address,l1_batch_number,storage_index) DO UPDATE  SET updated_at=now()",
+        let batch_hash = sqlx::query!(
+            "SELECT hash FROM l1_batches WHERE number = $1 ORDER BY number DESC  LIMIT 1",
+            block_number.0 as i64
+        )
+        .fetch_one(transaction.conn())
+        .await?
+        .hash;
+
+        let hash = match batch_hash {
+            Some(h) => H256::from_slice(&h),
+            None => H256::zero(),
+        };
+
+        sqlx::query!("INSERT INTO assignments (verification_address,l1_batch_number,miniblock_number,storage_index,status,created_at,updated_at,batch_hash) VALUES ($1,$2,$3,$4,'assigned_not_certified', now(), now(),$5) ON CONFLICT(verification_address,l1_batch_number,storage_index,batch_hash) DO UPDATE  SET updated_at=now()",
              verification_address.as_bytes(),
              block_number.0 as i64,
              miniblock_number.0 as i64,
              storage_index as i64,
+             hash.as_bytes(),
         )
         .execute(transaction.conn())
         .await?;
@@ -277,13 +291,15 @@ impl AssignmentsDal<'_, '_> {
     }
 
     pub async fn get_max_mini_number(&mut self) -> Result<MiniblockNumber, sqlx::Error> {
-        let number = sqlx::query!("select max(miniblock_number) number from assignments")
-            .instrument("get_max_mini_number")
-            .report_latency()
-            .fetch_one(self.storage.conn())
-            .await?
-            .number
-            .unwrap_or(0);
+        let number = sqlx::query!(
+            "select max(miniblock_number) number from assignments where status != 'rollbacked'"
+        )
+        .instrument("get_max_mini_number")
+        .report_latency()
+        .fetch_one(self.storage.conn())
+        .await?
+        .number
+        .unwrap_or(0);
         Ok(MiniblockNumber(number as u32))
     }
 

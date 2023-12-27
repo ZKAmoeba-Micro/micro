@@ -6160,24 +6160,6 @@
     },
     "query": "UPDATE miniblocks SET l1_batch_number = $1 WHERE l1_batch_number IS NULL"
   },
-  "7f83781f9388ca5f06884a73f700647198e2f8cc1bed7b6a292637159fa594ec": {
-    "describe": {
-      "columns": [
-        {
-          "name": "number",
-          "ordinal": 0,
-          "type_info": "Int8"
-        }
-      ],
-      "nullable": [
-        null
-      ],
-      "parameters": {
-        "Left": []
-      }
-    },
-    "query": "select max(miniblock_number) number from assignments"
-  },
   "8045a697a6a1070857b6fdc656f60ee6bab4b3a875ab98099beee227c199f818": {
     "describe": {
       "columns": [
@@ -9445,6 +9427,24 @@
     },
     "query": "SELECT l1_address, l2_address FROM tokens WHERE well_known = true"
   },
+  "b519b9b1bede4da82831a32be1e25a7111fe6a869a45bff8e40d505374ab12e4": {
+    "describe": {
+      "columns": [
+        {
+          "name": "number",
+          "ordinal": 0,
+          "type_info": "Int8"
+        }
+      ],
+      "nullable": [
+        null
+      ],
+      "parameters": {
+        "Left": []
+      }
+    },
+    "query": "select max(miniblock_number) number from assignments where status != 'rollbacked'"
+  },
   "b6f9874059c57e5e59f3021936437e9ff71a68065dfc19c295d806d7a9aafc93": {
     "describe": {
       "columns": [],
@@ -9557,6 +9557,26 @@
       }
     },
     "query": "\n                        SELECT id from prover_jobs_fri\n                        WHERE l1_batch_number = $1\n                        AND circuit_id = $2\n                        AND aggregation_round = $3\n                        AND depth = $4\n                        AND status = 'successful'\n                        ORDER BY sequence_number ASC;\n                        "
+  },
+  "be887a10f4424a9cb68bcef99fffc79c742a24cea94e1f7e75004e5792efc33c": {
+    "describe": {
+      "columns": [
+        {
+          "name": "hash",
+          "ordinal": 0,
+          "type_info": "Bytea"
+        }
+      ],
+      "nullable": [
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      }
+    },
+    "query": "SELECT hash FROM l1_batches WHERE number = $1 ORDER BY number DESC  LIMIT 1"
   },
   "bef58e581dd0b658350dcdc15ebf7cf350cf088b60c916a15889e31ee7534907": {
     "describe": {
@@ -10047,6 +10067,22 @@
       }
     },
     "query": "\n                    INSERT INTO gpu_prover_queue (instance_host, instance_port, queue_capacity, queue_free_slots, instance_status, specialized_prover_group_id, region, zone, num_gpu, created_at, updated_at)\n                    VALUES (cast($1::text as inet), $2, $3, $3, 'available', $4, $5, $6, $7, now(), now())\n                    ON CONFLICT(instance_host, instance_port, region, zone)\n                    DO UPDATE SET instance_status='available', queue_capacity=$3, queue_free_slots=$3, specialized_prover_group_id=$4, region=$5, zone=$6, num_gpu=$7, updated_at=now()"
+  },
+  "cabc811d85fee11ffdce93ab8e7424ec7e6d40d7c22ef748a2d40a1ee971d0f7": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Bytea",
+          "Int8",
+          "Int8",
+          "Int8",
+          "Bytea"
+        ]
+      }
+    },
+    "query": "INSERT INTO assignments (verification_address,l1_batch_number,miniblock_number,storage_index,status,created_at,updated_at,batch_hash) VALUES ($1,$2,$3,$4,'assigned_not_certified', now(), now(),$5) ON CONFLICT(verification_address,l1_batch_number,storage_index,batch_hash) DO UPDATE  SET updated_at=now()"
   },
   "cc20350af9e837ae6b6160be65f88e6b675f62e207252f91f2ce7dcaaddb12b1": {
     "describe": {
@@ -11767,21 +11803,6 @@
       }
     },
     "query": "UPDATE basic_witness_input_producer_jobs SET status = $1, updated_at = now(), time_taken = $3, error = $4 WHERE l1_batch_number = $2 AND status != $5 RETURNING basic_witness_input_producer_jobs.attempts"
-  },
-  "f76dbad3b96e33f5482f62a697b7dbe9995d162569960645aa49452518932f9e": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Bytea",
-          "Int8",
-          "Int8",
-          "Int8"
-        ]
-      }
-    },
-    "query": "INSERT INTO assignments (verification_address,l1_batch_number,miniblock_number,storage_index,status,created_at,updated_at) VALUES ($1,$2,$3,$4,'assigned_not_certified', now(), now()) ON CONFLICT(verification_address,l1_batch_number,storage_index) DO UPDATE  SET updated_at=now()"
   },
   "f78960549e6201527454d060d5b483db032f4df80b4269a624f0309ed9a6a38e": {
     "describe": {
