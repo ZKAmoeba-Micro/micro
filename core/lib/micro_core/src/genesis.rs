@@ -283,7 +283,7 @@ pub(crate) async fn create_genesis_l1_batch(
         0,
         first_validator_address,
         base_system_contracts.hashes(),
-        ProtocolVersionId::latest(),
+        protocol_version,
     );
     genesis_l1_batch_header.is_finished = true;
 
@@ -297,7 +297,7 @@ pub(crate) async fn create_genesis_l1_batch(
         l1_gas_price: 0,
         l2_fair_gas_price: 0,
         base_system_contracts_hashes: base_system_contracts.hashes(),
-        protocol_version: Some(ProtocolVersionId::latest()),
+        protocol_version: Some(protocol_version),
         virtual_blocks: 0,
     };
 
