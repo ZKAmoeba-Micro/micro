@@ -37,6 +37,7 @@ pub(crate) enum RequestProcessorError {
     Sqlx(SqlxError),
     SignatureError,
     ProveTimeout,
+    InvalidProof,
 }
 
 impl IntoResponse for RequestProcessorError {
@@ -65,7 +66,10 @@ impl IntoResponse for RequestProcessorError {
                 (StatusCode::BAD_REQUEST, "Invalid signature".to_owned())
             }
             RequestProcessorError::ProveTimeout => {
-                (StatusCode::BAD_REQUEST, "prove timeout".to_owned())
+                (StatusCode::BAD_REQUEST, "Prove timeout".to_owned())
+            }
+            RequestProcessorError::InvalidProof => {
+                (StatusCode::BAD_REQUEST, "Invalid proof".to_owned())
             }
         };
         tracing::info!("proof response {} {}", status_code, message);
@@ -191,7 +195,7 @@ impl RequestProcessor {
                         return Err(RequestProcessorError::ProveTimeout);
                     }
                 } else {
-                    return Err(RequestProcessorError::ProveTimeout);
+                    return Ok(Json(SubmitProofResponse::Success));
                 }
 
                 let blob_url = self
@@ -237,10 +241,12 @@ impl RequestProcessor {
                     {
                         let server_values = format!("events_queue_state = {events_queue_state}, bootloader_heap_initial_content = {bootloader_heap_initial_content}");
                         let prover_values = format!("events_queue_state = {events_queue_state_from_prover}, bootloader_heap_initial_content = {bootloader_heap_initial_content_from_prover}");
-                        panic!(
+                        tracing::error!(
                             "Auxilary output doesn't match, server values: {} prover values: {}",
-                            server_values, prover_values
+                            server_values,
+                            prover_values
                         );
+                        return Err(RequestProcessorError::InvalidProof);
                     }
                 }
 
@@ -262,10 +268,12 @@ impl RequestProcessor {
                     {
                         let server_values = format!("system_logs_hash = {system_logs_hash}, state_diff_hash = {state_diff_hash}");
                         let prover_values = format!("system_logs_hash = {system_logs_hash_from_prover}, state_diff_hash = {state_diff_hash_from_prover}");
-                        panic!(
+                        tracing::error!(
                             "Auxilary output doesn't match, server values: {} prover values: {}",
-                            server_values, prover_values
+                            server_values,
+                            prover_values
                         );
+                        return Err(RequestProcessorError::InvalidProof);
                     }
                 }
                 storage
