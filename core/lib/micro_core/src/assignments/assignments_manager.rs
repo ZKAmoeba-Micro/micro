@@ -115,43 +115,36 @@ impl AssignmentsManager {
     async fn monitor_change_event(&mut self) {
         const METHOD_NAME: &str = "monitor_change_event";
         let mut connection = self.pool.access_storage().await.unwrap();
-        let latest_mini_block_number = connection
-            .assignments_dal()
-            .get_max_mini_number()
-            .await
-            .unwrap_or(MiniblockNumber(self.from_block));
+        if self.from_block == 0 {
+            self.from_block = connection
+                .assignments_dal()
+                .get_max_mini_number()
+                .await
+                .unwrap_or(MiniblockNumber(0))
+                .0;
+        }
+
         let sealed_mini_number = connection
             .blocks_web3_dal()
             .get_sealed_miniblock_number()
             .await
             .unwrap();
 
-        tracing::warn!(
-            "monitor_change_event get_next_number: {:?},from:{}",
-            &latest_mini_block_number,
-            self.from_block
-        );
-        if latest_mini_block_number.0 == 0 {
-            self.from_block = self.from_block;
-        } else if latest_mini_block_number.0 != 0 && latest_mini_block_number.0 > self.from_block {
-            self.from_block = latest_mini_block_number.0;
-        } else if self.from_block >= sealed_mini_number.0 {
-            self.from_block = sealed_mini_number.0;
-        } else {
-            self.from_block = self.from_block + 1;
+        let mut to_block = self.from_block + 1024;
+        if to_block > sealed_mini_number.0 {
+            to_block = sealed_mini_number.0;
         }
-        let next_number = (self.from_block as u32) + 1024;
-        // //Multiple parameter lists for one event
-        // let mut event_names = Vec::new();
-        // //Verification address parameter of the event
-        // for signal in &self.event_signatures {
-        //     let h256 = vec![*signal];
-        //     event_names.push(h256);
-        // }
+
+        tracing::warn!(
+            "monitor_change_event from: {}, to: {}",
+            self.from_block,
+            to_block
+        );
+
         let topic = (1, self.event_signatures.clone());
         let filter = GetLogsFilter {
             from_block: MiniblockNumber(self.from_block),
-            to_block: MiniblockNumber(next_number),
+            to_block: MiniblockNumber(to_block),
             addresses: vec![DEPOSIT_ADDRESS, ASSIGNMENT_ADDRESS],
             topics: vec![topic],
         };
@@ -162,6 +155,8 @@ impl AssignmentsManager {
             .await
             .map_err(|err| internal_error(METHOD_NAME, err))
             .unwrap();
+
+        self.from_block = to_block;
 
         if logs.is_empty() {
             tracing::warn!("monitor_change_event logs is null");
