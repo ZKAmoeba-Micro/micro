@@ -15,7 +15,7 @@ subscriptions_limit = 10000
 # Interval between polling db for pubsub (in ms).
 pubsub_polling_interval = 200
 threads_per_server = 128
-max_nonce_ahead = 50
+max_nonce_ahead = 10000000
 gas_price_scale_factor = 1.2
 request_timeout = 10
 account_pks = [
@@ -62,4 +62,4 @@ port = 3071
 
 # Configuration for the Merkle tree API server
 [api.merkle_tree]
-port=3072
+port = 3072
