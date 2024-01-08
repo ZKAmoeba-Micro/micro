@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 micro_types = { path = "../../core/lib/types" }
+micro_dal = { path = "../../core/lib/dal" }
 micro_contracts = { path = "../../core/lib/contracts" }
 micro_system_constants = { path = "../../core/lib/constants" }
 micro_eth_client = { path = "../../core/lib/eth_client" }

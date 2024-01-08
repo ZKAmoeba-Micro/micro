@@ -1,14 +1,16 @@
 use anyhow::Context as _;
-use micro_config::configs::FriProverTaskApplyConfig;
+use micro_config::configs::{FriProverTaskApplyConfig, PostgresConfig};
+use micro_dal::ConnectionPool;
 use micro_env_config::FromEnv;
 use micro_eth_client::clients::http::QueryClient;
 use micro_utils::wait_for_tasks::wait_for_tasks;
 use tokio::sync::{oneshot, watch};
 
-use crate::{client::MicroHttpQueryClient, micro_watch::EthWatch};
+use crate::{client::MicroHttpQueryClient, micro_watch::EthWatch, task_apply::TaskApply};
 
 mod client;
 mod micro_watch;
+mod task_apply;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -26,6 +28,14 @@ async fn main() -> anyhow::Result<()> {
 
     let config =
         FriProverTaskApplyConfig::from_env().context("FriProverTaskApplyConfig::from_env()")?;
+    let postgres_config = PostgresConfig::from_env().context("PostgresConfig::from_env()")?;
+    let pool = ConnectionPool::builder(
+        postgres_config.prover_url()?,
+        postgres_config.max_connections()?,
+    )
+    .build()
+    .await
+    .context("failed to build a connection pool")?;
 
     let (stop_sender, stop_receiver) = watch::channel(false);
 
@@ -44,11 +54,16 @@ async fn main() -> anyhow::Result<()> {
 
     let client = MicroHttpQueryClient::new(query_client, Some(config.confirmations_for_eth_event));
 
-    let mut eth_watch = EthWatch::new(client, config).await;
+    let mut eth_watch = EthWatch::new(client, config.clone()).await;
 
-    let tasks = vec![tokio::spawn(
-        async move { eth_watch.run(stop_receiver).await },
-    )];
+    let mut task_apply = TaskApply::new(config, pool).await;
+
+    let eth_watch_receiver = stop_receiver.clone();
+
+    let tasks = vec![
+        tokio::spawn(async move { eth_watch.run(eth_watch_receiver).await }),
+        tokio::spawn(async move { task_apply.run(stop_receiver).await }),
+    ];
 
     let graceful_shutdown = None::<futures::future::Ready<()>>;
     let tasks_allowed_to_finish = false;

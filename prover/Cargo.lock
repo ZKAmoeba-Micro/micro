@@ -3854,6 +3854,7 @@ dependencies = [
  "micro",
  "micro_config",
  "micro_contracts",
+ "micro_dal",
  "micro_env_config",
  "micro_eth_client",
  "micro_eth_signer",

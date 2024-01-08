@@ -9,7 +9,7 @@ use micro_types::{
     ethabi::{Contract, Token},
     l2::new_batch::NewBatch,
     web3::types::{BlockNumber as Web3BlockNumber, Log},
-    L2ChainId,
+    L2ChainId, Nonce,
 };
 use tokio::sync::watch;
 
@@ -97,8 +97,10 @@ impl<W: MicroClient + Sync> EthWatch<W> {
 
         //todo  send transaction
         if !events.is_empty() {
+            let mut nonce = self.wallet.get_nonce().await.unwrap();
             for event in events {
-                let _ = self.task_apply(event).await;
+                let _ = self.task_apply(event, nonce).await;
+                nonce += 1;
             }
         }
 
@@ -106,7 +108,7 @@ impl<W: MicroClient + Sync> EthWatch<W> {
         Ok(())
     }
 
-    async fn task_apply(&mut self, event: Log) -> Result<(), Error> {
+    async fn task_apply(&mut self, event: Log, nonce: u32) -> Result<(), Error> {
         let batch = NewBatch::try_from(event.clone()).unwrap();
         tracing::info!("task_apply  batch :{:?}", batch);
         let data = self
@@ -116,15 +118,21 @@ impl<W: MicroClient + Sync> EthWatch<W> {
             .encode_input(&[Token::Uint(batch.batch_number)])
             .unwrap();
 
+        let nonce = Nonce::from(nonce);
         if let Err(error) = self
             .wallet
             .start_execute_contract()
             .contract_address(ASSIGNMENT_ADDRESS)
             .calldata(data)
+            .nonce(nonce)
             .send()
             .await
         {
-            tracing::error!("Failed to apply new batch {:?}  error:{}", &batch, error);
+            tracing::error!(
+                "micro_watch Failed to apply new batch {:?}  error:{}",
+                &batch,
+                error
+            );
         };
 
         Ok(())

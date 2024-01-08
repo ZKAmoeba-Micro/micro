@@ -8323,6 +8323,24 @@
     },
     "query": "\n                    INSERT INTO prover_jobs_fri (l1_batch_number, circuit_id, circuit_blob_url, aggregation_round, sequence_number, depth, is_node_final_proof, protocol_version, status, created_at, updated_at)\n                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'queued', now(), now())\n                    ON CONFLICT(l1_batch_number, aggregation_round, circuit_id, depth, sequence_number)\n                    DO UPDATE SET updated_at=now()\n                    "
   },
+  "9e880aad8241303dc933c39a83fe26ec438bfa573881beb1d3f33a20607e6b60": {
+    "describe": {
+      "columns": [
+        {
+          "name": "count",
+          "ordinal": 0,
+          "type_info": "Int8"
+        }
+      ],
+      "nullable": [
+        null
+      ],
+      "parameters": {
+        "Left": []
+      }
+    },
+    "query": "select count(*) from  proof_compression_jobs_fri WHERE status != 'queued'"
+  },
   "a074cd2c23434a8e801c2c0b42e63f1657765aceabd6d8a50ef2d2299bba99ab": {
     "describe": {
       "columns": [
@@ -8677,6 +8695,24 @@
       }
     },
     "query": "INSERT INTO proof_generation_details (l1_batch_number, status, proof_gen_data_blob_url, created_at, updated_at) VALUES ($1, 'ready_to_be_proven', $2, now(), now()) ON CONFLICT (l1_batch_number) DO NOTHING"
+  },
+  "a534257809df5bb016fbc68df1b3351aff1549fd74939e44f4fe524bf3230f38": {
+    "describe": {
+      "columns": [
+        {
+          "name": "count",
+          "ordinal": 0,
+          "type_info": "Int8"
+        }
+      ],
+      "nullable": [
+        null
+      ],
+      "parameters": {
+        "Left": []
+      }
+    },
+    "query": "SELECT COUNT(*) from gpu_prover_queue_fri  WHERE  instance_status in ('available','reserved','full')"
   },
   "a7abde5a53248d6e63aa998acac521194231bbe08140c9c4efa548c4f3ae17fa": {
     "describe": {

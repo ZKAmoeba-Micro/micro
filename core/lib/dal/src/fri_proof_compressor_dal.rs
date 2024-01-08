@@ -248,4 +248,16 @@ impl FriProofCompressorDal<'_, '_> {
                 .collect()
         }
     }
+
+    pub async fn queued_count(&mut self) -> u32 {
+        let counts = sqlx::query!(
+            r#"select count(*) from  proof_compression_jobs_fri WHERE status != 'queued'"#
+        )
+        .fetch_one(self.storage.conn())
+        .await
+        .unwrap()
+        .count
+        .unwrap();
+        counts as u32
+    }
 }
