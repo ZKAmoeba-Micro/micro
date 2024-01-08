@@ -121,7 +121,7 @@ impl FriGpuProverQueueDal<'_, '_> {
 
     pub async fn fri_task_count(&mut self) -> u32 {
         let counts: i64 =
-            sqlx::query!(r#"SELECT COUNT(*) from gpu_prover_queue_fri  WHERE  instance_status in ('available','reserved','full')"#)
+            sqlx::query!(r#"SELECT COUNT(*) from gpu_prover_queue_fri WHERE instance_status in ('available','reserved','full')"#)
                 .fetch_one(self.storage.conn())
                 .await
                 .unwrap()
