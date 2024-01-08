@@ -15,6 +15,7 @@ use micro_types::{
     ProtocolVersionId,
 };
 use tokio::{sync::watch, task::JoinHandle};
+use tracing::info;
 
 use self::{
     client::{Error, EthClient, EthHttpQueryClient, RETRY_LIMIT},
@@ -160,10 +161,19 @@ impl<W: EthClient + Sync> EthWatch<W> {
     #[tracing::instrument(skip(self, storage))]
     async fn loop_iteration(&mut self, storage: &mut StorageProcessor<'_>) -> Result<(), Error> {
         let stage_latency = METRICS.poll_eth_node[&PollStage::Request].start();
-        let to_block = self.client.finalized_block_number().await?;
+        let mut to_block = self.client.finalized_block_number().await?;
         if to_block <= self.last_processed_ethereum_block {
             return Ok(());
         }
+
+        if to_block - self.last_processed_ethereum_block > 2000 {
+            to_block = self.last_processed_ethereum_block + 2000;
+        }
+
+        info!(
+            "get events from {}, to {}",
+            self.last_processed_ethereum_block, to_block
+        );
 
         let events = self
             .client
