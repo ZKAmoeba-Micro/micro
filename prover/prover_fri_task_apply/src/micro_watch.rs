@@ -81,7 +81,7 @@ impl<W: MicroClient + Sync> EthWatch<W> {
             )
             .await?;
 
-        let _ = self.caller.scan_event_apply(events).await;
+        self.caller.scan_event_apply(events).await;
 
         self.last_processed_micro_block = to_block;
         Ok(())

@@ -1,8 +1,7 @@
-use futures::{
-    channel::{mpsc, oneshot},
-    StreamExt,
+use futures::{channel::mpsc, StreamExt};
+use micro::{
+    error::ClientError, signer::Signer, types::U256, wallet::Wallet, EthNamespaceClient, HttpClient,
 };
-use micro::{signer::Signer, types::U256, wallet::Wallet, EthNamespaceClient, HttpClient};
 use micro_config::configs::FriProverTaskApplyConfig;
 use micro_contracts::sys_assignment_contract;
 use micro_eth_signer::{EthereumSigner, PrivateKeySigner};
@@ -13,11 +12,11 @@ use micro_types::{
     l2::new_batch::NewBatch,
     transaction_request::CallRequest,
     web3::types::Log,
-    L2ChainId, Nonce, H256,
+    L2ChainId, Nonce,
 };
 use tokio::sync::watch;
 
-use crate::{caller, caller::Data, client::Error};
+use crate::{caller, caller::Data};
 
 #[derive(Debug)]
 pub struct TaskApplyWallet {
@@ -83,16 +82,12 @@ impl TaskApplyWallet {
     }
     async fn process(&mut self, data: Data) -> anyhow::Result<()> {
         match data {
-            caller::Data::List(data, callback) => self.query_and_send(data, callback).await,
-            caller::Data::Apply(data, callback) => self.scan_event_apply(data, callback).await,
+            caller::Data::QueryApply(data) => self.query_and_apply(data).await,
+            caller::Data::EventApply(data) => self.scan_event_apply(data).await,
         }
     }
 
-    async fn query_and_send(
-        &mut self,
-        query_count: u32,
-        _callback: oneshot::Sender<Result<H256, Error>>,
-    ) -> anyhow::Result<()> {
+    async fn query_and_apply(&mut self, query_count: u32) -> anyhow::Result<()> {
         tracing::info!("wallet query_and_send query_count:{:?}", query_count);
         let contract_function = self
             .contract_abi
@@ -113,41 +108,54 @@ impl TaskApplyWallet {
         let mut result = contract_function.decode_output(&bytes.0).unwrap();
 
         let arr = result.remove(0).into_array().unwrap();
-        let len = arr.len() as u32;
-        if len > 0 {
+
+        if arr.len() > 0 {
             let mut nonce = self.get_nonce().await;
-            self.nonce += len;
             for token in arr {
                 let batch_number = token.into_uint().unwrap();
-                let _ = self.task_apply(nonce, batch_number).await;
-                nonce += 1;
+                let res = self.task_apply(nonce, batch_number).await;
+                match res {
+                    Ok(_) => {
+                        nonce += 1;
+                        self.nonce = nonce;
+                    }
+                    Err(_) => {
+                        break;
+                    }
+                }
             }
         }
 
         Ok(())
     }
 
-    async fn scan_event_apply(
-        &mut self,
-        events: Vec<Log>,
-        _callback: oneshot::Sender<Result<H256, Error>>,
-    ) -> anyhow::Result<()> {
-        let len = events.len() as u32;
-        tracing::info!("wallet scan_event_apply events:{:?}", len);
-        if len > 0 {
+    async fn scan_event_apply(&mut self, events: Vec<Log>) -> anyhow::Result<()> {
+        tracing::info!("wallet scan_event_apply events:{:?}", events.len());
+        if events.len() > 0 {
             let mut nonce = self.get_nonce().await;
-            self.nonce += len;
             for event in events {
-                let batch = NewBatch::try_from(event.clone()).unwrap();
-                let _ = self.task_apply(nonce, batch.batch_number).await;
-                nonce += 1;
+                let new_batch = NewBatch::try_from(event.clone()).unwrap();
+                let res = self.task_apply(nonce, new_batch.batch_number).await;
+                match res {
+                    Ok(_) => {
+                        nonce += 1;
+                        self.nonce = nonce;
+                    }
+                    Err(_) => {
+                        break;
+                    }
+                }
             }
         }
 
         Ok(())
     }
 
-    async fn task_apply(&mut self, nonce: u32, batch_number: U256) -> anyhow::Result<()> {
+    async fn task_apply(
+        &mut self,
+        nonce: u32,
+        batch_number: U256,
+    ) -> anyhow::Result<(), ClientError> {
         tracing::info!("task_apply  nonce:{:?} batch :{:?} ", nonce, batch_number);
         let data = self
             .contract_abi
@@ -172,8 +180,8 @@ impl TaskApplyWallet {
                 batch_number,
                 error
             );
-
             self.nonce = self.wallet.get_nonce().await.unwrap();
+            return Err(error);
         };
 
         Ok(())
@@ -183,8 +191,6 @@ impl TaskApplyWallet {
         let mut nonce = self.wallet.get_nonce().await.unwrap();
         if self.nonce > nonce {
             nonce = self.nonce;
-        } else {
-            self.nonce = nonce;
         }
         nonce
     }

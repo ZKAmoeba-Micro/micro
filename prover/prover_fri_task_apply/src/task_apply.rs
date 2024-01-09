@@ -81,7 +81,7 @@ impl TaskApply {
             tracing::info!("task_apply query_count is 0");
             return Ok(());
         }
-        let _ = self.caller.query_and_send(query_count).await;
+        self.caller.query_and_apply(query_count).await;
 
         Ok(())
     }
