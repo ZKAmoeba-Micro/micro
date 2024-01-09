@@ -12,6 +12,7 @@ members = [
     "core/bin/verification_key_generator_and_server",
     "core/bin/verified_sources_fetcher",
     "core/bin/micro_server",
+    "core/bin/monitor_application",
     # Libraries
     "core/lib/micro_core",
     "core/lib/basic_types",

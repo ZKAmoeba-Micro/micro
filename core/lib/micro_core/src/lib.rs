@@ -91,6 +91,7 @@ pub mod l1_gas_price;
 pub mod l2_sender;
 pub mod metadata_calculator;
 mod metrics;
+pub mod monitor_application;
 pub mod proof_data_handler;
 pub mod reorg_detector;
 pub mod state_keeper;

@@ -16,7 +16,7 @@ use micro_types::{
     PriorityOpId, Transaction, H256, PROTOCOL_UPGRADE_TX_TYPE, U256,
 };
 use micro_utils::{h256_to_u32, u256_to_big_decimal};
-use sqlx::{error, types::chrono::NaiveDateTime};
+use sqlx::{error, postgres::types::PgInterval, types::chrono::NaiveDateTime};
 
 use crate::{
     instrument::InstrumentExt,
@@ -1148,5 +1148,22 @@ impl TransactionsDal<'_, '_> {
                 .unwrap()
                 .count;
         counts as u32
+    }
+
+    pub async fn get_last_transactions_time(&mut self) -> i64 {
+        let resut= sqlx::query!(r#"SELECT now()-created_at as "diff_time" from transactions where is_priority = true ORDER BY created_at desc limit 1"#)
+            .fetch_optional(self.storage.conn())
+            .await
+            .unwrap()
+            .and_then(|row| row.diff_time)
+            .map(|value|  value);
+
+        match resut {
+            Some(r) => {
+                tracing::info!("PgInterval{:?}", &r);
+                r.microseconds / 1_000_000
+            }
+            None => 0,
+        }
     }
 }

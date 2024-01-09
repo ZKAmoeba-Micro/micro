@@ -5024,6 +5024,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "monitor_application"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "clap 4.4.6",
+ "futures 0.3.28",
+ "micro_config",
+ "micro_core",
+ "micro_dal",
+ "micro_env_config",
+ "micro_types",
+ "micro_utils",
+ "serde_json",
+ "tokio",
+ "tracing",
+ "vlog",
+]
+
+[[package]]
 name = "multimap"
 version = "0.8.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"

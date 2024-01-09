@@ -20,6 +20,7 @@ micro_queued_job_processor=info,\
 micro_types=info,\
 micro_mempool=info,\
 loadnext=info,\
+monitor_application=info,\
 vm=info,\
 block_sizes_test=info,\
 micro_verification_key_generator_and_server=info,\

@@ -3855,6 +3855,24 @@
     },
     "query": "UPDATE storage SET value = u.value FROM UNNEST($1::bytea[], $2::bytea[]) AS u(key, value) WHERE u.key = hashed_key"
   },
+  "3fd471e94aacaa4eb8ca33a89a6e669b7b2c1b9e2eb4b948de43692e64e08a33": {
+    "describe": {
+      "columns": [
+        {
+          "name": "diff_time",
+          "ordinal": 0,
+          "type_info": "Interval"
+        }
+      ],
+      "nullable": [
+        null
+      ],
+      "parameters": {
+        "Left": []
+      }
+    },
+    "query": "SELECT now()-created_at as \"diff_time\" from transactions where is_priority = true ORDER BY created_at desc limit 1"
+  },
   "4029dd84cde963ed8541426a659b10ccdbacbf4392664e34bfc29737aa630b28": {
     "describe": {
       "columns": [],
