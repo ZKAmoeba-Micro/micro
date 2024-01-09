@@ -110,7 +110,7 @@ impl<W: MicroClient + Sync> EthWatch<W> {
 
     async fn task_apply(&mut self, event: Log, nonce: u32) -> Result<(), Error> {
         let batch = NewBatch::try_from(event.clone()).unwrap();
-        tracing::info!("task_apply  batch :{:?}", batch);
+        tracing::info!("micro_watch  batch :{:?}", batch);
         let data = self
             .contract_abi
             .function("proofApply")

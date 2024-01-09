@@ -20,6 +20,7 @@ mod tests {
             rpc_url: "http://private-dns-for-server".to_string(),
             poll_duration_secs: 100,
             confirmations_for_eth_event: 10,
+            call_contract_duration_secs: 1800,
             chain_id: 270,
         }
     }
@@ -29,6 +30,7 @@ mod tests {
         let config = r#"
             FRI_PROVER_TASK_APPLY_RPC_URL="http://private-dns-for-server"
             FRI_PROVER_TASK_APPLY_POLL_DURATION_SECS="100"
+            FRI_PROVER_TASK_APPLY_CALL_CONTRACT_DURATION_SECS="1800"
             FRI_PROVER_TASK_APPLY_CONFIRMATIONS_FOR_ETH_EVENT="10"
             FRI_PROVER_TASK_APPLY_CHAIN_ID="270"
 

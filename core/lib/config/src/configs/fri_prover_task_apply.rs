@@ -7,6 +7,7 @@ use serde::Deserialize;
 pub struct FriProverTaskApplyConfig {
     pub rpc_url: String,
     pub poll_duration_secs: u16,
+    pub call_contract_duration_secs: u64,
     pub confirmations_for_eth_event: u64,
     pub chain_id: u64,
 }
@@ -21,5 +22,9 @@ impl FriProverTaskApplyConfig {
 
     pub fn poll_duration(&self) -> Duration {
         Duration::from_secs(self.poll_duration_secs as u64)
+    }
+
+    pub fn call_contract_duration_secs(&self) -> Duration {
+        Duration::from_secs(self.call_contract_duration_secs)
     }
 }

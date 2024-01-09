@@ -16,7 +16,7 @@ use tokio::sync::watch;
 
 #[derive(Debug)]
 pub struct TaskApply {
-    poll_interval: Duration,
+    call_contract_interval: Duration,
     pool: ConnectionPool,
     wallet: Wallet<PrivateKeySigner, micro::HttpClient>,
     contract_abi: Contract,
@@ -34,9 +34,9 @@ impl TaskApply {
         let signer = Signer::new(eth_signer, address, chain_id);
         let wallet: Wallet<PrivateKeySigner, micro::HttpClient> =
             Wallet::with_http_client(&config.rpc_url, signer).unwrap();
-        let poll_interval = config.poll_duration();
+        let poll_interval = config.call_contract_duration_secs();
         Self {
-            poll_interval,
+            call_contract_interval: poll_interval,
             pool,
             wallet,
             contract_abi,
@@ -44,10 +44,10 @@ impl TaskApply {
     }
 
     pub async fn run(&mut self, stop_receiver: watch::Receiver<bool>) -> anyhow::Result<()> {
-        let mut timer = tokio::time::interval(self.poll_interval);
+        let mut timer = tokio::time::interval(self.call_contract_interval);
         loop {
             if *stop_receiver.borrow() {
-                tracing::info!("Stop signal received, eth_watch is shutting down");
+                tracing::info!("Stop signal received, task_apply is shutting down");
                 break;
             }
 
@@ -67,10 +67,11 @@ impl TaskApply {
             .queued_count()
             .await;
         if queue_count > 0u32 {
+            tracing::info!("task_apply queue_count greeter than 0");
             return Ok(());
         }
 
-        let mut query_count = self
+        let query_count = self
             .pool
             .access_storage()
             .await
@@ -79,6 +80,7 @@ impl TaskApply {
             .fri_task_count()
             .await;
         if query_count == 0 {
+            tracing::info!("task_apply query_count is 0");
             return Ok(());
         }
         let arr = self.list(query_count).await.unwrap();
