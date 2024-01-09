@@ -2,5 +2,6 @@
 rpc_url = "http://127.0.0.1:3050"
 poll_duration_secs = 60
 call_contract_duration_secs = 1800
+contract_apply_count = 3
 confirmations_for_eth_event = 10
 chain_id = 270

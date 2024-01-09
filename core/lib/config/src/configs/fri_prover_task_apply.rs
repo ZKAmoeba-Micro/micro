@@ -8,6 +8,7 @@ pub struct FriProverTaskApplyConfig {
     pub rpc_url: String,
     pub poll_duration_secs: u16,
     pub call_contract_duration_secs: u64,
+    pub contract_apply_count: Option<u32>,
     pub confirmations_for_eth_event: u64,
     pub chain_id: u64,
 }

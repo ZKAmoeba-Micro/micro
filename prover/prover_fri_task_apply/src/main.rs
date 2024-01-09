@@ -6,11 +6,16 @@ use micro_eth_client::clients::http::QueryClient;
 use micro_utils::wait_for_tasks::wait_for_tasks;
 use tokio::sync::{oneshot, watch};
 
-use crate::{client::MicroHttpQueryClient, micro_watch::EthWatch, task_apply::TaskApply};
+use crate::{
+    client::MicroHttpQueryClient, micro_watch::EthWatch, task_apply::TaskApply,
+    wallet::TaskApplyWallet,
+};
 
+mod caller;
 mod client;
 mod micro_watch;
 mod task_apply;
+mod wallet;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -54,15 +59,21 @@ async fn main() -> anyhow::Result<()> {
 
     let client = MicroHttpQueryClient::new(query_client, Some(config.confirmations_for_eth_event));
 
-    let mut eth_watch = EthWatch::new(client, config.clone()).await;
+    let wallet = TaskApplyWallet::new(config.clone()).await;
+    let eth_watch_caller = wallet.get_caller();
+    let task_apply_caller = wallet.get_caller();
 
-    let mut task_apply = TaskApply::new(config, pool).await;
+    let mut eth_watch = EthWatch::new(client, config.clone(), eth_watch_caller).await;
+
+    let mut task_apply = TaskApply::new(config, pool, task_apply_caller).await;
 
     let eth_watch_receiver = stop_receiver.clone();
+    let task_apply_receiver = stop_receiver.clone();
 
     let tasks = vec![
         tokio::spawn(async move { eth_watch.run(eth_watch_receiver).await }),
-        tokio::spawn(async move { task_apply.run(stop_receiver).await }),
+        tokio::spawn(async move { task_apply.run(task_apply_receiver).await }),
+        tokio::spawn(async move { wallet.run(stop_receiver).await }),
     ];
 
     let graceful_shutdown = None::<futures::future::Ready<()>>;
