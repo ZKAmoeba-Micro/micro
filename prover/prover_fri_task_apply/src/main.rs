@@ -71,7 +71,7 @@ async fn main() -> anyhow::Result<()> {
     let task_apply_receiver = stop_receiver.clone();
 
     let tasks = vec![
-        tokio::spawn(async move { eth_watch.run(eth_watch_receiver).await }),
+        // tokio::spawn(async move { eth_watch.run(eth_watch_receiver).await }),
         tokio::spawn(async move { task_apply.run(task_apply_receiver).await }),
         tokio::spawn(async move { wallet.run(stop_receiver).await }),
     ];
