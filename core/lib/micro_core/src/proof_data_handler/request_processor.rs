@@ -186,13 +186,23 @@ impl RequestProcessor {
                     .await
                     .map_err(RequestProcessorError::Sqlx)?;
 
-                if let Some((ProverResultStatus::PickedByProver, created_at)) = job {
-                    let now = Utc::now().timestamp();
-                    let time_taken = now - created_at;
-                    proof.time_taken = time_taken as u64;
+                if let Some((status, created_at)) = job {
+                    match status {
+                        ProverResultStatus::PickedByProver => {
+                            let now = Utc::now().timestamp();
+                            let time_taken = now - created_at;
+                            proof.time_taken = time_taken as u64;
 
-                    if time_taken > self.config.proof_generation_timeout_in_secs as i64 {
-                        return Err(RequestProcessorError::ProveTimeout);
+                            if time_taken > self.config.proof_generation_timeout_in_secs as i64 {
+                                return Err(RequestProcessorError::ProveTimeout);
+                            }
+                        }
+                        ProverResultStatus::Rollbacked => {
+                            return Ok(Json(SubmitProofResponse::Success));
+                        }
+                        _ => {
+                            return Err(RequestProcessorError::ProveTimeout);
+                        }
                     }
                 } else {
                     return Ok(Json(SubmitProofResponse::Success));
