@@ -21,7 +21,7 @@ mod tests {
             poll_duration_secs: 100,
             confirmations_for_eth_event: 10,
             call_contract_duration_secs: 1800,
-            contract_apply_count: 3,
+            contract_apply_count: Some(3),
             chain_id: 270,
         }
     }
