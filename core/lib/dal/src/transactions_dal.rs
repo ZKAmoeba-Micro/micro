@@ -16,7 +16,7 @@ use micro_types::{
     PriorityOpId, Transaction, H256, PROTOCOL_UPGRADE_TX_TYPE, U256,
 };
 use micro_utils::{h256_to_u32, u256_to_big_decimal};
-use sqlx::{error, postgres::types::PgInterval, types::chrono::NaiveDateTime};
+use sqlx::{error, types::chrono::NaiveDateTime};
 
 use crate::{
     instrument::InstrumentExt,

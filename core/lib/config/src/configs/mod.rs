@@ -17,6 +17,7 @@ pub use self::{
     fri_prover_task_apply::FriProverTaskApplyConfig,
     fri_witness_generator::FriWitnessGeneratorConfig,
     fri_witness_vector_generator::FriWitnessVectorGeneratorConfig,
+    monitor::MonitorConfig,
     object_store::ObjectStoreConfig,
     proof_data_handler::ProofDataHandlerConfig,
     prover::{ProverConfig, ProverConfigs},
@@ -45,6 +46,7 @@ pub mod fri_prover_task_apply;
 pub mod fri_witness_generator;
 pub mod fri_witness_vector_generator;
 pub mod house_keeper;
+pub mod monitor;
 pub mod object_store;
 pub mod proof_data_handler;
 pub mod prover;

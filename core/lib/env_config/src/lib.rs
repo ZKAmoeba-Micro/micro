@@ -20,6 +20,7 @@ mod fri_prover_task_apply;
 mod fri_witness_generator;
 mod fri_witness_vector_generator;
 mod house_keeper;
+mod monitor;
 pub mod object_store;
 mod proof_data_handler;
 mod prover;

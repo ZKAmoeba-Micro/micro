@@ -1,5 +1,5 @@
 use anyhow::Context as _;
-use micro_config::{configs::ProofDataHandlerConfig, PostgresConfig};
+use micro_config::{configs::MonitorConfig, PostgresConfig};
 use micro_core::monitor_application::monitor_transactions::MonitorTransactions;
 use micro_dal::ConnectionPool;
 use micro_env_config::FromEnv;
@@ -31,14 +31,13 @@ async fn main() -> anyhow::Result<()> {
         .await
         .context("failed to build connection_pool")?;
 
-    let proof_data_handler =
-        ProofDataHandlerConfig::from_env().context("proof_data_handler_config")?;
+    let monitor_config = MonitorConfig::from_env().context("monitor_config")?;
     let (stop_sender, stop_receiver) = watch::channel(false);
 
     let monitor = MonitorTransactions::new(
         pool,
-        proof_data_handler.proof_generation_timeout(),
-        proof_data_handler.retry_interval_ms,
+        monitor_config.monitor_transactions_timeout(),
+        monitor_config.retry_interval_ms,
     );
     let tasks = vec![tokio::spawn(monitor.run(stop_receiver))];
 

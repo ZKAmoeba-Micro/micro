@@ -31,7 +31,8 @@ const CONFIG_FILES = [
     'fri_witness_vector_generator.toml',
     'fri_prover_gateway.toml',
     'fri_proof_compressor.toml',
-    'fri_prover_task_apply.toml'
+    'fri_prover_task_apply.toml',
+    'monitor.toml'
 ];
 
 function loadConfigFile(path: string) {
