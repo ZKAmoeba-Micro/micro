@@ -6,7 +6,7 @@ use crate::error::DashboardError;
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Status {
     app_name: String,
-    start_time: u64,
+    start_time: i32,
     ip: String,
 }
 

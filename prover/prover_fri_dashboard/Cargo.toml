@@ -11,6 +11,7 @@ micro_config = { path = "../../core/lib/config" }
 micro_env_config = { path = "../../core/lib/env_config" }
 micro_utils = { path = "../../core/lib/utils" }
 vlog = { path = "../../core/lib/vlog" }
+micro_types = { path = "../../core/lib/types" }
 
 anyhow = "1.0"
 tracing = "0.1"
