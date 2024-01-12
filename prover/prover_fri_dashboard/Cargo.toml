@@ -6,3 +6,15 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+
+micro_dal = { path = "../../core/lib/dal" }
+micro_config = { path = "../../core/lib/config" }
+micro_env_config = { path = "../../core/lib/env_config" }
+micro_utils = { path = "../../core/lib/utils" }
+vlog = { path = "../../core/lib/vlog" }
+
+
+anyhow = "1.0"
+tracing = "0.1"
+tokio = { version = "1", features = ["time"] }
+futures = { version = "0.3", features = ["compat"] }
