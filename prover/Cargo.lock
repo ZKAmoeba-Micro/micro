@@ -3816,6 +3816,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "micro_prover_fri_dashboard"
+version = "0.1.0"
+
+[[package]]
 name = "micro_prover_fri_gateway"
 version = "0.1.0"
 dependencies = [

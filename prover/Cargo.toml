@@ -15,6 +15,7 @@ members = [
     "prover_fri_gateway",
     "proof_fri_compressor",
     "prover_fri_task_apply",
+    "prover_fri_dashboard",
 ]
 
 resolver = "2"
