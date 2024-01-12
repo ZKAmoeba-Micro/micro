@@ -1,7 +1,4 @@
 use axum::{routing::get, Router};
-
-pub mod application_monitor;
-
 mod application;
 mod deposit;
 mod error;

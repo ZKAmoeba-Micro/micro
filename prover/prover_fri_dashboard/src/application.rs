@@ -5,8 +5,9 @@ use crate::error::DashboardError;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Status {
-    pub ip: String,
-    pub start_time: u64,
+    app_name: String,
+    start_time: u64,
+    ip: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -16,3 +17,7 @@ pub async fn get() -> Result<Json<Response>, DashboardError> {
     // TODO
     Ok(Json(Response {}))
 }
+
+pub async fn add() {}
+
+pub async fn update() {}
