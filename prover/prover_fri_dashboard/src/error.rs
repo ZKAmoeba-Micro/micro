@@ -2,7 +2,6 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
-
 use micro_dal::SqlxError;
 
 pub enum DashboardError {
