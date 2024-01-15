@@ -47,6 +47,8 @@ const SYS_DEPOSIT_CONTRACT_FILE: &str =
     "etc/system-contracts/artifacts-zk/cache-zk/solpp-generated-contracts/interfaces/IDeposit.sol/IDeposit.json";
 const SYS_ASSIGNMENT_CONTRACT_FILE: &str =
     "etc/system-contracts/artifacts-zk/cache-zk/solpp-generated-contracts/interfaces/IAssignment.sol/IAssignment.json";
+const SYS_WHITE_LIST_CONTRACT_FILE: &str =
+    "etc/system-contracts/artifacts-zk/cache-zk/solpp-generated-contracts/interfaces/IWhiteList.sol/IWhiteList.json";
 
 fn read_file_to_json_value(path: impl AsRef<Path>) -> serde_json::Value {
     let micro_home = std::env::var("MICRO_HOME").unwrap_or_else(|_| ".".into());
@@ -116,6 +118,10 @@ pub fn sys_deposit_contract() -> Contract {
 
 pub fn sys_assignment_contract() -> Contract {
     load_contract(SYS_ASSIGNMENT_CONTRACT_FILE)
+}
+
+pub fn sys_white_list_contract() -> Contract {
+    load_contract(SYS_WHITE_LIST_CONTRACT_FILE)
 }
 
 #[derive(Debug, Clone)]
