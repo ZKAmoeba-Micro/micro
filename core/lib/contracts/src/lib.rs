@@ -34,7 +34,7 @@ const MULTICALL3_CONTRACT_FILE: &str =
 const VERIFIER_CONTRACT_FILE: &str =
     "contracts/ethereum/artifacts/cache/solpp-generated-contracts/micro/Verifier.sol/Verifier.json";
 const IERC20_CONTRACT_FILE: &str =
-    "contracts/ethereum/artifacts/cache/solpp-generated-contracts/common/interfaces/IERC20.sol/IERC20.json";
+    "contracts/ethereum/artifacts/@openzeppelin/contracts/token/ERC20/ERC20.sol/ERC20.json";
 const FAIL_ON_RECEIVE_CONTRACT_FILE: &str =
     "contracts/ethereum/artifacts/cache/solpp-generated-contracts/micro/dev-contracts/FailOnReceive.sol/FailOnReceive.json";
 const L2_BRIDGE_CONTRACT_FILE: &str =

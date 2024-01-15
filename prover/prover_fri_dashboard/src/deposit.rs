@@ -1,14 +1,15 @@
-use std::sync::Arc;
+use std::{ops::Div, str::FromStr, sync::Arc};
 
 use axum::{extract::State, Json};
-use bigdecimal::{BigDecimal, FromPrimitive, Zero};
-use micro_contracts::{sys_deposit_contract, sys_white_list_contract};
+use bigdecimal::{BigDecimal, Zero};
+use micro_contracts::{erc20_contract, sys_deposit_contract, sys_white_list_contract};
 use micro_system_constants::{DEPOSIT_ADDRESS, WHITE_LIST_ADDRESS};
 use micro_types::{
     api::{BlockIdVariant, BlockNumber},
     ethabi::{Address, Token},
     transaction_request::CallRequest,
     tx::primitives::PackedEthSignature,
+    U256,
 };
 use micro_web3_decl::namespaces::EthNamespaceClient;
 use serde::{Deserialize, Serialize};
@@ -43,6 +44,7 @@ pub async fn get(State(state): State<Arc<Dashboard>>) -> Result<Json<Response>, 
 
     let white_list_contract = sys_white_list_contract();
     let deposit_contract = sys_deposit_contract();
+    let erc20_contract = erc20_contract();
 
     let white_list_contract_function = white_list_contract
         .function("whiteList")
@@ -126,25 +128,62 @@ pub async fn get(State(state): State<Arc<Dashboard>>) -> Result<Json<Response>, 
         .decode_output(&deposit_info_resp.0)
         .map_err(|e| DashboardError::RpcError(e.to_string()))?;
 
-    let status = deposit_info_result
-        .remove(0)
-        .into_int()
-        .map_or(Status::UnDeposit, |x| match x.as_u32() {
-            1 => Status::Normal,
-            2 => Status::Frozen,
-            3 => Status::Applying,
-            _ => Status::UnDeposit,
-        });
+    let mut tuple = deposit_info_result.remove(0).into_tuple().unwrap();
 
-    let _apply_time = deposit_info_result.remove(0).into_uint();
+    let status = tuple.remove(0).into_uint().unwrap_or(U256::zero()).as_u32();
 
-    let amount = deposit_info_result
-        .remove(0)
-        .into_uint()
-        .map_or(BigDecimal::zero().to_string(), |x| {
-            BigDecimal::from_u128(x.as_u128()).unwrap().to_string()
-        });
-    let _deposit_time = deposit_info_result.remove(0).into_uint();
+    let status = match status {
+        1 => Status::Normal,
+        2 => Status::Frozen,
+        3 => Status::Applying,
+        _ => Status::UnDeposit,
+    };
+
+    let _apply_time = tuple.remove(0).into_uint();
+
+    let amount = tuple.remove(0).into_uint().unwrap_or(U256::zero());
+
+    let decimal = BigDecimal::from_str(&amount.to_string()).unwrap_or(BigDecimal::zero());
+
+    let _deposit_time = tuple.remove(0).into_uint();
+    // get token decimals
+    let mut decimals = 18u32;
+    //if main token is not zero address ,get decimals from contract
+    if !main_token.eq(&Address::zero()) {
+        let decimals_function = erc20_contract
+            .function("decimals")
+            .map_err(|e| DashboardError::RpcError(e.to_string()))?;
+
+        let decimals_call_data = decimals_function
+            .encode_input(&[])
+            .map_err(|e| DashboardError::RpcError(e.to_string()))?;
+
+        let decimals_req = CallRequest {
+            to: Some(main_token),
+            data: Some(decimals_call_data.into()),
+            ..Default::default()
+        };
+        let decimals_resp = state
+            .client
+            .call(decimals_req, block)
+            .await
+            .map_err(|e| DashboardError::RpcError(e.to_string()))?;
+
+        let mut decimals_result = decimals_function
+            .decode_output(&decimals_resp.0)
+            .map_err(|e| DashboardError::RpcError(e.to_string()))?;
+
+        decimals = decimals_result
+            .remove(0)
+            .into_uint()
+            .unwrap_or(U256::from(18))
+            .as_u32();
+    }
+
+    let divisor = U256::from(10).pow(U256::from(decimals));
+    let divisor = BigDecimal::from_str(&divisor.to_string()).unwrap();
+
+    let amount = decimal.div(divisor).to_string();
 
     Ok(Json(Response {
         in_white_list,
