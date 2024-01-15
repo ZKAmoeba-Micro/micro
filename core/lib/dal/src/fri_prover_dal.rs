@@ -412,8 +412,8 @@ impl FriProverDal<'_, '_> {
         &mut self,
         offset: u32,
         limit: u32,
-    ) -> Vec<ProverBatchJobStatus> {
-        sqlx::query!(
+    ) -> sqlx::Result<Vec<ProverBatchJobStatus>> {
+        let results = sqlx::query!(
             r#"WITH T2 AS (
                 WITH T1 AS (
                     SELECT 
@@ -439,8 +439,7 @@ impl FriProverDal<'_, '_> {
             limit as i64,
         )
         .fetch_all(self.storage.conn())
-        .await
-        .unwrap()
+        .await?
         .into_iter()
         .map(|row| {
             ProverBatchJobStatus {
@@ -450,6 +449,8 @@ impl FriProverDal<'_, '_> {
                 compression_status: row.status,
             }
         })
-        .collect()
+        .collect();
+
+        Ok(results)
     }
 }

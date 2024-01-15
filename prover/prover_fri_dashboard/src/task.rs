@@ -30,7 +30,8 @@ pub async fn get(
     let list = connection
         .fri_prover_jobs_dal()
         .get_job_status_details((params.page - 1) * params.page_size, params.page_size)
-        .await;
+        .await
+        .map_err(|e| DashboardError::DatabaseError(e))?;
 
     let result = list
         .into_iter()
