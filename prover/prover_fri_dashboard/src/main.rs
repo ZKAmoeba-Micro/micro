@@ -2,7 +2,6 @@ use std::sync::Arc;
 
 use anyhow::Context as _;
 use axum::{routing::get, Router};
-
 use dashboard::Dashboard;
 use micro_config::{configs::fri_prover_dashboard::FriProverDashboardConfig, PostgresConfig};
 use micro_dal::ConnectionPool;
