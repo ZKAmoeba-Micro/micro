@@ -1,0 +1,4 @@
+[fri_prover_dashboard]
+host = "127.0.0.1"
+port = 3000
+health_check_interval = 10
