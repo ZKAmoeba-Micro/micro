@@ -54,6 +54,7 @@ pub mod tx;
 pub mod vm_trace;
 
 pub mod api;
+pub mod app_monitor;
 pub mod eth_sender;
 pub mod helpers;
 pub mod proofs;
