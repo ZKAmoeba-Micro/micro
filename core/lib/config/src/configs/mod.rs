@@ -40,6 +40,7 @@ pub mod eth_watch;
 pub mod fetcher;
 pub mod fri_proof_compressor;
 pub mod fri_prover;
+pub mod fri_prover_dashboard;
 pub mod fri_prover_gateway;
 pub mod fri_prover_group;
 pub mod fri_prover_task_apply;

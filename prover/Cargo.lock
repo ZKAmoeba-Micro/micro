@@ -3977,6 +3977,7 @@ dependencies = [
  "micro_config",
  "micro_dal",
  "micro_env_config",
+ "micro_types",
  "micro_utils",
  "serde",
  "serde_json",

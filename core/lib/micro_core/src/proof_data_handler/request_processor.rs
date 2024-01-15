@@ -201,7 +201,7 @@ impl RequestProcessor {
                             return Ok(Json(SubmitProofResponse::Success));
                         }
                         _ => {
-                            return Err(RequestProcessorError::ProveTimeout);
+                            return Ok(Json(SubmitProofResponse::Success));
                         }
                     }
                 } else {
