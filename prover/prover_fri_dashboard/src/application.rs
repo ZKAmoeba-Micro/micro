@@ -1,23 +1,59 @@
-use axum::Json;
-use serde::{Deserialize, Serialize};
+use std::sync::Arc;
 
-use crate::error::DashboardError;
+use axum::{
+    extract::{Query, State},
+    Json,
+};
+use micro_types::app_monitor::{FilterStatus, Status};
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct Status {
-    app_name: String,
-    start_time: i32,
-    ip: String,
+use crate::{
+    application_monitor::{add_record, get_app_monitors, update_record},
+    dashboard::Dashboard,
+    error::DashboardError,
+};
+
+pub async fn get(
+    Query(params): Query<FilterStatus>,
+    State(state): State<Arc<Dashboard>>,
+) -> Result<Json<Vec<Status>>, DashboardError> {
+    let offset = (params.page - 1) * params.page_size;
+    let limit = params.page_size;
+    let list = get_app_monitors(&state.pool, params, offset, limit).await;
+
+    match list {
+        Ok(result) => Ok(Json(result)),
+        Err(e) => {
+            tracing::error!("app monitor database error: {:?}", e);
+            Err(DashboardError::DatabaseError(e))
+        }
+    }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct Response {}
-
-pub async fn get() -> Result<Json<Response>, DashboardError> {
-    // TODO
-    Ok(Json(Response {}))
+pub async fn add(
+    State(state): State<Arc<Dashboard>>,
+    Json(data): Json<Status>,
+) -> Result<Json<bool>, DashboardError> {
+    let result = add_record(&state.pool, data.app_name, data.start_time, data.ip).await;
+    match result {
+        Ok(result) => Ok(Json(result)),
+        Err(e) => Err(DashboardError::DatabaseError(e)),
+    }
 }
 
-pub async fn add() {}
-
-pub async fn update() {}
+pub async fn update(
+    State(state): State<Arc<Dashboard>>,
+    Json(data): Json<Status>,
+) -> Result<Json<bool>, DashboardError> {
+    let result = update_record(
+        &state.pool,
+        data.heartbeat_update_at,
+        data.app_name,
+        data.ip,
+        data.start_time,
+    )
+    .await;
+    match result {
+        Ok(result) => Ok(Json(result)),
+        Err(e) => Err(DashboardError::DatabaseError(e)),
+    }
+}

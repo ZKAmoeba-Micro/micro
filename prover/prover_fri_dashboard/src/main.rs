@@ -1,7 +1,10 @@
 use std::sync::Arc;
 
 use anyhow::Context as _;
-use axum::{routing::get, Router};
+use axum::{
+    routing::{get, post},
+    Router,
+};
 use dashboard::Dashboard;
 use micro_config::{
     configs::{fri_prover_dashboard::FriProverDashboardConfig, FriProverTaskApplyConfig},
@@ -51,6 +54,8 @@ async fn main() -> anyhow::Result<()> {
         .route("/node", get(node::get))
         .route("/tasks", get(task::get))
         .route("/application", get(application::get))
+        .route("/application/add", post(application::add))
+        .route("/application/update", post(application::update))
         .with_state(app_state);
 
     let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{}", config.port))

@@ -5,6 +5,8 @@ pub struct FilterStatus {
     pub ip: String,
     pub start_time: i32,
     pub end_time: i32,
+    pub page: usize,
+    pub page_size: usize,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

@@ -51,6 +51,7 @@ impl ApplicationMonitorDal<'_, '_> {
     pub async fn get_app_monitors(
         &mut self,
         filter: FilterStatus,
+        offset: usize,
         limit: usize,
     ) -> Result<Vec<Status>, SqlxError> {
         let (where_sql, arg_index) = self.build_where_clause(&filter);
@@ -58,9 +59,11 @@ impl ApplicationMonitorDal<'_, '_> {
             r#"SELECT id, app_name, ip, start_at as start_time, heartbeat_update_at FROM application_monitor
             WHERE {}
             ORDER BY start_time desc
-            LIMIT ${}
+            OFFSET ${} LIMIT ${}
             "#,
-            where_sql, arg_index
+            where_sql,
+            arg_index,
+            arg_index + 1
         );
         let mut query = sqlx::query_as(&query);
         if filter.start_time > 0 {
@@ -70,6 +73,7 @@ impl ApplicationMonitorDal<'_, '_> {
         if filter.end_time > 0 {
             query = query.bind(filter.end_time);
         }
+        query = query.bind(offset as i32);
         query = query.bind(limit as i32);
 
         let db_results: Vec<AppMonitorStatus> = query
