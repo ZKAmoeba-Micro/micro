@@ -453,4 +453,15 @@ impl FriProverDal<'_, '_> {
 
         Ok(results)
     }
+
+    pub async fn get_job_count(&mut self) -> sqlx::Result<Option<u32>> {
+        let result = sqlx::query!(
+            r#"SELECT COUNT(*) AS "count!" FROM witness_inputs_fri WHERE status = 'successful'"#
+        )
+        .fetch_optional(self.storage.conn())
+        .await?
+        .map(|row| row.count as u32);
+
+        Ok(result)
+    }
 }

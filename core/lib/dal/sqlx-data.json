@@ -10271,6 +10271,24 @@
     },
     "query": "DELETE FROM miniblocks WHERE number > $1"
   },
+  "cf6119e9379ad735b6d1d0899ad1f97c6345aaf28972d6e0d64f2f5970b84ec7": {
+    "describe": {
+      "columns": [
+        {
+          "name": "count!",
+          "ordinal": 0,
+          "type_info": "Int8"
+        }
+      ],
+      "nullable": [
+        null
+      ],
+      "parameters": {
+        "Left": []
+      }
+    },
+    "query": "SELECT COUNT(*) AS \"count!\" FROM witness_inputs_fri WHERE status = 'successful'"
+  },
   "cfd2ce8eb6997b7609090b4400e1bc42db577fdd3758248be69d3b5d9d132bf1": {
     "describe": {
       "columns": [
