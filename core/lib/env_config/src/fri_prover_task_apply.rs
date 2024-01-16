@@ -23,6 +23,8 @@ mod tests {
             call_contract_duration_secs: 1800,
             contract_apply_count: Some(3),
             chain_id: 270,
+            app_monitor_url: "http://127.0.0.1:3000".to_string(),
+            retry_interval_ms: 30000,
         }
     }
 
@@ -35,6 +37,8 @@ mod tests {
             FRI_PROVER_TASK_APPLY_CONFIRMATIONS_FOR_ETH_EVENT="10"
             FRI_PROVER_TASK_APPLY_CONTRACT_APPLY_COUNT="3"
             FRI_PROVER_TASK_APPLY_CHAIN_ID="270"
+            FRI_PROVER_TASK_APPLY_APP_MONITOR_URL="http://127.0.0.1:3000"
+            FRI_PROVER_TASK_APPLY_RETRY_INTERVAL_MS=30000
 
         "#;
         let mut lock = MUTEX.lock();

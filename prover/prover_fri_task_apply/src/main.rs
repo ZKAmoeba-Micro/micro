@@ -3,6 +3,7 @@ use micro_config::configs::{FriProverTaskApplyConfig, PostgresConfig};
 use micro_dal::ConnectionPool;
 use micro_env_config::FromEnv;
 use micro_eth_client::clients::http::QueryClient;
+use micro_prover_fri_utils::app_monitor::{AppMonitor, AppMonitorJob};
 use micro_utils::wait_for_tasks::wait_for_tasks;
 use tokio::sync::{oneshot, watch};
 
@@ -33,6 +34,8 @@ async fn main() -> anyhow::Result<()> {
 
     let config =
         FriProverTaskApplyConfig::from_env().context("FriProverTaskApplyConfig::from_env()")?;
+    let app_monitor_config = config.clone();
+
     let postgres_config = PostgresConfig::from_env().context("PostgresConfig::from_env()")?;
     let pool = ConnectionPool::builder(
         postgres_config.prover_url()?,
@@ -69,11 +72,18 @@ async fn main() -> anyhow::Result<()> {
 
     let eth_watch_receiver = stop_receiver.clone();
     let task_apply_receiver = stop_receiver.clone();
+    let app_monitor_receiver = stop_receiver.clone();
 
+    let app_monitor = AppMonitor::new(
+        "micro_prover_fri_gateway".to_string(),
+        app_monitor_config.retry_interval_ms,
+        app_monitor_config.app_monitor_url,
+    );
     let tasks = vec![
         // tokio::spawn(async move { eth_watch.run(eth_watch_receiver).await }),
         tokio::spawn(async move { task_apply.run(task_apply_receiver).await }),
-        tokio::spawn(async move { wallet.run(stop_receiver).await }),
+        tokio::spawn(async move { wallet.run(stop_receiver.clone()).await }),
+        tokio::spawn(async move { app_monitor.run(app_monitor_receiver).await }),
     ];
 
     let graceful_shutdown = None::<futures::future::Ready<()>>;

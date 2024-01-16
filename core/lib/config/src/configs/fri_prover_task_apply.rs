@@ -11,6 +11,8 @@ pub struct FriProverTaskApplyConfig {
     pub contract_apply_count: Option<u32>,
     pub confirmations_for_eth_event: u64,
     pub chain_id: u64,
+    pub app_monitor_url: String,
+    pub retry_interval_ms: u64,
 }
 
 impl FriProverTaskApplyConfig {

@@ -5,3 +5,5 @@ call_contract_duration_secs = 1800
 contract_apply_count = 3
 confirmations_for_eth_event = 10
 chain_id = 270
+app_monitor_url="http://127.0.0.1:3000"
+retry_interval_ms=30000

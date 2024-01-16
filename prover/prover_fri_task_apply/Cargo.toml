@@ -15,6 +15,7 @@ micro_env_config = { path = "../../core/lib/env_config" }
 micro_utils = { path = "../../core/lib/utils" }
 micro = { path = "../../sdk/micro-rs" }
 vlog = { path = "../../core/lib/vlog" }
+micro_prover_fri_utils = { path = "../prover_fri_utils" }
 
 
 anyhow = "1.0"

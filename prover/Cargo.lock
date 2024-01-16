@@ -4034,6 +4034,7 @@ dependencies = [
  "micro_env_config",
  "micro_eth_client",
  "micro_eth_signer",
+ "micro_prover_fri_utils",
  "micro_system_constants",
  "micro_types",
  "micro_utils",
