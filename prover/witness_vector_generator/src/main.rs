@@ -8,7 +8,10 @@ use micro_config::configs::{
 use micro_dal::ConnectionPool;
 use micro_env_config::{object_store::ProverObjectStoreConfig, FromEnv};
 use micro_object_store::ObjectStoreFactory;
-use micro_prover_fri_utils::get_all_circuit_id_round_tuples_for;
+use micro_prover_fri_utils::{
+    app_monitor::{AppMonitor, AppMonitorJob},
+    get_all_circuit_id_round_tuples_for,
+};
 use micro_prover_utils::region_fetcher::get_zone;
 use micro_queued_job_processor::JobProcessor;
 use micro_utils::wait_for_tasks::wait_for_tasks;
@@ -54,6 +57,7 @@ async fn main() -> anyhow::Result<()> {
     let opt = Opt::from_args();
     let config = FriWitnessVectorGeneratorConfig::from_env()
         .context("FriWitnessVectorGeneratorConfig::from_env()")?;
+    let app_monitor_config = config.clone();
     let specialized_group_id = config.specialized_group_id;
     // let exporter_config = PrometheusExporterConfig::pull(config.prometheus_listener_port);
 
@@ -104,9 +108,24 @@ async fn main() -> anyhow::Result<()> {
 
     tracing::info!("Starting witness vector generation for group: {} with circuits: {:?} in zone: {} with vk_commitments: {:?}", specialized_group_id, circuit_ids_for_round_to_be_proven, zone, vk_commitments);
 
+    let app_name = match app_monitor_config.prometheus_listener_port {
+        3416 => "micro_witness_vector_generator_3416",
+        3417 => "micro_witness_vector_generator_3417",
+        3418 => "micro_witness_vector_generator_3418",
+        3419 => "micro_witness_vector_generator_3419",
+        3420 => "micro_witness_vector_generator_3420",
+        _ => "micro_witness_vector_generator_un",
+    };
+    let app_monitor = AppMonitor::new(
+        app_name.to_string(),
+        app_monitor_config.retry_interval_ms,
+        app_monitor_config.app_monitor_url,
+    );
+
     let tasks = vec![
         // tokio::spawn(exporter_config.run(stop_receiver.clone())),
-        tokio::spawn(witness_vector_generator.run(stop_receiver, opt.number_of_iterations)),
+        tokio::spawn(witness_vector_generator.run(stop_receiver.clone(), opt.number_of_iterations)),
+        tokio::spawn(app_monitor.run(stop_receiver.clone())),
     ];
 
     let graceful_shutdown = None::<futures::future::Ready<()>>;

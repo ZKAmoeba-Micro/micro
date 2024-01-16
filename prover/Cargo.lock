@@ -3849,6 +3849,7 @@ dependencies = [
  "micro_env_config",
  "micro_object_store",
  "micro_prover_fri_types",
+ "micro_prover_fri_utils",
  "micro_prover_utils",
  "micro_queued_job_processor",
  "micro_types",
@@ -4003,6 +4004,7 @@ dependencies = [
  "micro_dal",
  "micro_env_config",
  "micro_object_store",
+ "micro_prover_fri_utils",
  "micro_types",
  "micro_utils",
  "prometheus_exporter",
@@ -4056,12 +4058,18 @@ dependencies = [
 name = "micro_prover_fri_utils"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
+ "async-trait",
+ "jsonrpc-core",
  "micro_config",
  "micro_dal",
  "micro_object_store",
  "micro_prover_fri_types",
  "micro_types",
+ "reqwest",
  "serde",
+ "thiserror",
+ "tokio",
  "tracing",
  "vise 0.1.0 (git+https://github.com/ZKAmoeba-Micro/vise.git?branch=main)",
 ]

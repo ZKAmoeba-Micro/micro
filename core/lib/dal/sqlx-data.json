@@ -8424,8 +8424,8 @@
         "Left": [
           "Text",
           "Text",
-          "Int4",
-          "Int4"
+          "Int8",
+          "Int8"
         ]
       }
     },
@@ -10448,10 +10448,10 @@
       "nullable": [],
       "parameters": {
         "Left": [
-          "Int4",
+          "Int8",
           "Text",
           "Text",
-          "Int4"
+          "Int8"
         ]
       }
     },

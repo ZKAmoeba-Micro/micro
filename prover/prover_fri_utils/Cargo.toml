@@ -16,3 +16,9 @@ micro_dal = { path = "../../core/lib/dal" }
 
 tracing = "0.1"
 serde = { version = "1.0", features = ["derive"] }
+tokio = { version = "1", features = ["time"] }
+anyhow = "1.0"
+async-trait = "0.1"
+reqwest = { version = "0.11", features = ["blocking", "json"] }
+thiserror = "1.0"
+jsonrpc-core = "18.0.0"

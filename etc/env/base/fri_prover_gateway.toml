@@ -4,3 +4,6 @@ api_poll_duration_secs = 60
 prometheus_listener_port = 3314
 prometheus_pushgateway_url = "http://127.0.0.1:9091"
 prometheus_push_interval_ms = 100
+
+app_monitor_url="http://127.0.0.1:3000"
+retry_interval_ms=30000

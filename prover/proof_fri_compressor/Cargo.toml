@@ -20,7 +20,7 @@ micro_queued_job_processor = { path = "../../core/lib/queued_job_processor" }
 vk_setup_data_generator_server_fri = { path = "../vk_setup_data_generator_server_fri" }
 vlog = { path = "../../core/lib/vlog" }
 micro_prover_utils = { path = "../../core/lib/prover_utils" }
-
+micro_prover_fri_utils = { path = "../prover_fri_utils" }
 zkevm_test_harness = { git = "https://github.com/ZKAmoeba-Micro/micro-zkevm_test_harness.git", branch = "v1.4.0" }
 
 anyhow = "1.0"

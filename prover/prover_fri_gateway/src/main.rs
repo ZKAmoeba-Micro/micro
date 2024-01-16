@@ -3,9 +3,9 @@ use micro_config::configs::{FriProverGatewayConfig, PostgresConfig};
 use micro_dal::ConnectionPool;
 use micro_env_config::{object_store::ProverObjectStoreConfig, FromEnv};
 use micro_object_store::ObjectStoreFactory;
+use micro_prover_fri_utils::app_monitor::{AppMonitor, AppMonitorJob};
 use micro_types::prover_server_api::{ProofGenerationDataRequest, SubmitProofRequest};
 use micro_utils::wait_for_tasks::wait_for_tasks;
-use prometheus_exporter::PrometheusExporterConfig;
 use reqwest::Client;
 use tokio::sync::{oneshot, watch};
 
@@ -65,6 +65,12 @@ async fn main() -> anyhow::Result<()> {
         config: config.clone(),
     };
 
+    let app_monitor = AppMonitor::new(
+        "micro_prover_fri_gateway".to_string(),
+        config.retry_interval_ms,
+        config.app_monitor_url,
+    );
+
     let (stop_sender, stop_receiver) = watch::channel(false);
 
     let (stop_signal_sender, stop_signal_receiver) = oneshot::channel();
@@ -86,7 +92,8 @@ async fn main() -> anyhow::Result<()> {
         tokio::spawn(
             proof_gen_data_fetcher.run::<ProofGenerationDataRequest>(stop_receiver.clone()),
         ),
-        tokio::spawn(proof_submitter.run::<SubmitProofRequest>(stop_receiver)),
+        tokio::spawn(proof_submitter.run::<SubmitProofRequest>(stop_receiver.clone())),
+        tokio::spawn(app_monitor.run(stop_receiver.clone())),
     ];
 
     let graceful_shutdown = None::<futures::future::Ready<()>>;

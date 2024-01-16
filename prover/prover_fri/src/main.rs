@@ -15,7 +15,11 @@ use micro_env_config::{
     FromEnv,
 };
 use micro_object_store::{ObjectStore, ObjectStoreFactory};
-use micro_prover_fri_utils::get_all_circuit_id_round_tuples_for;
+use micro_prover_fri_utils::{
+    app_monitor,
+    app_monitor::{AppMonitor, AppMonitorJob},
+    get_all_circuit_id_round_tuples_for,
+};
 use micro_prover_utils::region_fetcher::get_zone;
 use micro_queued_job_processor::JobProcessor;
 use micro_types::{
@@ -84,6 +88,13 @@ async fn main() -> anyhow::Result<()> {
     let prover_config = FriProverConfig::from_env().context("FriProverConfig::from_env()")?;
     // let exporter_config = PrometheusExporterConfig::pull(prover_config.prometheus_port);
 
+    let app_monitor_config = prover_config.clone();
+    let app_monitor = AppMonitor::new(
+        "micro_prover_fri".to_string(),
+        app_monitor_config.retry_interval_ms,
+        app_monitor_config.app_monitor_url,
+    );
+
     let (stop_signal_sender, stop_signal_receiver) = oneshot::channel();
     let mut stop_signal_sender = Some(stop_signal_sender);
     ctrlc::set_handler(move || {
@@ -145,7 +156,7 @@ async fn main() -> anyhow::Result<()> {
     .context("get_prover_tasks()")?;
 
     // let mut tasks = vec![tokio::spawn(exporter_config.run(stop_receiver))];
-    let mut tasks = vec![];
+    let mut tasks = vec![tokio::spawn(app_monitor.run(stop_receiver.clone()))];
     tasks.extend(prover_tasks);
 
     let particular_crypto_alerts = None;

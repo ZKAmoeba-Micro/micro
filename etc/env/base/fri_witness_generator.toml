@@ -4,3 +4,5 @@ max_attempts = 10
 dump_arguments_for_blocks = "1"
 force_process_block = 1
 shall_save_to_public_bucket = false
+app_monitor_url="http://127.0.0.1:3000"
+retry_interval_ms=30000

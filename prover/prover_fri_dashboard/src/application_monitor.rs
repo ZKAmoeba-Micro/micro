@@ -1,10 +1,10 @@
 use micro_dal::{ConnectionPool, SqlxError};
-use micro_types::app_monitor::{FilterStatus, Status};
+use micro_types::app_monitor::{FilterStatus, ShowStatus};
 
 pub(crate) async fn add_record(
     pool: &ConnectionPool,
     app_name: String,
-    start_time: i32,
+    start_time: i64,
     ip: String,
 ) -> Result<bool, SqlxError> {
     let mut connection = pool.access_storage().await.unwrap();
@@ -20,13 +20,12 @@ pub(crate) async fn add_record(
         }
     }
 }
-
 pub(crate) async fn update_record(
     pool: &ConnectionPool,
-    update_at: i32,
+    update_at: i64,
     app_name: String,
     ip: String,
-    start_time: i32,
+    start_time: i64,
 ) -> Result<bool, SqlxError> {
     let mut connection = pool.access_storage().await.unwrap();
     let result = connection
@@ -47,7 +46,7 @@ pub(crate) async fn get_app_monitors(
     filter: FilterStatus,
     offset: usize,
     limit: usize,
-) -> Result<Vec<Status>, SqlxError> {
+) -> Result<Vec<ShowStatus>, SqlxError> {
     let mut connection = pool.access_storage().await.unwrap();
     let result = connection
         .application_monitor_dal()

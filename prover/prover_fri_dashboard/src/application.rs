@@ -1,10 +1,10 @@
-use std::sync::Arc;
+use std::{net::SocketAddr, sync::Arc};
 
 use axum::{
-    extract::{Query, State},
+    extract::{ConnectInfo, Query, State},
     Json,
 };
-use micro_types::app_monitor::{FilterStatus, Status};
+use micro_types::app_monitor::{FilterStatus, QueryStatus, ShowStatus, Status};
 
 use crate::{
     application_monitor::{add_record, get_app_monitors, update_record},
@@ -13,13 +13,19 @@ use crate::{
 };
 
 pub async fn get(
-    Query(params): Query<FilterStatus>,
+    ConnectInfo(addr): ConnectInfo<SocketAddr>,
+    Query(params): Query<QueryStatus>,
     State(state): State<Arc<Dashboard>>,
-) -> Result<Json<Vec<Status>>, DashboardError> {
+) -> Result<Json<Vec<ShowStatus>>, DashboardError> {
     let offset = (params.page - 1) * params.page_size;
     let limit = params.page_size;
-    let list = get_app_monitors(&state.pool, params, offset, limit).await;
+    let ip = addr.ip().to_string();
 
+    let filter = FilterStatus {
+        ip: ip,
+        query: params,
+    };
+    let list = get_app_monitors(&state.pool, filter, offset, limit).await;
     match list {
         Ok(result) => Ok(Json(result)),
         Err(e) => {
@@ -30,10 +36,17 @@ pub async fn get(
 }
 
 pub async fn add(
+    ConnectInfo(addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<Dashboard>>,
     Json(data): Json<Status>,
 ) -> Result<Json<bool>, DashboardError> {
-    let result = add_record(&state.pool, data.app_name, data.start_time, data.ip).await;
+    let result = add_record(
+        &state.pool,
+        data.app_name,
+        data.start_time,
+        addr.ip().to_string(),
+    )
+    .await;
     match result {
         Ok(result) => Ok(Json(result)),
         Err(e) => Err(DashboardError::DatabaseError(e)),
@@ -41,6 +54,7 @@ pub async fn add(
 }
 
 pub async fn update(
+    ConnectInfo(addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<Dashboard>>,
     Json(data): Json<Status>,
 ) -> Result<Json<bool>, DashboardError> {
@@ -48,7 +62,7 @@ pub async fn update(
         &state.pool,
         data.heartbeat_update_at,
         data.app_name,
-        data.ip,
+        addr.ip().to_string(),
         data.start_time,
     )
     .await;

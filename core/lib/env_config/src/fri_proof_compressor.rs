@@ -28,6 +28,8 @@ mod tests {
                 "https://storage.googleapis.com/zkamoeba-setup-keys-us/setup-keys/setup_2^26.key"
                     .to_string(),
             verify_wrapper_proof: false,
+            app_monitor_url: "http://127.0.0.1:3000".to_string(),
+            retry_interval_ms: 30000,
         }
     }
 
@@ -44,6 +46,8 @@ mod tests {
             FRI_PROOF_COMPRESSOR_UNIVERSAL_SETUP_PATH="keys/setup/setup_2^26.key"
             FRI_PROOF_COMPRESSOR_UNIVERSAL_SETUP_DOWNLOAD_URL="https://storage.googleapis.com/zkamoeba-setup-keys-us/setup-keys/setup_2^26.key"
             FRI_PROOF_COMPRESSOR_VERIFY_WRAPPER_PROOF=false
+            FRI_PROOF_COMPRESSOR_APP_MONITOR_URL="http://127.0.0.1:3000"
+            FRI_PROOF_COMPRESSOR_RETRY_INTERVAL_MS=30000
         "#;
         lock.set_env(config);
 
