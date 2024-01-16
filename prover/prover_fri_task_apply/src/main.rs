@@ -75,7 +75,7 @@ async fn main() -> anyhow::Result<()> {
     let app_monitor_receiver = stop_receiver.clone();
 
     let app_monitor = AppMonitor::new(
-        "micro_prover_fri_gateway".to_string(),
+        "micro_prover_task_apply".to_string(),
         app_monitor_config.retry_interval_ms,
         app_monitor_config.app_monitor_url,
     );

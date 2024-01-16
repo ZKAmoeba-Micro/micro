@@ -5,7 +5,7 @@ use std::time::Duration;
 use serde::Deserialize;
 
 /// Configuration for the fri witness generation
-#[derive(Debug, Deserialize, Clone, PartialEq, Copy)]
+#[derive(Debug, Deserialize, Clone, PartialEq)]
 pub struct FriWitnessGeneratorConfig {
     /// Max time for witness to be generated
     pub generation_timeout_in_secs: u16,
