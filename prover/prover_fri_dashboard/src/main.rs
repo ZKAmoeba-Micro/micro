@@ -24,6 +24,14 @@ mod task;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
+    #[allow(deprecated)] // TODO (QIT-21): Use centralized configuration approach.
+    let log_format = vlog::log_format_from_env();
+
+    let builder: vlog::ObservabilityBuilder =
+        vlog::ObservabilityBuilder::new().with_log_format(log_format);
+
+    let _guard = builder.build();
+    tracing::info!("start Dashboard");
     let config =
         FriProverDashboardConfig::from_env().context("FriProverDashboardConfig::from_env()")?;
 

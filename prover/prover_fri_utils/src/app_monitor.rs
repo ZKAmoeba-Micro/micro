@@ -2,11 +2,14 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use anyhow::Context as _;
 use async_trait::async_trait;
-use jsonrpc_core::{types::response::Failure as RpcFailure, Output};
+use jsonrpc_core::{serde_json, types::response::Failure as RpcFailure, Output};
 use micro_types::app_monitor::Status;
 use reqwest::Client;
 use thiserror::Error;
 use tokio::{sync::watch, time::sleep};
+
+const ADD_URL: &str = "application/add";
+const UPDATE_URL: &str = "application/update";
 #[derive(Debug, Error, PartialEq)]
 pub enum RpcError {
     #[error("Unable to decode server response")]
@@ -30,15 +33,12 @@ pub struct AppMonitor {
 pub trait AppMonitorJob: Sync + Send {
     /// Runs the routine task periodically in [`Self::polling_interval_ms()`] frequency.
     async fn run_routine_task(&mut self) -> anyhow::Result<()>;
-
     async fn init(&mut self) -> anyhow::Result<()>;
-
     async fn run(mut self, stop_receiver: watch::Receiver<bool>) -> anyhow::Result<()>
     where
         Self: Sized,
     {
         self.init().await.context("AppMonitorJob init()")?;
-
         loop {
             if *stop_receiver.borrow() {
                 return Ok(());
@@ -49,7 +49,6 @@ pub trait AppMonitorJob: Sync + Send {
             sleep(Duration::from_millis(self.polling_interval_ms())).await;
         }
     }
-
     fn polling_interval_ms(&self) -> u64;
 }
 
@@ -57,7 +56,7 @@ fn timestamp() -> i64 {
     let start = SystemTime::now();
     let since_the_epoch = start
         .duration_since(UNIX_EPOCH)
-        .expect("Time went backwards");
+        .expect("App_monitor Time went backwards");
     let ms = since_the_epoch.as_secs() as i64 * 1000i64
         + (since_the_epoch.subsec_nanos() as f64 / 1_000_000.0) as i64;
     ms
@@ -76,7 +75,7 @@ impl AppMonitor {
     }
     async fn execute(&self, method: String) {
         let mut ts1 = self.start_time;
-        if method.eq("update") {
+        if method.eq(UPDATE_URL) {
             ts1 = timestamp();
         }
         let message = Status {
@@ -95,7 +94,7 @@ impl AppMonitor {
         match result {
             Ok(res) => {
                 tracing::info!(
-                    "app_monitor init erro app_name:{},message:{:?},res:{:#?}",
+                    "app_monitor success app_name:{},message:{:?},res:{:#?}",
                     &self.app_name,
                     &message,
                     res
@@ -103,7 +102,7 @@ impl AppMonitor {
             }
             Err(e) => {
                 tracing::error!(
-                    "app_monitor init erro app_name:{},message:{:?},e:{}",
+                    "app_monitor  erro app_name:{},message:{:?},e:{}",
                     &self.app_name,
                     &message,
                     e
@@ -111,13 +110,12 @@ impl AppMonitor {
             }
         }
     }
-
     async fn post_raw(
         method: String,
         message: impl serde::Serialize,
         client: Client,
         rpc_addr: String,
-    ) -> Result<Output, RpcError> {
+    ) -> Result<String, RpcError> {
         let url = format!("{}/{}", &rpc_addr, method);
         let res = client
             .post(url)
@@ -127,13 +125,16 @@ impl AppMonitor {
             .map_err(|err| RpcError::NetworkError(err.to_string()))?;
         if res.status() != reqwest::StatusCode::OK {
             let error = format!(
-                "Post query responded with a non-OK response: {}",
+                "app_monitor Post query responded with a non-OK response: {}",
                 res.status()
             );
             return Err(RpcError::NetworkError(error));
         }
-        let reply: Output = res
-            .json()
+        // let json_content = res.json::<serde_json::Value>().await;
+        //let text_content = res.text().await;
+        //tracing::info!("===========text_content:{:?}======",text_content);
+        let reply = res
+            .text()
             .await
             .map_err(|err| RpcError::MalformedResponse(err.to_string()))?;
         Ok(reply)
@@ -143,15 +144,13 @@ impl AppMonitor {
 #[async_trait]
 impl AppMonitorJob for AppMonitor {
     async fn run_routine_task(&mut self) -> anyhow::Result<()> {
-        self.execute("update".to_string()).await;
+        self.execute(UPDATE_URL.to_string()).await;
         Ok(())
     }
-
     async fn init(&mut self) -> anyhow::Result<()> {
-        self.execute("add".to_string()).await;
+        self.execute(ADD_URL.to_string()).await;
         Ok(())
     }
-
     fn polling_interval_ms(&self) -> u64 {
         self.retry_interval_ms
     }

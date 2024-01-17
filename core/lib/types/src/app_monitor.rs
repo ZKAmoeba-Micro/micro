@@ -2,11 +2,11 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct QueryStatus {
-    pub app_name: String,
-    pub start_time: i64,
-    pub end_time: i64,
-    pub page: usize,
-    pub page_size: usize,
+    pub app_name: Option<String>,
+    pub start_time: Option<i64>,
+    pub end_time: Option<i64>,
+    pub page: u32,
+    pub page_size: u32,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -17,7 +17,7 @@ pub struct FilterStatus {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ShowStatus {
-    pub id: i64,
+    pub id: i32,
     pub app_name: String,
     pub ip: String,
     pub start_time: i64,

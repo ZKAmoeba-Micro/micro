@@ -44,8 +44,8 @@ pub(crate) async fn update_record(
 pub(crate) async fn get_app_monitors(
     pool: &ConnectionPool,
     filter: FilterStatus,
-    offset: usize,
-    limit: usize,
+    offset: u32,
+    limit: u32,
 ) -> Result<Vec<ShowStatus>, SqlxError> {
     let mut connection = pool.access_storage().await.unwrap();
     let result = connection
@@ -53,4 +53,25 @@ pub(crate) async fn get_app_monitors(
         .get_app_monitors(filter.clone(), offset, limit)
         .await;
     result
+}
+
+pub(crate) async fn get_count(pool: &ConnectionPool, filter: FilterStatus) -> u32 {
+    let mut connection = pool.access_storage().await.unwrap();
+    let result = connection
+        .application_monitor_dal()
+        .get_count(filter.clone())
+        .await;
+    match result {
+        Ok(res) => match res {
+            Some(r) => r,
+            None => 0,
+        },
+        Err(e) => {
+            tracing::error!(
+                "Get the Application Monitor record failed. FilterStatus:{:?},e:{e}",
+                filter
+            );
+            0
+        }
+    }
 }

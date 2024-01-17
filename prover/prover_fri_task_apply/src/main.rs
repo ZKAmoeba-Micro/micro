@@ -28,9 +28,9 @@ async fn main() -> anyhow::Result<()> {
 
     let _guard = builder.build();
 
-    std::env::vars().into_iter().for_each(|(k, v)| {
-        println!("env {}={}", k, v);
-    });
+    // std::env::vars().into_iter().for_each(|(k, v)| {
+    //     println!("env {}={}", k, v);
+    // });
 
     let config =
         FriProverTaskApplyConfig::from_env().context("FriProverTaskApplyConfig::from_env()")?;

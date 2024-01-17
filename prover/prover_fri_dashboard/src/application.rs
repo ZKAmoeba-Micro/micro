@@ -5,18 +5,25 @@ use axum::{
     Json,
 };
 use micro_types::app_monitor::{FilterStatus, QueryStatus, ShowStatus, Status};
+use serde::{Deserialize, Serialize};
 
 use crate::{
-    application_monitor::{add_record, get_app_monitors, update_record},
+    application_monitor::{add_record, get_app_monitors, get_count, update_record},
     dashboard::Dashboard,
     error::DashboardError,
 };
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Response {
+    pub total_page: u32,
+    pub list: Vec<ShowStatus>,
+}
 
 pub async fn get(
     ConnectInfo(addr): ConnectInfo<SocketAddr>,
     Query(params): Query<QueryStatus>,
     State(state): State<Arc<Dashboard>>,
-) -> Result<Json<Vec<ShowStatus>>, DashboardError> {
+) -> Result<Json<Response>, DashboardError> {
     let offset = (params.page - 1) * params.page_size;
     let limit = params.page_size;
     let ip = addr.ip().to_string();
@@ -25,13 +32,34 @@ pub async fn get(
         ip: ip,
         query: params,
     };
-    let list = get_app_monitors(&state.pool, filter, offset, limit).await;
-    match list {
-        Ok(result) => Ok(Json(result)),
-        Err(e) => {
-            tracing::error!("app monitor database error: {:?}", e);
-            Err(DashboardError::DatabaseError(e))
+    let count = get_count(&state.pool, filter.clone()).await;
+    if count > 0 {
+        let list = get_app_monitors(&state.pool, filter, offset, limit).await;
+        match list {
+            Ok(result) => {
+                let mut total_page = count / limit;
+                if count % limit != 0 {
+                    total_page += 1;
+                }
+                Ok(Json(Response {
+                    total_page,
+                    list: result,
+                }))
+            }
+            Err(e) => {
+                tracing::error!("app get monitor database error: {:?}", e);
+                // Err(DashboardError::DatabaseError(e));
+                Ok(Json(Response {
+                    total_page: 0,
+                    list: vec![],
+                }))
+            }
         }
+    } else {
+        Ok(Json(Response {
+            total_page: 0,
+            list: vec![],
+        }))
     }
 }
 

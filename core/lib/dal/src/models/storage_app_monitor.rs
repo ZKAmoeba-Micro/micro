@@ -2,7 +2,7 @@ use micro_types::app_monitor::ShowStatus;
 
 #[derive(sqlx::FromRow, Debug, Clone)]
 pub struct AppMonitorStatus {
-    pub id: i64,
+    pub id: i32,
     pub app_name: String,
     pub ip: String,
     pub start_time: i64,
