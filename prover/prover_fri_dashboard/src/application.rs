@@ -73,6 +73,7 @@ pub async fn add(
         data.app_name,
         data.start_time,
         addr.ip().to_string(),
+        data.heartbeat_time,
     )
     .await;
     match result {

@@ -5121,6 +5121,22 @@
     },
     "query": "select count(*) from  proof_compression_jobs_fri WHERE status = 'queued'"
   },
+  "62bbb19d7053eee7b527a43e89c4d98e8cd9032389af1ae09ece3a1ff68e6461": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Text",
+          "Text",
+          "Int8",
+          "Int8",
+          "Int4"
+        ]
+      }
+    },
+    "query": "INSERT INTO application_monitor \n        (app_name,ip,start_at,heartbeat_update_at,heartbeat_time,created_at,updated_at) \n        VALUES ($1,$2,$3,$4,$5,now(),now())"
+  },
   "6317155050a5dae24ea202cfd54d1e58cc7aeb0bfd4d95aa351f85cff04d3bff": {
     "describe": {
       "columns": [
@@ -8415,21 +8431,6 @@
       }
     },
     "query": "\n                    INSERT INTO prover_jobs_fri (l1_batch_number, circuit_id, circuit_blob_url, aggregation_round, sequence_number, depth, is_node_final_proof, protocol_version, status, created_at, updated_at)\n                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'queued', now(), now())\n                    ON CONFLICT(l1_batch_number, aggregation_round, circuit_id, depth, sequence_number)\n                    DO UPDATE SET updated_at=now()\n                    "
-  },
-  "9e2dc608d457890d3b83b6621b2e5330383742e0733beb47568e9d2216a45906": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Text",
-          "Text",
-          "Int8",
-          "Int8"
-        ]
-      }
-    },
-    "query": "INSERT INTO application_monitor \n        (app_name,ip,start_at,heartbeat_update_at,created_at,updated_at) \n        VALUES ($1,$2,$3,$4,now(),now())"
   },
   "a074cd2c23434a8e801c2c0b42e63f1657765aceabd6d8a50ef2d2299bba99ab": {
     "describe": {

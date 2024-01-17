@@ -4,6 +4,7 @@ CREATE TABLE application_monitor (
     ip text NOT NULL,
     start_at bigint  NOT NULL,
     heartbeat_update_at bigint  NOT NULL,
+    heartbeat_time int  NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
 );

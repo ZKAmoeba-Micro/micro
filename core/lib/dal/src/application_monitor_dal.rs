@@ -16,15 +16,17 @@ impl ApplicationMonitorDal<'_, '_> {
         app_name: String,
         ip: String,
         start_time: i64,
+        heartbeat_time: i32,
     ) -> Result<(), SqlxError> {
         sqlx::query!(
             r#"INSERT INTO application_monitor 
-        (app_name,ip,start_at,heartbeat_update_at,created_at,updated_at) 
-        VALUES ($1,$2,$3,$4,now(),now())"#,
+        (app_name,ip,start_at,heartbeat_update_at,heartbeat_time,created_at,updated_at) 
+        VALUES ($1,$2,$3,$4,$5,now(),now())"#,
             app_name,
             ip,
             start_time,
-            start_time
+            start_time,
+            heartbeat_time
         )
         .execute(self.storage.conn())
         .await?;
@@ -96,14 +98,14 @@ impl ApplicationMonitorDal<'_, '_> {
         let query = format!(
             r#"WITH Re AS (  
                 SELECT   
-                    id, app_name, ip, start_at as start_time, heartbeat_update_at,
+                    app_name, ip, start_at as start_time, heartbeat_update_at,heartbeat_time,
                     ROW_NUMBER() OVER(PARTITION BY app_name, ip ORDER BY id DESC) as rn  
                 FROM   
                     application_monitor
                 where {}
             )  
             SELECT   
-                id, app_name, ip, start_time, heartbeat_update_at
+                app_name, ip, start_time, heartbeat_update_at,heartbeat_time
             FROM   
                 Re  
             WHERE   

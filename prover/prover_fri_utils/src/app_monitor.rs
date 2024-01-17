@@ -2,7 +2,7 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use anyhow::Context as _;
 use async_trait::async_trait;
-use jsonrpc_core::{serde_json, types::response::Failure as RpcFailure, Output};
+use jsonrpc_core::types::response::Failure as RpcFailure;
 use micro_types::app_monitor::Status;
 use reqwest::Client;
 use thiserror::Error;
@@ -82,6 +82,7 @@ impl AppMonitor {
             app_name: self.app_name.clone(),
             start_time: self.start_time,
             heartbeat_update_at: ts1,
+            heartbeat_time: self.retry_interval_ms as u32,
         };
 
         let result = Self::post_raw(
@@ -93,12 +94,12 @@ impl AppMonitor {
         .await;
         match result {
             Ok(res) => {
-                tracing::info!(
-                    "app_monitor success app_name:{},message:{:?},res:{:#?}",
-                    &self.app_name,
-                    &message,
-                    res
-                );
+                // tracing::info!(
+                //     "app_monitor success app_name:{},message:{:?},res:{:#?}",
+                //     &self.app_name,
+                //     &message,
+                //     res
+                // );
             }
             Err(e) => {
                 tracing::error!(

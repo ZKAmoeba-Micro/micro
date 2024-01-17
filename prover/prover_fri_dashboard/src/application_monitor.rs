@@ -6,11 +6,17 @@ pub(crate) async fn add_record(
     app_name: String,
     start_time: i64,
     ip: String,
+    heartbeat_time: u32,
 ) -> Result<bool, SqlxError> {
     let mut connection = pool.access_storage().await.unwrap();
     let result = connection
         .application_monitor_dal()
-        .insert(app_name.clone(), ip.clone(), start_time)
+        .insert(
+            app_name.clone(),
+            ip.clone(),
+            start_time,
+            heartbeat_time as i32,
+        )
         .await;
     match result {
         Ok(_) => Ok(true),

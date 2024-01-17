@@ -17,11 +17,11 @@ pub struct FilterStatus {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ShowStatus {
-    pub id: i32,
     pub app_name: String,
     pub ip: String,
     pub start_time: i64,
     pub heartbeat_update_at: i64,
+    pub heartbeat_time: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -29,4 +29,5 @@ pub struct Status {
     pub app_name: String,
     pub start_time: i64,
     pub heartbeat_update_at: i64,
+    pub heartbeat_time: u32,
 }
