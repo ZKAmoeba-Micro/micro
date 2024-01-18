@@ -1,5 +1,6 @@
 use async_trait::async_trait;
 use chrono::Utc;
+use micro_prover_fri_utils::sync_status::get_sync_status;
 use micro_types::{
     prover_server_api::{
         ProofGenerationData, ProofGenerationDataRequest, ProofGenerationDataResponse,
@@ -40,6 +41,12 @@ impl PeriodicApi<ProofGenerationDataRequest> for PeriodicApiStruct {
     const SERVICE_NAME: &'static str = "ProofGenDataFetcher";
 
     async fn get_next_request(&self) -> Option<(Self::JobId, ProofGenerationDataRequest)> {
+        let sync_status = get_sync_status(self.pool.clone(), &self.rpc_url)
+            .await
+            .unwrap();
+        if !sync_status {
+            return None;
+        }
         let timestamp = Utc::now().timestamp();
         let signature = PackedEthSignature::sign(
             &self.config.prover_private_key().unwrap(),

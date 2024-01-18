@@ -1,5 +1,5 @@
 use anyhow::Context as _;
-use micro_config::configs::{FriProverGatewayConfig, PostgresConfig};
+use micro_config::configs::{FriProverGatewayConfig, FriProverTaskApplyConfig, PostgresConfig};
 use micro_dal::ConnectionPool;
 use micro_env_config::{object_store::ProverObjectStoreConfig, FromEnv};
 use micro_object_store::ObjectStoreFactory;
@@ -36,6 +36,8 @@ async fn main() -> anyhow::Result<()> {
 
     let config =
         FriProverGatewayConfig::from_env().context("FriProverGatewayConfig::from_env()")?;
+    let task_apply_config =
+        FriProverTaskApplyConfig::from_env().context("FriProverTaskApplyConfig::from_env()")?;
     let postgres_config = PostgresConfig::from_env().context("PostgresConfig::from_env()")?;
     let pool = ConnectionPool::builder(
         postgres_config.prover_url()?,
@@ -52,6 +54,7 @@ async fn main() -> anyhow::Result<()> {
         blob_store: store_factory.create_store().await,
         pool: pool.clone(),
         api_url: format!("{}{SUBMIT_PROOF_PATH}", config.api_url),
+        rpc_url: task_apply_config.clone().rpc_url,
         poll_duration: config.api_poll_duration(),
         client: Client::new(),
         config: config.clone(),
@@ -60,6 +63,7 @@ async fn main() -> anyhow::Result<()> {
         blob_store: store_factory.create_store().await,
         pool,
         api_url: format!("{}{PROOF_GENERATION_DATA_PATH}", config.api_url),
+        rpc_url: task_apply_config.rpc_url,
         poll_duration: config.api_poll_duration(),
         client: Client::new(),
         config: config.clone(),

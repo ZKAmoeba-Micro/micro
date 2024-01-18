@@ -93,7 +93,7 @@ impl AppMonitor {
         )
         .await;
         match result {
-            Ok(res) => {
+            Ok(_res) => {
                 // tracing::info!(
                 //     "app_monitor success app_name:{},message:{:?},res:{:#?}",
                 //     &self.app_name,

@@ -4067,6 +4067,7 @@ dependencies = [
  "micro_object_store",
  "micro_prover_fri_types",
  "micro_types",
+ "micro_web3_decl",
  "reqwest",
  "serde",
  "thiserror",

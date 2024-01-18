@@ -1,7 +1,7 @@
 use std::fmt::Debug;
 
 use micro_contracts::sys_assignment_contract;
-use micro_eth_client::{types::Error as EthClientError, EthInterface};
+use micro_eth_client::{types::Error as MicroClientError, EthInterface};
 use micro_system_constants::ASSIGNMENT_ADDRESS;
 use micro_types::{
     l2::new_batch::NEW_BATCH,
@@ -12,13 +12,7 @@ use micro_types::{
     Address, H256,
 };
 
-#[derive(Debug, thiserror::Error)]
-pub enum Error {
-    #[error("Eth client error: {0}")]
-    EthClient(#[from] EthClientError),
-    #[error("Infinite recursion caused by too many responses")]
-    InfiniteRecursion,
-}
+use crate::error::TaskApplyError;
 
 #[async_trait::async_trait]
 pub trait MicroClient {
@@ -28,9 +22,9 @@ pub trait MicroClient {
         from: BlockNumber,
         to: BlockNumber,
         retries_left: usize,
-    ) -> Result<Vec<Log>, Error>;
+    ) -> Result<Vec<Log>, TaskApplyError>;
     /// Returns finalized L1 block number.
-    async fn finalized_block_number(&self) -> Result<u64, Error>;
+    async fn finalized_block_number(&self) -> Result<u64, TaskApplyError>;
 }
 
 pub const RETRY_LIMIT: usize = 5;
@@ -69,7 +63,7 @@ impl<E: EthInterface> MicroHttpQueryClient<E> {
         from: BlockNumber,
         to: BlockNumber,
         topics: Vec<H256>,
-    ) -> Result<Vec<Log>, Error> {
+    ) -> Result<Vec<Log>, TaskApplyError> {
         let filter = FilterBuilder::default()
             .address(vec![self.contract_addr])
             .from_block(from)
@@ -91,7 +85,7 @@ impl<E: EthInterface + Send + Sync + 'static> MicroClient for MicroHttpQueryClie
         from: BlockNumber,
         to: BlockNumber,
         retries_left: usize,
-    ) -> Result<Vec<Log>, Error> {
+    ) -> Result<Vec<Log>, TaskApplyError> {
         tracing::info!(
             "get_events   from:{:?}  to:{:?}  retries_left:{:?}",
             from,
@@ -102,7 +96,7 @@ impl<E: EthInterface + Send + Sync + 'static> MicroClient for MicroHttpQueryClie
 
         // This code is compatible with both Infura and Alchemy API providers.
         // Note: we don't handle rate-limits here - assumption is that we're never going to hit them.
-        if let Err(Error::EthClient(EthClientError::EthereumGateway(err))) = &result {
+        if let Err(TaskApplyError::MicroClient(MicroClientError::EthereumGateway(err))) = &result {
             tracing::warn!("Provider returned error message: {:?}", err);
             let err_message = err.to_string();
             let err_code = if let web3::Error::Rpc(err) = err {
@@ -144,7 +138,9 @@ impl<E: EthInterface + Send + Sync + 'static> MicroClient for MicroHttpQueryClie
 
                 // safety check to prevent infinite recursion (quite unlikely)
                 if from_number >= mid {
-                    return Err(Error::InfiniteRecursion);
+                    return Err(TaskApplyError::ClientError(
+                        "Infinite recursion caused by too many responses".to_string(),
+                    ));
                 }
                 tracing::warn!(
                     "Splitting block range in half: {:?} - {:?} - {:?}",
@@ -170,7 +166,7 @@ impl<E: EthInterface + Send + Sync + 'static> MicroClient for MicroHttpQueryClie
         result
     }
 
-    async fn finalized_block_number(&self) -> Result<u64, Error> {
+    async fn finalized_block_number(&self) -> Result<u64, TaskApplyError> {
         if let Some(confirmations) = self.confirmations_for_eth_event {
             let latest_block_number = self.client.block_number("task_apply").await?.as_u64();
             Ok(latest_block_number.saturating_sub(confirmations))

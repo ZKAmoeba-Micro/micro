@@ -27,7 +27,7 @@ pub async fn get(State(state): State<Arc<Dashboard>>) -> Result<Json<Response>, 
         .client
         .get_block_number()
         .await
-        .map_err(|_| DashboardError::RpcError("".to_string()))?;
+        .map_err(|_| DashboardError::RpcError("get latest_block_number error".to_string()))?;
 
     Ok(Json(Response {
         local_block_number: local_block_number.as_u64(),

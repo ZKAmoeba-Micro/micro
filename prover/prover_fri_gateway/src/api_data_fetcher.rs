@@ -20,6 +20,7 @@ pub(crate) struct PeriodicApiStruct {
     pub(crate) blob_store: Box<dyn ObjectStore>,
     pub(crate) pool: ConnectionPool,
     pub(crate) api_url: String,
+    pub(crate) rpc_url: String,
     pub(crate) poll_duration: Duration,
     pub(crate) client: Client,
     pub(crate) config: FriProverGatewayConfig,

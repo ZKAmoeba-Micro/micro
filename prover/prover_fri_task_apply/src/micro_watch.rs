@@ -5,8 +5,8 @@ use micro_types::web3::types::BlockNumber;
 use tokio::sync::watch;
 
 // Local deps
-use crate::client::{Error, MicroClient};
-use crate::{caller::Caller, client::RETRY_LIMIT};
+use crate::client::MicroClient;
+use crate::{caller::Caller, client::RETRY_LIMIT, error::TaskApplyError};
 
 #[derive(Debug)]
 pub struct EthWatch<W: MicroClient + Sync> {
@@ -29,7 +29,6 @@ impl<W: MicroClient + Sync> EthWatch<W> {
         Self {
             client,
             poll_interval,
-
             last_processed_micro_block,
             caller,
         }
@@ -59,7 +58,7 @@ impl<W: MicroClient + Sync> EthWatch<W> {
     }
 
     #[tracing::instrument(skip(self))]
-    async fn loop_iteration(&mut self) -> Result<(), Error> {
+    async fn loop_iteration(&mut self) -> Result<(), TaskApplyError> {
         let to_block = self.client.finalized_block_number().await?;
 
         tracing::info!(

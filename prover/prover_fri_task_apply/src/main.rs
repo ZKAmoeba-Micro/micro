@@ -14,6 +14,7 @@ use crate::{
 
 mod caller;
 mod client;
+mod error;
 mod micro_watch;
 mod task_apply;
 mod wallet;
@@ -62,7 +63,7 @@ async fn main() -> anyhow::Result<()> {
 
     let client = MicroHttpQueryClient::new(query_client, Some(config.confirmations_for_eth_event));
 
-    let wallet = TaskApplyWallet::new(config.clone()).await;
+    let wallet = TaskApplyWallet::new(config.clone()).await?;
     let eth_watch_caller = wallet.get_caller();
     let task_apply_caller = wallet.get_caller();
 

@@ -10,7 +10,6 @@ impl FromEnv for FriProverGatewayConfig {
 
 #[cfg(test)]
 mod tests {
-    use micro_basic_types::web3::helpers::to_string;
 
     use super::*;
     use crate::test_utils::EnvMutex;
