@@ -1,4 +1,4 @@
-use micro_types::app_monitor::{FilterStatus, ShowStatus};
+use micro_types::app_monitor::{QueryStatus, ShowStatus};
 use sqlx::Row;
 
 use crate::{
@@ -51,7 +51,7 @@ impl ApplicationMonitorDal<'_, '_> {
         Ok(())
     }
 
-    pub async fn get_count(&mut self, filter: FilterStatus) -> Result<Option<u32>, SqlxError> {
+    pub async fn get_count(&mut self, filter: QueryStatus) -> Result<Option<u32>, SqlxError> {
         let (where_sql, _arg_index) = self.build_where_clause(&filter);
         let query = format!(
             r#"select count(1) AS "total" from (
@@ -62,19 +62,26 @@ impl ApplicationMonitorDal<'_, '_> {
             where_sql
         );
         let mut query = sqlx::query(&query);
-        match &filter.query.app_name {
+        match &filter.ip {
+            Some(ip) => {
+                let r = format!("{}%", ip);
+                query = query.bind(r);
+            }
+            None => {}
+        };
+        match &filter.app_name {
             Some(app_name) => {
                 query = query.bind(app_name);
             }
             None => {}
         };
-        match filter.query.start_time {
+        match filter.start_time {
             Some(start_time) => {
                 query = query.bind(start_time);
             }
             None => {}
         };
-        match filter.query.end_time {
+        match filter.end_time {
             Some(end_time) => {
                 query = query.bind(end_time);
             }
@@ -90,7 +97,7 @@ impl ApplicationMonitorDal<'_, '_> {
 
     pub async fn get_app_monitors(
         &mut self,
-        filter: FilterStatus,
+        filter: QueryStatus,
         offset: u32,
         limit: u32,
     ) -> Result<Vec<ShowStatus>, SqlxError> {
@@ -117,20 +124,29 @@ impl ApplicationMonitorDal<'_, '_> {
             arg_index,
             arg_index + 1
         );
+
         let mut query = sqlx::query_as(&query);
-        match &filter.query.app_name {
+        match &filter.ip {
+            Some(ip) => {
+                let r = format!("{}%", ip);
+                query = query.bind(r);
+            }
+            None => {}
+        };
+
+        match &filter.app_name {
             Some(app_name) => {
                 query = query.bind(app_name);
             }
             None => {}
         };
-        match filter.query.start_time {
+        match filter.start_time {
             Some(start_time) => {
                 query = query.bind(start_time);
             }
             None => {}
         };
-        match filter.query.end_time {
+        match filter.end_time {
             Some(end_time) => {
                 query = query.bind(end_time);
             }
@@ -151,25 +167,32 @@ impl ApplicationMonitorDal<'_, '_> {
         Ok(results)
     }
 
-    fn build_where_clause(&self, filter: &FilterStatus) -> (String, u8) {
+    fn build_where_clause(&self, filter: &QueryStatus) -> (String, u8) {
         let mut arg_index = 1;
-        let mut where_sql = format!("(ip = '{}')", filter.ip);
+        let mut where_sql = format!("(1=1)");
 
-        match &filter.query.app_name {
+        match &filter.ip {
+            Some(_) => {
+                where_sql += &format!(" AND (ip like ${})", arg_index);
+                arg_index += 1;
+            }
+            None => {}
+        };
+        match &filter.app_name {
             Some(_) => {
                 where_sql += &format!(" AND (app_name = ${})", arg_index);
                 arg_index += 1;
             }
             None => {}
         };
-        match filter.query.start_time {
+        match filter.start_time {
             Some(_) => {
                 where_sql += &format!(" AND (start_at >= ${})", arg_index);
                 arg_index += 1;
             }
             None => {}
         };
-        match filter.query.end_time {
+        match filter.end_time {
             Some(_) => {
                 where_sql += &format!(" AND (start_at <= ${})", arg_index);
                 arg_index += 1;

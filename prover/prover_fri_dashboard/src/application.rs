@@ -4,7 +4,7 @@ use axum::{
     extract::{ConnectInfo, Query, State},
     Json,
 };
-use micro_types::app_monitor::{FilterStatus, QueryStatus, ShowStatus, Status};
+use micro_types::app_monitor::{QueryStatus, ShowStatus, Status};
 use serde::{Deserialize, Serialize};
 
 use crate::{
@@ -20,21 +20,16 @@ pub struct Response {
 }
 
 pub async fn get(
-    ConnectInfo(addr): ConnectInfo<SocketAddr>,
+    ConnectInfo(_addr): ConnectInfo<SocketAddr>,
     Query(params): Query<QueryStatus>,
     State(state): State<Arc<Dashboard>>,
 ) -> Result<Json<Response>, DashboardError> {
     let offset = (params.page - 1) * params.page_size;
     let limit = params.page_size;
-    let ip = addr.ip().to_string();
-
-    let filter = FilterStatus {
-        ip: ip,
-        query: params,
-    };
-    let count = get_count(&state.pool, filter.clone()).await;
+    //let ip = addr.ip().to_string();
+    let count = get_count(&state.pool, params.clone()).await;
     if count > 0 {
-        let list = get_app_monitors(&state.pool, filter, offset, limit).await;
+        let list = get_app_monitors(&state.pool, params, offset, limit).await;
         match list {
             Ok(result) => {
                 let mut total_page = count / limit;

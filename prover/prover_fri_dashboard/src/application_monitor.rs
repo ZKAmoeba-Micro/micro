@@ -1,5 +1,5 @@
 use micro_dal::{ConnectionPool, SqlxError};
-use micro_types::app_monitor::{FilterStatus, ShowStatus};
+use micro_types::app_monitor::{QueryStatus, ShowStatus};
 
 pub(crate) async fn add_record(
     pool: &ConnectionPool,
@@ -49,7 +49,7 @@ pub(crate) async fn update_record(
 
 pub(crate) async fn get_app_monitors(
     pool: &ConnectionPool,
-    filter: FilterStatus,
+    filter: QueryStatus,
     offset: u32,
     limit: u32,
 ) -> Result<Vec<ShowStatus>, SqlxError> {
@@ -61,7 +61,7 @@ pub(crate) async fn get_app_monitors(
     result
 }
 
-pub(crate) async fn get_count(pool: &ConnectionPool, filter: FilterStatus) -> u32 {
+pub(crate) async fn get_count(pool: &ConnectionPool, filter: QueryStatus) -> u32 {
     let mut connection = pool.access_storage().await.unwrap();
     let result = connection
         .application_monitor_dal()
