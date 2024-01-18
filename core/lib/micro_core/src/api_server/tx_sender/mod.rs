@@ -91,7 +91,8 @@ impl MultiVMBaseSystemContracts {
             ProtocolVersionId::Version18
             | ProtocolVersionId::Version19
             | ProtocolVersionId::Version20
-            | ProtocolVersionId::Version21 => self.post_boojum,
+            | ProtocolVersionId::Version21
+            | ProtocolVersionId::Version22 => self.post_boojum,
         }
     }
 }

@@ -43,15 +43,16 @@ pub enum ProtocolVersionId {
     Version19,
     Version20,
     Version21,
+    Version22,
 }
 
 impl ProtocolVersionId {
     pub fn latest() -> Self {
-        Self::Version20
+        Self::Version21
     }
 
     pub fn next() -> Self {
-        Self::Version21
+        Self::Version22
     }
 
     /// Returns VM version to be used by API for this protocol version.
@@ -80,6 +81,7 @@ impl ProtocolVersionId {
             ProtocolVersionId::Version19 => VmVersion::VmBoojumIntegration,
             ProtocolVersionId::Version20 => VmVersion::VmBoojumIntegration,
             ProtocolVersionId::Version21 => VmVersion::VmBoojumIntegration,
+            ProtocolVersionId::Version22 => VmVersion::VmBoojumIntegration,
         }
     }
 
@@ -701,6 +703,7 @@ impl From<ProtocolVersionId> for VmVersion {
             ProtocolVersionId::Version19 => VmVersion::VmBoojumIntegration,
             ProtocolVersionId::Version20 => VmVersion::VmBoojumIntegration,
             ProtocolVersionId::Version21 => VmVersion::VmBoojumIntegration,
+            ProtocolVersionId::Version22 => VmVersion::VmBoojumIntegration,
         }
     }
 }
