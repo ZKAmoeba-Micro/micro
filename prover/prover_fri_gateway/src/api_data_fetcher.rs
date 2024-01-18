@@ -24,6 +24,7 @@ pub(crate) struct PeriodicApiStruct {
     pub(crate) poll_duration: Duration,
     pub(crate) client: Client,
     pub(crate) config: FriProverGatewayConfig,
+    pub(crate) check_sync_status: bool,
 }
 
 impl PeriodicApiStruct {
@@ -49,7 +50,7 @@ impl PeriodicApiStruct {
     }
 
     pub(crate) async fn run<Req>(
-        self,
+        mut self,
         mut stop_receiver: watch::Receiver<bool>,
     ) -> anyhow::Result<()>
     where
@@ -99,7 +100,7 @@ pub(crate) trait PeriodicApi<Req: Send>: Sync + Send {
     const SERVICE_NAME: &'static str;
 
     /// Returns the next request to be sent to the API and the endpoint to send it to.
-    async fn get_next_request(&self) -> Option<(Self::JobId, Req)>;
+    async fn get_next_request(&mut self) -> Option<(Self::JobId, Req)>;
 
     /// Handles the response from the API.
     async fn send_request(

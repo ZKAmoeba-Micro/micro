@@ -58,6 +58,7 @@ async fn main() -> anyhow::Result<()> {
         poll_duration: config.api_poll_duration(),
         client: Client::new(),
         config: config.clone(),
+        check_sync_status: false,
     };
     let proof_gen_data_fetcher = PeriodicApiStruct {
         blob_store: store_factory.create_store().await,
@@ -67,6 +68,7 @@ async fn main() -> anyhow::Result<()> {
         poll_duration: config.api_poll_duration(),
         client: Client::new(),
         config: config.clone(),
+        check_sync_status: false,
     };
 
     let app_monitor = AppMonitor::new(

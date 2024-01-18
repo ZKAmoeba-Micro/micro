@@ -40,13 +40,18 @@ impl PeriodicApi<ProofGenerationDataRequest> for PeriodicApiStruct {
 
     const SERVICE_NAME: &'static str = "ProofGenDataFetcher";
 
-    async fn get_next_request(&self) -> Option<(Self::JobId, ProofGenerationDataRequest)> {
-        let sync_status = get_sync_status(self.pool.clone(), &self.rpc_url)
-            .await
-            .unwrap();
-        if !sync_status {
-            return None;
+    async fn get_next_request(&mut self) -> Option<(Self::JobId, ProofGenerationDataRequest)> {
+        if !self.check_sync_status {
+            let sync_status = get_sync_status(self.pool.clone(), &self.rpc_url)
+                .await
+                .unwrap();
+            if !sync_status {
+                return None;
+            }
+            tracing::info!("Syncing is finished");
+            self.check_sync_status = sync_status;
         }
+
         let timestamp = Utc::now().timestamp();
         let signature = PackedEthSignature::sign(
             &self.config.prover_private_key().unwrap(),

@@ -14,6 +14,7 @@ pub struct TaskApply {
     contract_apply_count: Option<u32>,
     caller: Caller,
     rpc_url: String,
+    check_sync_status: bool,
 }
 
 impl TaskApply {
@@ -31,6 +32,7 @@ impl TaskApply {
             contract_apply_count,
             caller,
             rpc_url: task_apply_config.rpc_url,
+            check_sync_status: false,
         }
     }
 
@@ -49,12 +51,16 @@ impl TaskApply {
     }
 
     pub async fn loop_iteration(&mut self) -> anyhow::Result<()> {
-        //check sync status
-        let sync_status = get_sync_status(self.pool.clone(), &self.rpc_url).await?;
+        if !self.check_sync_status {
+            //check sync status
+            let sync_status = get_sync_status(self.pool.clone(), &self.rpc_url).await?;
 
-        if !sync_status {
-            tracing::info!("Syncing is working");
-            return Ok(());
+            if !sync_status {
+                tracing::info!("Syncing is working");
+                return Ok(());
+            }
+            self.check_sync_status = sync_status;
+            tracing::info!("Syncing is finished");
         }
 
         let mut connection = self.pool.access_storage().await.unwrap();
