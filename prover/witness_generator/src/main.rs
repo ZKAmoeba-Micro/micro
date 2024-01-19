@@ -251,7 +251,7 @@ async fn main() -> anyhow::Result<()> {
         let app_monitor = AppMonitor::new(
             app_name.to_string(),
             app_monitor_config.retry_interval_ms,
-            app_monitor_config.app_monitor_url,
+            app_monitor_config.app_monitor_url.clone(),
         );
         tasks.push(tokio::spawn(app_monitor.run(stop_receiver.clone())));
         tasks.push(tokio::spawn(witness_generator_task));
