@@ -50,6 +50,9 @@ async fn main() -> anyhow::Result<()> {
         ProverObjectStoreConfig::from_env().context("ProverObjectStoreConfig::from_env()")?;
     let store_factory = ObjectStoreFactory::new(object_store_config.0);
 
+    let mut tasks = vec![];
+    let (stop_sender, stop_receiver) = watch::channel(false);
+
     let proof_submitter = PeriodicApiStruct {
         blob_store: store_factory.create_store().await,
         pool: pool.clone(),
@@ -71,13 +74,13 @@ async fn main() -> anyhow::Result<()> {
         check_sync_status: false,
     };
 
-    let app_monitor = AppMonitor::new(
-        "micro_prover_fri_gateway".to_string(),
-        config.retry_interval_ms,
-        config.app_monitor_url,
-    );
-
-    let (stop_sender, stop_receiver) = watch::channel(false);
+    if let Some(url) = config.app_monitor_url {
+        if let Some(interval) = config.retry_interval_ms {
+            let app_monitor =
+                AppMonitor::new("micro_prover_fri_gateway".to_string(), interval, url);
+            tasks.push(tokio::spawn(app_monitor.run(stop_receiver.clone())));
+        }
+    }
 
     let (stop_signal_sender, stop_signal_receiver) = oneshot::channel();
     let mut stop_signal_sender = Some(stop_signal_sender);
@@ -90,17 +93,15 @@ async fn main() -> anyhow::Result<()> {
 
     tracing::info!("Starting Fri Prover Gateway");
 
-    let tasks = vec![
-        // tokio::spawn(
-        //     PrometheusExporterConfig::pull(config.prometheus_listener_port)
-        //         .run(stop_receiver.clone()),
-        // ),
-        tokio::spawn(
-            proof_gen_data_fetcher.run::<ProofGenerationDataRequest>(stop_receiver.clone()),
-        ),
-        tokio::spawn(proof_submitter.run::<SubmitProofRequest>(stop_receiver.clone())),
-        tokio::spawn(app_monitor.run(stop_receiver.clone())),
-    ];
+    tasks.push(tokio::spawn(
+        proof_gen_data_fetcher.run::<ProofGenerationDataRequest>(stop_receiver.clone()),
+    ));
+    tasks.push(tokio::spawn(
+        proof_submitter.run::<SubmitProofRequest>(stop_receiver.clone()),
+    ));
+    // tasks.push(tokio::spawn(
+    //     PrometheusExporterConfig::pull(config.prometheus_listener_port).run(stop_receiver.clone()),
+    // ));
 
     let graceful_shutdown = None::<futures::future::Ready<()>>;
     let tasks_allowed_to_finish = false;

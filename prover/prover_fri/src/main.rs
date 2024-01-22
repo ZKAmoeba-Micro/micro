@@ -88,13 +88,6 @@ async fn main() -> anyhow::Result<()> {
     let prover_config = FriProverConfig::from_env().context("FriProverConfig::from_env()")?;
     // let exporter_config = PrometheusExporterConfig::pull(prover_config.prometheus_port);
 
-    let app_monitor_config = prover_config.clone();
-    let app_monitor = AppMonitor::new(
-        "micro_prover_fri".to_string(),
-        app_monitor_config.retry_interval_ms,
-        app_monitor_config.app_monitor_url,
-    );
-
     let (stop_signal_sender, stop_signal_receiver) = oneshot::channel();
     let mut stop_signal_sender = Some(stop_signal_sender);
     ctrlc::set_handler(move || {
@@ -145,7 +138,7 @@ async fn main() -> anyhow::Result<()> {
     .context("failed to build a connection pool")?;
     let port = prover_config.witness_vector_receiver_port;
     let prover_tasks = get_prover_tasks(
-        prover_config,
+        prover_config.clone(),
         stop_receiver.clone(),
         object_store_factory,
         public_blob_store,
@@ -156,8 +149,15 @@ async fn main() -> anyhow::Result<()> {
     .context("get_prover_tasks()")?;
 
     // let mut tasks = vec![tokio::spawn(exporter_config.run(stop_receiver))];
-    let mut tasks = vec![tokio::spawn(app_monitor.run(stop_receiver.clone()))];
+    let mut tasks = vec![];
     tasks.extend(prover_tasks);
+
+    if let Some(url) = prover_config.app_monitor_url {
+        if let Some(interval) = prover_config.retry_interval_ms {
+            let app_monitor = AppMonitor::new("micro_prover_fri".to_string(), interval, url);
+            tasks.push(tokio::spawn(app_monitor.run(stop_receiver.clone())));
+        }
+    }
 
     let particular_crypto_alerts = None;
     let graceful_shutdown = match cfg!(feature = "gpu") {

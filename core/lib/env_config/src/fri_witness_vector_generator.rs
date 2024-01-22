@@ -27,8 +27,8 @@ mod tests {
             prometheus_pushgateway_url: "http://127.0.0.1:9091".to_string(),
             prometheus_push_interval_ms: Some(100),
             specialized_group_id: 1,
-            app_monitor_url: "http://127.0.0.1:3000".to_string(),
-            retry_interval_ms: 30000,
+            app_monitor_url: Some("http://127.0.0.1:3000".to_string()),
+            retry_interval_ms: Some(30000),
         }
     }
 

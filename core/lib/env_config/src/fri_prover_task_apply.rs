@@ -23,8 +23,8 @@ mod tests {
             call_contract_duration_secs: 1800,
             contract_apply_count: Some(3),
             chain_id: 270,
-            app_monitor_url: "http://127.0.0.1:3000".to_string(),
-            retry_interval_ms: 30000,
+            app_monitor_url: Some("http://127.0.0.1:3000".to_string()),
+            retry_interval_ms: Some(30000),
         }
     }
 

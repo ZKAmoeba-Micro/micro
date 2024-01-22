@@ -24,8 +24,8 @@ mod tests {
             last_l1_batch_to_process: None,
             force_process_block: Some(1),
             shall_save_to_public_bucket: true,
-            app_monitor_url: "http://127.0.0.1:3000".to_string(),
-            retry_interval_ms: 30000,
+            app_monitor_url: Some("http://127.0.0.1:3000".to_string()),
+            retry_interval_ms: Some(30000),
         }
     }
 

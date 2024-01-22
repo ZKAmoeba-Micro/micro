@@ -61,12 +61,7 @@ async fn main() -> anyhow::Result<()> {
     let blob_store = ObjectStoreFactory::new(object_store_config.0)
         .create_store()
         .await;
-    let app_monitor_config = config.clone();
-    let app_monitor = AppMonitor::new(
-        "micro_proof_fri_compressor".to_string(),
-        app_monitor_config.retry_interval_ms,
-        app_monitor_config.app_monitor_url,
-    );
+
     let proof_compressor = ProofCompressor::new(
         blob_store,
         pool,
@@ -94,10 +89,17 @@ async fn main() -> anyhow::Result<()> {
 
     tracing::info!("Starting proof compressor");
 
-    let mut tasks = vec![
-        tokio::spawn(proof_compressor.run(stop_receiver.clone(), opt.number_of_iterations)),
-        tokio::spawn(app_monitor.run(stop_receiver.clone())),
-    ];
+    let mut tasks = vec![tokio::spawn(
+        proof_compressor.run(stop_receiver.clone(), opt.number_of_iterations),
+    )];
+
+    if let Some(url) = config.app_monitor_url {
+        if let Some(interval) = config.retry_interval_ms {
+            let app_monitor =
+                AppMonitor::new("micro_proof_fri_compressor".to_string(), interval, url);
+            tasks.push(tokio::spawn(app_monitor.run(stop_receiver.clone())));
+        }
+    }
 
     if config.prometheus_listener_port != 0 {
         let prometheus_config = PrometheusExporterConfig::push(

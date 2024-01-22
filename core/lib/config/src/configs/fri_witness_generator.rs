@@ -25,8 +25,8 @@ pub struct FriWitnessGeneratorConfig {
     // whether to write to public GCS bucket for https://github.com/ZKAmoeba-Micro/micro-boojum-validator-cli
     pub shall_save_to_public_bucket: bool,
 
-    pub app_monitor_url: String,
-    pub retry_interval_ms: u64,
+    pub app_monitor_url: Option<String>,
+    pub retry_interval_ms: Option<u64>,
 }
 impl FriWitnessGeneratorConfig {
     pub fn witness_generation_timeout(&self) -> Duration {

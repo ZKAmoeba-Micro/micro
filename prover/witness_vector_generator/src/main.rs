@@ -57,7 +57,6 @@ async fn main() -> anyhow::Result<()> {
     let opt = Opt::from_args();
     let config = FriWitnessVectorGeneratorConfig::from_env()
         .context("FriWitnessVectorGeneratorConfig::from_env()")?;
-    let app_monitor_config = config.clone();
     let specialized_group_id = config.specialized_group_id;
     // let exporter_config = PrometheusExporterConfig::pull(config.prometheus_listener_port);
 
@@ -90,7 +89,7 @@ async fn main() -> anyhow::Result<()> {
         pool,
         circuit_ids_for_round_to_be_proven.clone(),
         zone.clone(),
-        config,
+        config.clone(),
         vk_commitments,
         fri_prover_config.max_attempts,
     );
@@ -108,25 +107,25 @@ async fn main() -> anyhow::Result<()> {
 
     tracing::info!("Starting witness vector generation for group: {} with circuits: {:?} in zone: {} with vk_commitments: {:?}", specialized_group_id, circuit_ids_for_round_to_be_proven, zone, vk_commitments);
 
-    let app_name = match app_monitor_config.prometheus_listener_port {
-        3416 => "micro_witness_vector_generator_3416",
-        3417 => "micro_witness_vector_generator_3417",
-        3418 => "micro_witness_vector_generator_3418",
-        3419 => "micro_witness_vector_generator_3419",
-        3420 => "micro_witness_vector_generator_3420",
-        _ => "micro_witness_vector_generator_un",
-    };
-    let app_monitor = AppMonitor::new(
-        app_name.to_string(),
-        app_monitor_config.retry_interval_ms,
-        app_monitor_config.app_monitor_url,
-    );
-
-    let tasks = vec![
+    let mut tasks = vec![
         // tokio::spawn(exporter_config.run(stop_receiver.clone())),
         tokio::spawn(witness_vector_generator.run(stop_receiver.clone(), opt.number_of_iterations)),
-        tokio::spawn(app_monitor.run(stop_receiver.clone())),
     ];
+
+    if let Some(url) = config.app_monitor_url {
+        if let Some(interval) = config.retry_interval_ms {
+            let app_name = match config.prometheus_listener_port {
+                3416 => "micro_witness_vector_generator_3416",
+                3417 => "micro_witness_vector_generator_3417",
+                3418 => "micro_witness_vector_generator_3418",
+                3419 => "micro_witness_vector_generator_3419",
+                3420 => "micro_witness_vector_generator_3420",
+                _ => "micro_witness_vector_generator_un",
+            };
+            let app_monitor = AppMonitor::new(app_name.to_string(), interval, url);
+            tasks.push(tokio::spawn(app_monitor.run(stop_receiver.clone())));
+        }
+    }
 
     let graceful_shutdown = None::<futures::future::Ready<()>>;
     let tasks_allowed_to_finish = false;

@@ -28,8 +28,8 @@ mod tests {
                 "https://storage.googleapis.com/zkamoeba-setup-keys-us/setup-keys/setup_2^26.key"
                     .to_string(),
             verify_wrapper_proof: false,
-            app_monitor_url: "http://127.0.0.1:3000".to_string(),
-            retry_interval_ms: 30000,
+            app_monitor_url: Some("http://127.0.0.1:3000".to_string()),
+            retry_interval_ms: Some(30000),
         }
     }
 
