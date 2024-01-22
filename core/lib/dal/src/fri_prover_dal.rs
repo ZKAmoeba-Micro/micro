@@ -1,9 +1,11 @@
 use std::{collections::HashMap, convert::TryFrom, time::Duration};
 
+use bigdecimal::ToPrimitive;
 use micro_types::{
     basic_fri_types::CircuitIdRoundTuple,
     proofs::{AggregationRound, FriProverJobMetadata, JobCountStatistics, StuckJobs},
     protocol_version::FriProtocolVersionId,
+    prover_batch_job_status::ProverBatchJobStatus,
     L1BatchNumber,
 };
 
@@ -404,5 +406,62 @@ impl FriProverDal<'_, '_> {
         .await
         .ok()?
         .map(|row| row.id as u32)
+    }
+
+    pub async fn get_job_status_details(
+        &mut self,
+        offset: u32,
+        limit: u32,
+    ) -> sqlx::Result<Vec<ProverBatchJobStatus>> {
+        let results = sqlx::query!(
+            r#"WITH T2 AS (
+                WITH T1 AS (
+                    SELECT 
+                        l1_batch_number, 
+                        CASE WHEN T1.status = 'successful' THEN 'successful' ELSE 'others' END AS status_name,
+                        COUNT(*) AS C 
+                    FROM prover_jobs_fri T1 
+                    WHERE l1_batch_number IN (SELECT l1_batch_number FROM witness_inputs_fri ORDER BY l1_batch_number DESC OFFSET $1 LIMIT $2) 
+                    GROUP BY l1_batch_number, status_name
+                )
+                SELECT 
+                    T1.l1_batch_number,
+                    SUM(CASE WHEN status_name = 'successful' THEN C ELSE 0 END) "prover_status_successful",
+                    SUM(C) "prover_status_all"
+                FROM
+                T1 
+                GROUP BY T1.l1_batch_number
+            )
+            SELECT T2.l1_batch_number, T2.prover_status_successful, T2.prover_status_all, pcjf.status 
+            FROM T2 
+            LEFT JOIN proof_compression_jobs_fri pcjf ON T2.l1_batch_number = pcjf.l1_batch_number"#,
+            offset as i64,
+            limit as i64,
+        )
+        .fetch_all(self.storage.conn())
+        .await?
+        .into_iter()
+        .map(|row| {
+            ProverBatchJobStatus {
+                l1_batch_number: L1BatchNumber(row.l1_batch_number.unwrap() as u32),
+                prover_status_successful_count: row.prover_status_successful.unwrap().to_u64().unwrap(),
+                prover_status_all_count: row.prover_status_all.unwrap().to_u64().unwrap(),
+                compression_status: row.status,
+            }
+        })
+        .collect();
+
+        Ok(results)
+    }
+
+    pub async fn get_job_count(&mut self) -> sqlx::Result<Option<u32>> {
+        let result = sqlx::query!(
+            r#"SELECT COUNT(*) AS "count!" FROM witness_inputs_fri WHERE status = 'successful'"#
+        )
+        .fetch_optional(self.storage.conn())
+        .await?
+        .map(|row| row.count as u32);
+
+        Ok(result)
     }
 }

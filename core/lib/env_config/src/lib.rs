@@ -14,6 +14,7 @@ mod eth_watch;
 mod fetcher;
 mod fri_proof_compressor;
 mod fri_prover;
+mod fri_prover_dashboard;
 mod fri_prover_gateway;
 mod fri_prover_group;
 mod fri_prover_task_apply;

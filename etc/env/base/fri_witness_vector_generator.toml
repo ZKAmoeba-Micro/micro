@@ -6,3 +6,5 @@ prometheus_pushgateway_url="http://127.0.0.1:9091"
 prometheus_push_interval_ms=100
 specialized_group_id=100
 max_prover_reservation_duration_in_secs=1000
+app_monitor_url="http://127.0.0.1:3000"
+retry_interval_ms=30000

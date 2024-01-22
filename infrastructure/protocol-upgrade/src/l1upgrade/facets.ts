@@ -45,6 +45,9 @@ async function deployFacetsAndMergeFiles(
     );
     const tmpFacets = JSON.parse(fs.readFileSync(tmpFacetsFile).toString());
     const facetsFile = getFacetsFileName(environment);
+    if (!fs.existsSync(facetsFile)) {
+        fs.writeFileSync(facetsFile, JSON.stringify({}, null, 2));
+    }
     const facets = JSON.parse(fs.readFileSync(facetsFile).toString());
     for (const key in tmpFacets) {
         facets[key] = tmpFacets[key];

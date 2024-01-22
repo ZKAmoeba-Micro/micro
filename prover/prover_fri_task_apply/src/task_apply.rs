@@ -2,6 +2,7 @@ use std::time::Duration;
 
 use micro_config::configs::FriProverTaskApplyConfig;
 use micro_dal::ConnectionPool;
+use micro_prover_fri_utils::sync_status::get_sync_status;
 use tokio::sync::watch;
 
 use crate::caller::Caller;
@@ -12,6 +13,8 @@ pub struct TaskApply {
     pool: ConnectionPool,
     contract_apply_count: Option<u32>,
     caller: Caller,
+    rpc_url: String,
+    check_sync_status: bool,
 }
 
 impl TaskApply {
@@ -28,6 +31,8 @@ impl TaskApply {
             pool,
             contract_apply_count,
             caller,
+            rpc_url: task_apply_config.rpc_url,
+            check_sync_status: false,
         }
     }
 
@@ -46,14 +51,21 @@ impl TaskApply {
     }
 
     pub async fn loop_iteration(&mut self) -> anyhow::Result<()> {
-        let queue_count = self
-            .pool
-            .access_storage()
-            .await
-            .unwrap()
-            .fri_proof_compressor_dal()
-            .queued_count()
-            .await;
+        if !self.check_sync_status {
+            //check sync status
+            let sync_status = get_sync_status(self.pool.clone(), &self.rpc_url).await?;
+
+            if !sync_status {
+                tracing::info!("Syncing is working");
+                return Ok(());
+            }
+            self.check_sync_status = sync_status;
+            tracing::info!("Syncing is finished");
+        }
+
+        let mut connection = self.pool.access_storage().await.unwrap();
+
+        let queue_count = connection.fri_proof_compressor_dal().queued_count().await;
         if queue_count > 0u32 {
             tracing::info!("task_apply queue_count greeter than 0");
             return Ok(());
@@ -66,14 +78,7 @@ impl TaskApply {
                 query_count = value;
             }
             None => {
-                query_count = self
-                    .pool
-                    .access_storage()
-                    .await
-                    .unwrap()
-                    .fri_gpu_prover_queue_dal()
-                    .fri_task_count()
-                    .await;
+                query_count = connection.fri_gpu_prover_queue_dal().fri_task_count().await;
             }
         }
 

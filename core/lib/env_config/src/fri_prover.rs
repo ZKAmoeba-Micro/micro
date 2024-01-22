@@ -32,6 +32,8 @@ mod tests {
             witness_vector_receiver_host: None,
             witness_vector_receiver_port: 3316,
             shall_save_to_public_bucket: true,
+            app_monitor_url: Some("http://127.0.0.1:3000".to_string()),
+            retry_interval_ms: Some(30000),
         }
     }
 
@@ -51,6 +53,8 @@ mod tests {
             FRI_PROVER_QUEUE_CAPACITY="10"
             FRI_PROVER_WITNESS_VECTOR_RECEIVER_PORT="3316"
             FRI_PROVER_SHALL_SAVE_TO_PUBLIC_BUCKET=true
+            FRI_PROVER_APP_MONITOR_URL="http://127.0.0.1:3000"
+            FRI_PROVER_RETRY_INTERVAL_MS=30000
         "#;
         lock.set_env(config);
 

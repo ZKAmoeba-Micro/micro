@@ -20,6 +20,9 @@ pub struct FriWitnessVectorGeneratorConfig {
     // specialized group id for this witness vector generator.
     // witness vector generator running the same (circuit id, round) shall have same group id.
     pub specialized_group_id: u8,
+
+    pub app_monitor_url: Option<String>,
+    pub retry_interval_ms: Option<u64>,
 }
 
 impl FriWitnessVectorGeneratorConfig {

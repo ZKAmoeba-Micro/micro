@@ -27,6 +27,8 @@ mod tests {
             prometheus_pushgateway_url: "http://127.0.0.1:9091".to_string(),
             prometheus_push_interval_ms: Some(100),
             specialized_group_id: 1,
+            app_monitor_url: Some("http://127.0.0.1:3000".to_string()),
+            retry_interval_ms: Some(30000),
         }
     }
 
@@ -41,6 +43,8 @@ mod tests {
             FRI_WITNESS_VECTOR_GENERATOR_PROMETHEUS_PUSHGATEWAY_URL="http://127.0.0.1:9091"
             FRI_WITNESS_VECTOR_GENERATOR_PROMETHEUS_PUSH_INTERVAL_MS=100
             FRI_WITNESS_VECTOR_GENERATOR_SPECIALIZED_GROUP_ID=1
+            FRI_WITNESS_VECTOR_GENERATOR_APP_MONITOR_URL="http://127.0.0.1:3000"
+            FRI_WITNESS_VECTOR_GENERATOR_RETRY_INTERVAL_MS=30000
         "#;
         lock.set_env(config);
 

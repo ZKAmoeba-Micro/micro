@@ -1,0 +1,31 @@
+[
+  {
+    "facet": "0x0000000000000000000000000000000000000000",
+    "selectors": [
+      "0x6c0960f9",
+      "0xb473318e",
+      "0x79f4d606",
+      "0x042901c7",
+      "0x263b7f8e",
+      "0xe4948f43",
+      "0xeb672419"
+    ],
+    "action": 2,
+    "isFreezable": false
+  },
+  {
+    "facet": "0x19F43D1Cd5E5144D4A29Fb2A8de08c6a6Ce7f837",
+    "selectors": [
+      "0x6c0960f9",
+      "0xc7deb955",
+      "0xb473318e",
+      "0x79f4d606",
+      "0x042901c7",
+      "0x263b7f8e",
+      "0xe4948f43",
+      "0xeb672419"
+    ],
+    "action": 0,
+    "isFreezable": true
+  }
+]

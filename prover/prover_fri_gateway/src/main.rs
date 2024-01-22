@@ -1,11 +1,11 @@
 use anyhow::Context as _;
-use micro_config::configs::{FriProverGatewayConfig, PostgresConfig};
+use micro_config::configs::{FriProverGatewayConfig, FriProverTaskApplyConfig, PostgresConfig};
 use micro_dal::ConnectionPool;
 use micro_env_config::{object_store::ProverObjectStoreConfig, FromEnv};
 use micro_object_store::ObjectStoreFactory;
+use micro_prover_fri_utils::app_monitor::{AppMonitor, AppMonitorJob};
 use micro_types::prover_server_api::{ProofGenerationDataRequest, SubmitProofRequest};
 use micro_utils::wait_for_tasks::wait_for_tasks;
-use prometheus_exporter::PrometheusExporterConfig;
 use reqwest::Client;
 use tokio::sync::{oneshot, watch};
 
@@ -36,6 +36,8 @@ async fn main() -> anyhow::Result<()> {
 
     let config =
         FriProverGatewayConfig::from_env().context("FriProverGatewayConfig::from_env()")?;
+    let task_apply_config =
+        FriProverTaskApplyConfig::from_env().context("FriProverTaskApplyConfig::from_env()")?;
     let postgres_config = PostgresConfig::from_env().context("PostgresConfig::from_env()")?;
     let pool = ConnectionPool::builder(
         postgres_config.prover_url()?,
@@ -48,24 +50,37 @@ async fn main() -> anyhow::Result<()> {
         ProverObjectStoreConfig::from_env().context("ProverObjectStoreConfig::from_env()")?;
     let store_factory = ObjectStoreFactory::new(object_store_config.0);
 
+    let mut tasks = vec![];
+    let (stop_sender, stop_receiver) = watch::channel(false);
+
     let proof_submitter = PeriodicApiStruct {
         blob_store: store_factory.create_store().await,
         pool: pool.clone(),
         api_url: format!("{}{SUBMIT_PROOF_PATH}", config.api_url),
+        rpc_url: task_apply_config.clone().rpc_url,
         poll_duration: config.api_poll_duration(),
         client: Client::new(),
         config: config.clone(),
+        check_sync_status: false,
     };
     let proof_gen_data_fetcher = PeriodicApiStruct {
         blob_store: store_factory.create_store().await,
         pool,
         api_url: format!("{}{PROOF_GENERATION_DATA_PATH}", config.api_url),
+        rpc_url: task_apply_config.rpc_url,
         poll_duration: config.api_poll_duration(),
         client: Client::new(),
         config: config.clone(),
+        check_sync_status: false,
     };
 
-    let (stop_sender, stop_receiver) = watch::channel(false);
+    if let Some(url) = config.app_monitor_url {
+        if let Some(interval) = config.retry_interval_ms {
+            let app_monitor =
+                AppMonitor::new("micro_prover_fri_gateway".to_string(), interval, url);
+            tasks.push(tokio::spawn(app_monitor.run(stop_receiver.clone())));
+        }
+    }
 
     let (stop_signal_sender, stop_signal_receiver) = oneshot::channel();
     let mut stop_signal_sender = Some(stop_signal_sender);
@@ -78,16 +93,15 @@ async fn main() -> anyhow::Result<()> {
 
     tracing::info!("Starting Fri Prover Gateway");
 
-    let tasks = vec![
-        // tokio::spawn(
-        //     PrometheusExporterConfig::pull(config.prometheus_listener_port)
-        //         .run(stop_receiver.clone()),
-        // ),
-        tokio::spawn(
-            proof_gen_data_fetcher.run::<ProofGenerationDataRequest>(stop_receiver.clone()),
-        ),
-        tokio::spawn(proof_submitter.run::<SubmitProofRequest>(stop_receiver)),
-    ];
+    tasks.push(tokio::spawn(
+        proof_gen_data_fetcher.run::<ProofGenerationDataRequest>(stop_receiver.clone()),
+    ));
+    tasks.push(tokio::spawn(
+        proof_submitter.run::<SubmitProofRequest>(stop_receiver.clone()),
+    ));
+    // tasks.push(tokio::spawn(
+    //     PrometheusExporterConfig::pull(config.prometheus_listener_port).run(stop_receiver.clone()),
+    // ));
 
     let graceful_shutdown = None::<futures::future::Ready<()>>;
     let tasks_allowed_to_finish = false;

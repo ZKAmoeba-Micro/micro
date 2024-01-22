@@ -54,6 +54,7 @@ pub mod tx;
 pub mod vm_trace;
 
 pub mod api;
+pub mod app_monitor;
 pub mod eth_sender;
 pub mod helpers;
 pub mod proofs;
@@ -62,6 +63,8 @@ pub mod transaction_request;
 pub mod utils;
 pub mod vk_transform;
 pub mod vm_version;
+
+pub mod prover_batch_job_status;
 
 /// Denotes the first byte of the special micro's EIP-712-signed transaction.
 pub const EIP_712_TX_TYPE: u8 = 0x71;

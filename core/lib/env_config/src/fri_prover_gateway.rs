@@ -10,6 +10,7 @@ impl FromEnv for FriProverGatewayConfig {
 
 #[cfg(test)]
 mod tests {
+
     use super::*;
     use crate::test_utils::EnvMutex;
 
@@ -22,6 +23,8 @@ mod tests {
             prometheus_listener_port: 3316,
             prometheus_pushgateway_url: "http://127.0.0.1:9091".to_string(),
             prometheus_push_interval_ms: Some(100),
+            app_monitor_url: Some("http://127.0.0.1:3000".to_string()),
+            retry_interval_ms: Some(30000),
         }
     }
 
@@ -33,6 +36,8 @@ mod tests {
             FRI_PROVER_GATEWAY_PROMETHEUS_LISTENER_PORT=3316
             FRI_PROVER_GATEWAY_PROMETHEUS_PUSHGATEWAY_URL="http://127.0.0.1:9091"
             FRI_PROVER_GATEWAY_PROMETHEUS_PUSH_INTERVAL_MS=100
+            FRI_PROVER_GATEWAY_APP_MONITOR_URL="http://127.0.0.1:3000"
+            FRI_PROVER_GATEWAY_RETRY_INTERVAL_MS=30000
         "#;
         let mut lock = MUTEX.lock();
         lock.set_env(config);

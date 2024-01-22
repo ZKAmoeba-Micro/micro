@@ -10,12 +10,12 @@ use micro_config::{
 use micro_dal::ConnectionPool;
 use micro_env_config::{object_store::ProverObjectStoreConfig, FromEnv};
 use micro_object_store::ObjectStoreFactory;
+use micro_prover_fri_utils::app_monitor::{AppMonitor, AppMonitorJob};
 use micro_prover_utils::get_stop_signal_receiver;
 use micro_queued_job_processor::JobProcessor;
 use micro_types::{proofs::AggregationRound, web3::futures::StreamExt};
 use micro_utils::wait_for_tasks::wait_for_tasks;
 use micro_vk_setup_data_server_fri::commitment_utils::get_cached_commitments;
-use prometheus_exporter::PrometheusExporterConfig;
 use structopt::StructOpt;
 use tokio::{sync::watch, time::sleep};
 
@@ -89,6 +89,7 @@ async fn main() -> anyhow::Result<()> {
         FriWitnessGeneratorConfig::from_env().context("FriWitnessGeneratorConfig::from_env()")?;
     // let prometheus_config = PrometheusConfig::from_env().context("PrometheusConfig::from_env()")?;
     let postgres_config = PostgresConfig::from_env().context("PostgresConfig::from_env()")?;
+
     let connection_pool = ConnectionPool::builder(
         postgres_config.master_url()?,
         postgres_config.max_connections()?,
@@ -185,7 +186,7 @@ async fn main() -> anyhow::Result<()> {
         //     PrometheusExporterConfig::pull(prometheus_config.listener_port + i as u16)
         // };
         // let prometheus_task = prometheus_config.run(stop_receiver.clone());
-
+        let app_name;
         let witness_generator_task = match round {
             AggregationRound::BasicCircuits => {
                 let public_blob_store = match config.shall_save_to_public_bucket {
@@ -208,6 +209,7 @@ async fn main() -> anyhow::Result<()> {
                     protocol_versions.clone(),
                 )
                 .await;
+                app_name = "basic_circuits";
                 generator.run(stop_receiver.clone(), opt.batch_size)
             }
             AggregationRound::LeafAggregation => {
@@ -218,6 +220,7 @@ async fn main() -> anyhow::Result<()> {
                     protocol_versions.clone(),
                 )
                 .await;
+                app_name = "leaf_aggregation";
                 generator.run(stop_receiver.clone(), opt.batch_size)
             }
             AggregationRound::NodeAggregation => {
@@ -228,6 +231,7 @@ async fn main() -> anyhow::Result<()> {
                     protocol_versions.clone(),
                 )
                 .await;
+                app_name = "node_aggregation";
                 generator.run(stop_receiver.clone(), opt.batch_size)
             }
             AggregationRound::Scheduler => {
@@ -238,11 +242,18 @@ async fn main() -> anyhow::Result<()> {
                     protocol_versions.clone(),
                 )
                 .await;
+                app_name = "scheduler";
                 generator.run(stop_receiver.clone(), opt.batch_size)
             }
         };
 
-        // tasks.push(tokio::spawn(prometheus_task));
+        if let Some(url) = config.app_monitor_url.clone() {
+            if let Some(interval) = config.retry_interval_ms {
+                let app_monitor = AppMonitor::new(app_name.to_string(), interval, url);
+                tasks.push(tokio::spawn(app_monitor.run(stop_receiver.clone())));
+            }
+        }
+
         tasks.push(tokio::spawn(witness_generator_task));
 
         tracing::info!(

@@ -32,7 +32,8 @@ const CONFIG_FILES = [
     'fri_prover_gateway.toml',
     'fri_proof_compressor.toml',
     'fri_prover_task_apply.toml',
-    'monitor.toml'
+    'monitor.toml',
+    'fri_prover_dashboard.toml'
 ];
 
 function loadConfigFile(path: string) {

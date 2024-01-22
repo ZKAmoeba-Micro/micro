@@ -12,6 +12,9 @@ pub struct FriProverGatewayConfig {
     pub prometheus_listener_port: u16,
     pub prometheus_pushgateway_url: String,
     pub prometheus_push_interval_ms: Option<u64>,
+
+    pub app_monitor_url: Option<String>,
+    pub retry_interval_ms: Option<u64>,
 }
 
 impl FriProverGatewayConfig {

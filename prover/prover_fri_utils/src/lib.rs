@@ -18,8 +18,10 @@ use micro_types::{
 
 use crate::metrics::{CircuitLabels, PROVER_FRI_UTILS_METRICS};
 
+pub mod app_monitor;
 pub mod metrics;
 pub mod socket_utils;
+pub mod sync_status;
 
 pub async fn fetch_next_circuit(
     storage: &mut StorageProcessor<'_>,

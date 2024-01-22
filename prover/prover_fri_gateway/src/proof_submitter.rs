@@ -64,7 +64,7 @@ impl PeriodicApi<SubmitProofRequest> for PeriodicApiStruct {
     type Response = SubmitProofResponse;
     const SERVICE_NAME: &'static str = "ProofSubmitter";
 
-    async fn get_next_request(&self) -> Option<(Self::JobId, SubmitProofRequest)> {
+    async fn get_next_request(&mut self) -> Option<(Self::JobId, SubmitProofRequest)> {
         let (l1_batch_number, request) = self.next_submit_proof_request().await?;
         Some((l1_batch_number, request))
     }

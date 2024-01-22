@@ -25,6 +25,9 @@ pub struct FriProofCompressorConfig {
 
     // Whether to verify wrapper proof or not.
     pub verify_wrapper_proof: bool,
+
+    pub app_monitor_url: Option<String>,
+    pub retry_interval_ms: Option<u64>,
 }
 
 impl FriProofCompressorConfig {

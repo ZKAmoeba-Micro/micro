@@ -2,17 +2,15 @@ use anyhow::Context as _;
 use micro_config::configs::{FriProverTaskApplyConfig, PostgresConfig};
 use micro_dal::ConnectionPool;
 use micro_env_config::FromEnv;
-use micro_eth_client::clients::http::QueryClient;
+use micro_prover_fri_utils::app_monitor::{AppMonitor, AppMonitorJob};
 use micro_utils::wait_for_tasks::wait_for_tasks;
 use tokio::sync::{oneshot, watch};
 
-use crate::{
-    client::MicroHttpQueryClient, micro_watch::EthWatch, task_apply::TaskApply,
-    wallet::TaskApplyWallet,
-};
+use crate::{task_apply::TaskApply, wallet::TaskApplyWallet};
 
 mod caller;
 mod client;
+mod error;
 mod micro_watch;
 mod task_apply;
 mod wallet;
@@ -27,12 +25,13 @@ async fn main() -> anyhow::Result<()> {
 
     let _guard = builder.build();
 
-    std::env::vars().into_iter().for_each(|(k, v)| {
-        println!("env {}={}", k, v);
-    });
+    // std::env::vars().into_iter().for_each(|(k, v)| {
+    //     println!("env {}={}", k, v);
+    // });
 
     let config =
         FriProverTaskApplyConfig::from_env().context("FriProverTaskApplyConfig::from_env()")?;
+
     let postgres_config = PostgresConfig::from_env().context("PostgresConfig::from_env()")?;
     let pool = ConnectionPool::builder(
         postgres_config.prover_url()?,
@@ -55,26 +54,39 @@ async fn main() -> anyhow::Result<()> {
 
     tracing::info!("Starting Fri Prover TaskApply");
 
-    let query_client = QueryClient::new(&config.rpc_url).unwrap();
+    // let query_client = QueryClient::new(&config.rpc_url).unwrap();
 
-    let client = MicroHttpQueryClient::new(query_client, Some(config.confirmations_for_eth_event));
+    // let client = MicroHttpQueryClient::new(query_client, Some(config.confirmations_for_eth_event));
 
-    let wallet = TaskApplyWallet::new(config.clone()).await;
-    let eth_watch_caller = wallet.get_caller();
+    let wallet = TaskApplyWallet::new(config.clone()).await?;
+    // let eth_watch_caller = wallet.get_caller();
     let task_apply_caller = wallet.get_caller();
 
-    let mut eth_watch = EthWatch::new(client, config.clone(), eth_watch_caller).await;
+    // let mut eth_watch = EthWatch::new(client, config.clone(), eth_watch_caller).await;
 
-    let mut task_apply = TaskApply::new(config, pool, task_apply_caller).await;
+    let mut task_apply = TaskApply::new(config.clone(), pool, task_apply_caller).await;
 
-    let eth_watch_receiver = stop_receiver.clone();
+    // let eth_watch_receiver = stop_receiver.clone();
     let task_apply_receiver = stop_receiver.clone();
+    let wallet_receiver = stop_receiver.clone();
 
-    let tasks = vec![
+    let mut tasks = vec![
         // tokio::spawn(async move { eth_watch.run(eth_watch_receiver).await }),
         tokio::spawn(async move { task_apply.run(task_apply_receiver).await }),
-        tokio::spawn(async move { wallet.run(stop_receiver).await }),
+        tokio::spawn(async move { wallet.run(wallet_receiver.clone()).await }),
     ];
+
+    if let Some(url) = config.app_monitor_url {
+        if let Some(interval) = config.retry_interval_ms {
+            let app_monitor_receiver = stop_receiver.clone();
+
+            let app_monitor = AppMonitor::new("micro_prover_task_apply".to_string(), interval, url);
+
+            tasks.push(tokio::spawn(async move {
+                app_monitor.run(app_monitor_receiver).await
+            }));
+        }
+    }
 
     let graceful_shutdown = None::<futures::future::Ready<()>>;
     let tasks_allowed_to_finish = false;

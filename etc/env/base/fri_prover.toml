@@ -12,3 +12,5 @@ queue_capacity = 10
 witness_vector_receiver_host = "127.0.0.1"
 witness_vector_receiver_port = 4000
 shall_save_to_public_bucket = false
+app_monitor_url="http://127.0.0.1:3000"
+retry_interval_ms=30000

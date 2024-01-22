@@ -5121,6 +5121,22 @@
     },
     "query": "select count(*) from  proof_compression_jobs_fri WHERE status = 'queued'"
   },
+  "62bbb19d7053eee7b527a43e89c4d98e8cd9032389af1ae09ece3a1ff68e6461": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Text",
+          "Text",
+          "Int8",
+          "Int8",
+          "Int4"
+        ]
+      }
+    },
+    "query": "INSERT INTO application_monitor \n        (app_name,ip,start_at,heartbeat_update_at,heartbeat_time,created_at,updated_at) \n        VALUES ($1,$2,$3,$4,$5,now(),now())"
+  },
   "6317155050a5dae24ea202cfd54d1e58cc7aeb0bfd4d95aa351f85cff04d3bff": {
     "describe": {
       "columns": [
@@ -8073,6 +8089,45 @@
     },
     "query": "SELECT id,verification_address,l1_batch_number,storage_index FROM ( SELECT id,verification_address,l1_batch_number,storage_index,status,tx_hash,COUNT(*) OVER (PARTITION BY verification_address) AS total_count FROM assignments WHERE status IN ('failed', 'be_punished') ORDER BY created_at ) AS subquery WHERE total_count > 0 AND status = 'be_punished' and tx_hash is null"
   },
+  "986a4c802c6e5df6a3e03e95758668f176e19a137d48e4d446afd28769f83de4": {
+    "describe": {
+      "columns": [
+        {
+          "name": "l1_batch_number",
+          "ordinal": 0,
+          "type_info": "Int8"
+        },
+        {
+          "name": "prover_status_successful",
+          "ordinal": 1,
+          "type_info": "Numeric"
+        },
+        {
+          "name": "prover_status_all",
+          "ordinal": 2,
+          "type_info": "Numeric"
+        },
+        {
+          "name": "status",
+          "ordinal": 3,
+          "type_info": "Text"
+        }
+      ],
+      "nullable": [
+        true,
+        true,
+        true,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Int8",
+          "Int8"
+        ]
+      }
+    },
+    "query": "WITH T2 AS (\n                WITH T1 AS (\n                    SELECT \n                        l1_batch_number, \n                        CASE WHEN T1.status = 'successful' THEN 'successful' ELSE 'others' END AS status_name,\n                        COUNT(*) AS C \n                    FROM prover_jobs_fri T1 \n                    WHERE l1_batch_number IN (SELECT l1_batch_number FROM witness_inputs_fri ORDER BY l1_batch_number DESC OFFSET $1 LIMIT $2) \n                    GROUP BY l1_batch_number, status_name\n                )\n                SELECT \n                    T1.l1_batch_number,\n                    SUM(CASE WHEN status_name = 'successful' THEN C ELSE 0 END) \"prover_status_successful\",\n                    SUM(C) \"prover_status_all\"\n                FROM\n                T1 \n                GROUP BY T1.l1_batch_number\n            )\n            SELECT T2.l1_batch_number, T2.prover_status_successful, T2.prover_status_all, pcjf.status \n            FROM T2 \n            LEFT JOIN proof_compression_jobs_fri pcjf ON T2.l1_batch_number = pcjf.l1_batch_number"
+  },
   "987fcbbd716648c7c368462643f13d8001d5c6d197add90613ae21d21fdef79b": {
     "describe": {
       "columns": [],
@@ -10217,6 +10272,24 @@
     },
     "query": "DELETE FROM miniblocks WHERE number > $1"
   },
+  "cf6119e9379ad735b6d1d0899ad1f97c6345aaf28972d6e0d64f2f5970b84ec7": {
+    "describe": {
+      "columns": [
+        {
+          "name": "count!",
+          "ordinal": 0,
+          "type_info": "Int8"
+        }
+      ],
+      "nullable": [
+        null
+      ],
+      "parameters": {
+        "Left": []
+      }
+    },
+    "query": "SELECT COUNT(*) AS \"count!\" FROM witness_inputs_fri WHERE status = 'successful'"
+  },
   "cfd2ce8eb6997b7609090b4400e1bc42db577fdd3758248be69d3b5d9d132bf1": {
     "describe": {
       "columns": [
@@ -10369,6 +10442,21 @@
       }
     },
     "query": "\n                UPDATE prover_jobs_fri\n                SET status = 'in_progress', attempts = attempts + 1,\n                    updated_at = now(), processing_started_at = now(),\n                    picked_by = $2\n                WHERE id = (\n                    SELECT id\n                    FROM prover_jobs_fri\n                    WHERE status = 'queued'\n                    AND protocol_version = ANY($1)\n                    ORDER BY aggregation_round DESC, l1_batch_number ASC, id ASC\n                    LIMIT 1\n                    FOR UPDATE\n                    SKIP LOCKED\n                )\n                RETURNING prover_jobs_fri.id, prover_jobs_fri.l1_batch_number, prover_jobs_fri.circuit_id,\n                prover_jobs_fri.aggregation_round, prover_jobs_fri.sequence_number, prover_jobs_fri.depth,\n                prover_jobs_fri.is_node_final_proof\n                "
+  },
+  "d19755a5d09e01a5203d52ab440ef959d22cf05037813161097cc278f7037862": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8",
+          "Text",
+          "Text",
+          "Int8"
+        ]
+      }
+    },
+    "query": "UPDATE application_monitor set heartbeat_update_at=$1,updated_at=now() where app_name=$2 and ip=$3 and start_at=$4"
   },
   "d1c82bd0b3c010569937ad7600760fa0c3aca7c9585bbf9598a5c0515b431b26": {
     "describe": {

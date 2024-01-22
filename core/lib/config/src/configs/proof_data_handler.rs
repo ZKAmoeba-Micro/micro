@@ -11,7 +11,7 @@ pub enum ProtocolVersionLoadingMode {
 #[derive(Debug, Deserialize, Clone, PartialEq)]
 pub struct ProofDataHandlerConfig {
     pub http_port: u16,
-    pub proof_generation_timeout_in_secs: u16,
+    pub proof_generation_timeout_in_secs: u64,
     pub protocol_version_loading_mode: ProtocolVersionLoadingMode,
     pub fri_protocol_version_id: u16,
     //Task polling interval, in milliseconds

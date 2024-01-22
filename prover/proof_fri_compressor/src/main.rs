@@ -5,6 +5,7 @@ use micro_config::configs::{FriProofCompressorConfig, PostgresConfig};
 use micro_dal::ConnectionPool;
 use micro_env_config::{object_store::ProverObjectStoreConfig, FromEnv};
 use micro_object_store::ObjectStoreFactory;
+use micro_prover_fri_utils::app_monitor::{AppMonitor, AppMonitorJob};
 use micro_queued_job_processor::JobProcessor;
 use micro_utils::wait_for_tasks::wait_for_tasks;
 use prometheus_exporter::PrometheusExporterConfig;
@@ -60,6 +61,7 @@ async fn main() -> anyhow::Result<()> {
     let blob_store = ObjectStoreFactory::new(object_store_config.0)
         .create_store()
         .await;
+
     let proof_compressor = ProofCompressor::new(
         blob_store,
         pool,
@@ -90,6 +92,14 @@ async fn main() -> anyhow::Result<()> {
     let mut tasks = vec![tokio::spawn(
         proof_compressor.run(stop_receiver.clone(), opt.number_of_iterations),
     )];
+
+    if let Some(url) = config.app_monitor_url {
+        if let Some(interval) = config.retry_interval_ms {
+            let app_monitor =
+                AppMonitor::new("micro_proof_fri_compressor".to_string(), interval, url);
+            tasks.push(tokio::spawn(app_monitor.run(stop_receiver.clone())));
+        }
+    }
 
     if config.prometheus_listener_port != 0 {
         let prometheus_config = PrometheusExporterConfig::push(

@@ -24,6 +24,8 @@ mod tests {
             last_l1_batch_to_process: None,
             force_process_block: Some(1),
             shall_save_to_public_bucket: true,
+            app_monitor_url: Some("http://127.0.0.1:3000".to_string()),
+            retry_interval_ms: Some(30000),
         }
     }
 
@@ -37,6 +39,8 @@ mod tests {
             FRI_WITNESS_BLOCKS_PROVING_PERCENTAGE="30"
             FRI_WITNESS_FORCE_PROCESS_BLOCK="1"
             FRI_WITNESS_SHALL_SAVE_TO_PUBLIC_BUCKET=true
+            FRI_WITNESS_APP_MONITOR_URL="http://127.0.0.1:3000"
+            FRI_WITNESS_RETRY_INTERVAL_MS=30000
         "#;
         lock.set_env(config);
 
