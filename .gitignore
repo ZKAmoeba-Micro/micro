@@ -75,3 +75,5 @@ verified_sources
 hyperchain-*.yml
 /etc/hyperchains/prover-keys
 /etc/hyperchains/artifacts
+
+/prover/prover_fri_dashboard/ui

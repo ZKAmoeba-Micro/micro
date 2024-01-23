@@ -13,6 +13,7 @@ use micro_config::{
 use micro_dal::ConnectionPool;
 use micro_env_config::FromEnv;
 use micro_web3_decl::jsonrpsee::http_client::HttpClientBuilder;
+use tower_http::services::ServeDir;
 
 mod application;
 mod application_monitor;
@@ -64,6 +65,7 @@ async fn main() -> anyhow::Result<()> {
         .route("/application", get(application::get))
         .route("/application/add", post(application::add))
         .route("/application/update", post(application::update))
+        .nest_service("/", ServeDir::new("/ui"))
         .with_state(app_state);
 
     let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{}", config.port))
