@@ -12,7 +12,7 @@ use crate::{dashboard::Dashboard, error::DashboardError};
 pub struct Task {
     pub batch_number: u64,
     pub prove_status: String,       // data: completed number and all number
-    pub compression_status: String, // data: queued, in_progress, successful, failed, sent_to_server
+    pub compression_status: String, // data: queued, in_progress, successful, failed, sent_to_server, null
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -53,9 +53,14 @@ pub async fn get(
                     batch_number: item.l1_batch_number.0 as u64,
                     prove_status: format!(
                         "{} / {}",
-                        item.prover_status_successful_count, item.prover_status_all_count
+                        item.prover_status_successful_count
+                            .map_or("None".to_string(), |i| i.to_string()),
+                        item.prover_status_all_count
+                            .map_or("None".to_string(), |i| i.to_string())
                     ),
-                    compression_status: item.compression_status,
+                    compression_status: item
+                        .compression_status
+                        .map_or("None".to_string(), |i| i.to_string()),
                 })
                 .collect();
 

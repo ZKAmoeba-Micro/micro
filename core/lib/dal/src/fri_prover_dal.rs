@@ -432,9 +432,10 @@ impl FriProverDal<'_, '_> {
                 T1 
                 GROUP BY T1.l1_batch_number
             )
-            SELECT T2.l1_batch_number, T2.prover_status_successful, T2.prover_status_all, pcjf.status 
+            SELECT T2.l1_batch_number AS "l1_batch_number!", T2.prover_status_successful, T2.prover_status_all, pcjf.status AS "compression_status?"
             FROM T2 
-            LEFT JOIN proof_compression_jobs_fri pcjf ON T2.l1_batch_number = pcjf.l1_batch_number"#,
+            LEFT JOIN proof_compression_jobs_fri pcjf ON T2.l1_batch_number = pcjf.l1_batch_number
+            ORDER BY T2.l1_batch_number DESC"#,
             offset as i64,
             limit as i64,
         )
@@ -443,10 +444,10 @@ impl FriProverDal<'_, '_> {
         .into_iter()
         .map(|row| {
             ProverBatchJobStatus {
-                l1_batch_number: L1BatchNumber(row.l1_batch_number.unwrap() as u32),
-                prover_status_successful_count: row.prover_status_successful.unwrap().to_u64().unwrap(),
-                prover_status_all_count: row.prover_status_all.unwrap().to_u64().unwrap(),
-                compression_status: row.status,
+                l1_batch_number: L1BatchNumber(row.l1_batch_number as u32),
+                prover_status_successful_count: row.prover_status_successful.map(|i| i.to_u64().unwrap()),
+                prover_status_all_count: row.prover_status_all.map(|i| i.to_u64().unwrap()),
+                compression_status: row.compression_status,
             }
         })
         .collect();

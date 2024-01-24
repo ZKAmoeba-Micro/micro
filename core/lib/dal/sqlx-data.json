@@ -294,19 +294,19 @@
         }
       ],
       "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
         true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true
+        false,
+        false,
+        false,
+        false
       ],
       "parameters": {
         "Left": [
@@ -8089,45 +8089,6 @@
     },
     "query": "SELECT id,verification_address,l1_batch_number,storage_index FROM ( SELECT id,verification_address,l1_batch_number,storage_index,status,tx_hash,COUNT(*) OVER (PARTITION BY verification_address) AS total_count FROM assignments WHERE status IN ('failed', 'be_punished') ORDER BY created_at ) AS subquery WHERE total_count > 0 AND status = 'be_punished' and tx_hash is null"
   },
-  "986a4c802c6e5df6a3e03e95758668f176e19a137d48e4d446afd28769f83de4": {
-    "describe": {
-      "columns": [
-        {
-          "name": "l1_batch_number",
-          "ordinal": 0,
-          "type_info": "Int8"
-        },
-        {
-          "name": "prover_status_successful",
-          "ordinal": 1,
-          "type_info": "Numeric"
-        },
-        {
-          "name": "prover_status_all",
-          "ordinal": 2,
-          "type_info": "Numeric"
-        },
-        {
-          "name": "status",
-          "ordinal": 3,
-          "type_info": "Text"
-        }
-      ],
-      "nullable": [
-        true,
-        true,
-        true,
-        false
-      ],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Int8"
-        ]
-      }
-    },
-    "query": "WITH T2 AS (\n                WITH T1 AS (\n                    SELECT \n                        l1_batch_number, \n                        CASE WHEN T1.status = 'successful' THEN 'successful' ELSE 'others' END AS status_name,\n                        COUNT(*) AS C \n                    FROM prover_jobs_fri T1 \n                    WHERE l1_batch_number IN (SELECT l1_batch_number FROM witness_inputs_fri ORDER BY l1_batch_number DESC OFFSET $1 LIMIT $2) \n                    GROUP BY l1_batch_number, status_name\n                )\n                SELECT \n                    T1.l1_batch_number,\n                    SUM(CASE WHEN status_name = 'successful' THEN C ELSE 0 END) \"prover_status_successful\",\n                    SUM(C) \"prover_status_all\"\n                FROM\n                T1 \n                GROUP BY T1.l1_batch_number\n            )\n            SELECT T2.l1_batch_number, T2.prover_status_successful, T2.prover_status_all, pcjf.status \n            FROM T2 \n            LEFT JOIN proof_compression_jobs_fri pcjf ON T2.l1_batch_number = pcjf.l1_batch_number"
-  },
   "987fcbbd716648c7c368462643f13d8001d5c6d197add90613ae21d21fdef79b": {
     "describe": {
       "columns": [],
@@ -10695,6 +10656,45 @@
       }
     },
     "query": "UPDATE gpu_prover_queue_fri SET instance_status = $1, updated_at = now() WHERE instance_host = $2::text::inet AND instance_port = $3 AND zone = $4\n                "
+  },
+  "de5052d8b084d0b650e869f944045602a64f183a74d84d060d9e1d4e32828837": {
+    "describe": {
+      "columns": [
+        {
+          "name": "l1_batch_number!",
+          "ordinal": 0,
+          "type_info": "Int8"
+        },
+        {
+          "name": "prover_status_successful",
+          "ordinal": 1,
+          "type_info": "Numeric"
+        },
+        {
+          "name": "prover_status_all",
+          "ordinal": 2,
+          "type_info": "Numeric"
+        },
+        {
+          "name": "compression_status?",
+          "ordinal": 3,
+          "type_info": "Text"
+        }
+      ],
+      "nullable": [
+        false,
+        null,
+        null,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Int8",
+          "Int8"
+        ]
+      }
+    },
+    "query": "WITH T2 AS (\n                WITH T1 AS (\n                    SELECT \n                        l1_batch_number, \n                        CASE WHEN T1.status = 'successful' THEN 'successful' ELSE 'others' END AS status_name,\n                        COUNT(*) AS C \n                    FROM prover_jobs_fri T1 \n                    WHERE l1_batch_number IN (SELECT l1_batch_number FROM witness_inputs_fri ORDER BY l1_batch_number DESC OFFSET $1 LIMIT $2) \n                    GROUP BY l1_batch_number, status_name\n                )\n                SELECT \n                    T1.l1_batch_number,\n                    SUM(CASE WHEN status_name = 'successful' THEN C ELSE 0 END) \"prover_status_successful\",\n                    SUM(C) \"prover_status_all\"\n                FROM\n                T1 \n                GROUP BY T1.l1_batch_number\n            )\n            SELECT T2.l1_batch_number AS \"l1_batch_number!\", T2.prover_status_successful, T2.prover_status_all, pcjf.status AS \"compression_status?\"\n            FROM T2 \n            LEFT JOIN proof_compression_jobs_fri pcjf ON T2.l1_batch_number = pcjf.l1_batch_number\n            ORDER BY T2.l1_batch_number DESC"
   },
   "de960625b0fa0b766aacab74473fcd0332a3f7dc356648452a6a63189a8b7cc3": {
     "describe": {
