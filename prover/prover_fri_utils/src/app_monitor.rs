@@ -7,7 +7,6 @@ use std::{
 use anyhow::Context as _;
 use async_trait::async_trait;
 use jsonrpc_core::types::response::Failure as RpcFailure;
-use lazy_static::lazy_static;
 use micro_types::app_monitor::Status;
 use reqwest::Client;
 use thiserror::Error;
@@ -18,12 +17,6 @@ use tokio::{
 
 const ADD_URL: &str = "application/add";
 const UPDATE_URL: &str = "application/update";
-
-lazy_static! {
-    #[derive(Debug)]
-    static ref APP_MONITOR_HASH_SET: Arc<Mutex<HashMap<String, i64>>> = Arc::new(Mutex::new(HashMap::new()));
-}
-
 #[derive(Debug, Error, PartialEq)]
 pub enum RpcError {
     #[error("Unable to decode server response")]
@@ -41,6 +34,7 @@ pub struct AppMonitor {
     client: Client,
     rpc_addr: String,
     start_time: i64,
+    is_add: Option<bool>,
 }
 
 #[async_trait]
@@ -53,7 +47,6 @@ pub trait AppMonitorJob: Sync + Send {
     {
         loop {
             if *stop_receiver.borrow() {
-                APP_MONITOR_HASH_SET.lock().await.clear();
                 return Ok(());
             }
             self.run_routine_task()
@@ -84,6 +77,7 @@ impl AppMonitor {
             client: Client::new(),
             rpc_addr: rpc_addr,
             start_time: ts1,
+            is_add: Some(false),
         }
     }
     async fn execute(&self, method: String) -> Option<String> {
@@ -160,30 +154,23 @@ impl AppMonitor {
 #[async_trait]
 impl AppMonitorJob for AppMonitor {
     async fn run_routine_task(&mut self) -> anyhow::Result<()> {
-        let binding = APP_MONITOR_HASH_SET.clone();
-        let mut binding = binding.lock().await;
-        let val = binding.get(&self.app_name);
-        match val {
-            Some(_) => {
-                let res = self.execute(UPDATE_URL.to_string()).await;
-                match res {
-                    Some(_) => {
-                        binding.insert(self.app_name.clone(), timestamp());
+        match self.is_add {
+            Some(t) => {
+                if t {
+                    let _res = self.execute(UPDATE_URL.to_string()).await;
+                } else {
+                    let res = self.execute(ADD_URL.to_string()).await;
+                    match res {
+                        Some(_) => {
+                            self.is_add = Some(true);
+                        }
+                        None => {}
                     }
-                    None => {}
                 }
             }
-            None => {
-                self.start_time = timestamp();
-                let res = self.execute(ADD_URL.to_string()).await;
-                match res {
-                    Some(_) => {
-                        binding.insert(self.app_name.clone(), timestamp());
-                    }
-                    None => {}
-                }
-            }
+            None => {}
         }
+
         Ok(())
     }
 
