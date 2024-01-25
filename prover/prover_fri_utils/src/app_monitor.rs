@@ -1,15 +1,29 @@
-use std::time::{Duration, SystemTime, UNIX_EPOCH};
+use std::{
+    collections::HashMap,
+    sync::Arc,
+    time::{Duration, SystemTime, UNIX_EPOCH},
+};
 
 use anyhow::Context as _;
 use async_trait::async_trait;
 use jsonrpc_core::types::response::Failure as RpcFailure;
+use lazy_static::lazy_static;
 use micro_types::app_monitor::Status;
 use reqwest::Client;
 use thiserror::Error;
-use tokio::{sync::watch, time::sleep};
+use tokio::{
+    sync::{watch, Mutex},
+    time::sleep,
+};
 
 const ADD_URL: &str = "application/add";
 const UPDATE_URL: &str = "application/update";
+
+lazy_static! {
+    #[derive(Debug)]
+    static ref APP_MONITOR_HASH_SET: Arc<Mutex<HashMap<String, i64>>> = Arc::new(Mutex::new(HashMap::new()));
+}
+
 #[derive(Debug, Error, PartialEq)]
 pub enum RpcError {
     #[error("Unable to decode server response")]
@@ -33,19 +47,18 @@ pub struct AppMonitor {
 pub trait AppMonitorJob: Sync + Send {
     /// Runs the routine task periodically in [`Self::polling_interval_ms()`] frequency.
     async fn run_routine_task(&mut self) -> anyhow::Result<()>;
-    async fn init(&mut self) -> anyhow::Result<()>;
     async fn run(mut self, stop_receiver: watch::Receiver<bool>) -> anyhow::Result<()>
     where
         Self: Sized,
     {
-        self.init().await.context("AppMonitorJob init()")?;
         loop {
             if *stop_receiver.borrow() {
+                APP_MONITOR_HASH_SET.lock().await.clear();
                 return Ok(());
             }
             self.run_routine_task()
                 .await
-                .context("AppMonitorJob run_routine_task()")?;
+                .context("AppMonitorJob run_routine_task fail")?;
             sleep(Duration::from_millis(self.polling_interval_ms())).await;
         }
     }
@@ -73,7 +86,7 @@ impl AppMonitor {
             start_time: ts1,
         }
     }
-    async fn execute(&self, method: String) {
+    async fn execute(&self, method: String) -> Option<String> {
         let mut ts1 = self.start_time;
         if method.eq(UPDATE_URL) {
             ts1 = timestamp();
@@ -93,13 +106,14 @@ impl AppMonitor {
         )
         .await;
         match result {
-            Ok(_res) => {
+            Ok(res) => {
                 // tracing::info!(
                 //     "app_monitor success app_name:{},message:{:?},res:{:#?}",
                 //     &self.app_name,
                 //     &message,
                 //     res
                 // );
+                Some(res)
             }
             Err(e) => {
                 tracing::error!(
@@ -108,6 +122,7 @@ impl AppMonitor {
                     &message,
                     e
                 );
+                None
             }
         }
     }
@@ -145,13 +160,33 @@ impl AppMonitor {
 #[async_trait]
 impl AppMonitorJob for AppMonitor {
     async fn run_routine_task(&mut self) -> anyhow::Result<()> {
-        self.execute(UPDATE_URL.to_string()).await;
+        let binding = APP_MONITOR_HASH_SET.clone();
+        let mut binding = binding.lock().await;
+        let val = binding.get(&self.app_name);
+        match val {
+            Some(_) => {
+                let res = self.execute(UPDATE_URL.to_string()).await;
+                match res {
+                    Some(_) => {
+                        binding.insert(self.app_name.clone(), timestamp());
+                    }
+                    None => {}
+                }
+            }
+            None => {
+                self.start_time = timestamp();
+                let res = self.execute(ADD_URL.to_string()).await;
+                match res {
+                    Some(_) => {
+                        binding.insert(self.app_name.clone(), timestamp());
+                    }
+                    None => {}
+                }
+            }
+        }
         Ok(())
     }
-    async fn init(&mut self) -> anyhow::Result<()> {
-        self.execute(ADD_URL.to_string()).await;
-        Ok(())
-    }
+
     fn polling_interval_ms(&self) -> u64 {
         self.retry_interval_ms
     }

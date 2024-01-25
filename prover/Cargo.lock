@@ -4069,6 +4069,7 @@ dependencies = [
  "anyhow",
  "async-trait",
  "jsonrpc-core",
+ "lazy_static",
  "micro_config",
  "micro_dal",
  "micro_object_store",
