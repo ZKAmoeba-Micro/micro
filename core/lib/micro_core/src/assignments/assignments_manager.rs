@@ -72,10 +72,13 @@ impl AssignmentsManager {
     }
     async fn send_be_punished_tx(&mut self) {
         let mut connection = self.pool.access_storage().await.unwrap();
-        let res = connection
+        let mut res = connection
             .assignments_dal()
             .get_punished_address_list()
             .await;
+
+        res.reverse();
+
         for (_id, address, l1_batch_number, event_index) in res {
             let abi_data = self
                 .deposit_abi
